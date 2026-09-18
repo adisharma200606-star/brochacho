@@ -1,0 +1,15 @@
+[
+  {"name": "youtube", "display": "YouTube", "aliases": ["yt"], "kind": "site", "target": "https://www.youtube.com", "profile": "personal", "searchTemplate": "https://www.youtube.com/results?search_query={q}"},
+  {"name": "youtube music", "display": "YouTube Music", "aliases": ["ytm"], "kind": "site", "target": "https://music.youtube.com", "profile": "personal"},
+  {"name": "gmail", "display": "Gmail", "aliases": ["mail"], "kind": "site", "target": "https://mail.google.com", "profile": "personal"},
+  {"name": "google", "display": "Google", "aliases": ["g"], "kind": "site", "target": "https://www.google.com", "profile": "personal", "searchTemplate": "https://www.google.com/search?q={q}"},
+  {"name": "github", "display": "GitHub", "aliases": ["gh"], "kind": "site", "target": "https://github.com", "profile": "personal", "searchTemplate": "https://github.com/search?q={q}"},
+  {"name": "linkedin", "display": "LinkedIn", "aliases": ["li"], "kind": "site", "target": "https://www.linkedin.com/feed/", "profile": "personal"},
+  {"name": "claude", "display": "Claude", "aliases": [], "kind": "site", "target": "https://claude.ai", "profile": "personal"},
+  {"name": "whatsapp", "display": "WhatsApp", "aliases": ["wa"], "kind": "app", "target": "net.whatsapp.WhatsApp"},
+  {"name": "spotify", "display": "Spotify", "aliases": [], "kind": "app", "target": "com.spotify.client"},
+  {"name": "steam", "display": "Steam", "aliases": [], "kind": "app", "target": "com.valvesoftware.steam"},
+  {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"},
+  {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"},
+  {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"}
+]

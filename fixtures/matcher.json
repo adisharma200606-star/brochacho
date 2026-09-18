@@ -1,0 +1,1619 @@
+{
+  "catalog": [
+    {
+      "name": "youtube",
+      "display": "YouTube",
+      "aliases": [
+        "yt"
+      ],
+      "kind": "site",
+      "target": "https://www.youtube.com",
+      "profile": "personal",
+      "searchTemplate": "https://www.youtube.com/results?search_query={q}"
+    },
+    {
+      "name": "youtube music",
+      "display": "YouTube Music",
+      "aliases": [
+        "ytm"
+      ],
+      "kind": "site",
+      "target": "https://music.youtube.com",
+      "profile": "personal"
+    },
+    {
+      "name": "gmail",
+      "display": "Gmail",
+      "aliases": [
+        "mail"
+      ],
+      "kind": "site",
+      "target": "https://mail.google.com",
+      "profile": "personal"
+    },
+    {
+      "name": "google",
+      "display": "Google",
+      "aliases": [
+        "g"
+      ],
+      "kind": "site",
+      "target": "https://www.google.com",
+      "profile": "personal",
+      "searchTemplate": "https://www.google.com/search?q={q}"
+    },
+    {
+      "name": "github",
+      "display": "GitHub",
+      "aliases": [
+        "gh"
+      ],
+      "kind": "site",
+      "target": "https://github.com",
+      "profile": "personal",
+      "searchTemplate": "https://github.com/search?q={q}"
+    },
+    {
+      "name": "linkedin",
+      "display": "LinkedIn",
+      "aliases": [
+        "li"
+      ],
+      "kind": "site",
+      "target": "https://www.linkedin.com/feed/",
+      "profile": "personal"
+    },
+    {
+      "name": "claude",
+      "display": "Claude",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://claude.ai",
+      "profile": "personal"
+    },
+    {
+      "name": "whatsapp",
+      "display": "WhatsApp",
+      "aliases": [
+        "wa"
+      ],
+      "kind": "app",
+      "target": "net.whatsapp.WhatsApp"
+    },
+    {
+      "name": "spotify",
+      "display": "Spotify",
+      "aliases": [],
+      "kind": "app",
+      "target": "com.spotify.client"
+    },
+    {
+      "name": "steam",
+      "display": "Steam",
+      "aliases": [],
+      "kind": "app",
+      "target": "com.valvesoftware.steam"
+    },
+    {
+      "name": "vs code",
+      "display": "VS Code",
+      "aliases": [
+        "code",
+        "visual studio code"
+      ],
+      "kind": "app",
+      "target": "com.microsoft.VSCode"
+    },
+    {
+      "name": "downloads",
+      "display": "Downloads",
+      "aliases": [
+        "dl"
+      ],
+      "kind": "path",
+      "target": "~/Downloads"
+    },
+    {
+      "name": "desktop",
+      "display": "Desktop",
+      "aliases": [],
+      "kind": "path",
+      "target": "~/Desktop"
+    }
+  ],
+  "cases": [
+    {
+      "input": "yt",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "YT",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "youtube",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "you tube",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "You-Tube!",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "ytm",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://music.youtube.com",
+        "profile": "personal",
+        "entry": "youtube music"
+      }
+    },
+    {
+      "input": "youtube music",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://music.youtube.com",
+        "profile": "personal",
+        "entry": "youtube music"
+      }
+    },
+    {
+      "input": "g",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "google",
+          "band": "exact"
+        },
+        {
+          "name": "github",
+          "band": "prefix"
+        },
+        {
+          "name": "gmail",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.google.com",
+        "profile": "personal",
+        "entry": "google"
+      }
+    },
+    {
+      "input": "gmail",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "mail",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "gh",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "github",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://github.com",
+        "profile": "personal",
+        "entry": "github"
+      }
+    },
+    {
+      "input": "li",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "linkedin",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.linkedin.com/feed/",
+        "profile": "personal",
+        "entry": "linkedin"
+      }
+    },
+    {
+      "input": "claude",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://claude.ai",
+        "profile": "personal",
+        "entry": "claude"
+      }
+    },
+    {
+      "input": "wa",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "whatsapp",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "net.whatsapp.WhatsApp",
+        "entry": "whatsapp"
+      }
+    },
+    {
+      "input": "steam",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "steam",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.valvesoftware.steam",
+        "entry": "steam"
+      }
+    },
+    {
+      "input": "code",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "vs code",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "vscode",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "visual studio code",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "dl",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "downloads",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Downloads",
+        "entry": "downloads"
+      }
+    },
+    {
+      "input": "desktop",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "desktop",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Desktop",
+        "entry": "desktop"
+      }
+    },
+    {
+      "input": "y",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "prefix"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "you",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "prefix"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "gm",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "git",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "github",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://github.com",
+        "profile": "personal",
+        "entry": "github"
+      }
+    },
+    {
+      "input": "link",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "linkedin",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.linkedin.com/feed/",
+        "profile": "personal",
+        "entry": "linkedin"
+      }
+    },
+    {
+      "input": "cl",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://claude.ai",
+        "profile": "personal",
+        "entry": "claude"
+      }
+    },
+    {
+      "input": "whats",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "whatsapp",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "net.whatsapp.WhatsApp",
+        "entry": "whatsapp"
+      }
+    },
+    {
+      "input": "spot",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "spotify",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.spotify.client",
+        "entry": "spotify"
+      }
+    },
+    {
+      "input": "vsc",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "visual",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "down",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "downloads",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Downloads",
+        "entry": "downloads"
+      }
+    },
+    {
+      "input": "desk",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "desktop",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Desktop",
+        "entry": "desktop"
+      }
+    },
+    {
+      "input": "d",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "downloads",
+          "band": "prefix"
+        },
+        {
+          "name": "desktop",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Downloads",
+        "entry": "downloads"
+      }
+    },
+    {
+      "input": "music",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube music",
+          "band": "wordPrefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://music.youtube.com",
+        "profile": "personal",
+        "entry": "youtube music"
+      }
+    },
+    {
+      "input": "studio",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "wordPrefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "stm",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "steam",
+          "band": "subsequence"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.valvesoftware.steam",
+        "entry": "steam"
+      }
+    },
+    {
+      "input": "ytb",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "subsequence"
+        },
+        {
+          "name": "youtube music",
+          "band": "subsequence"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "linkdin",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "linkedin",
+          "band": "subsequence"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.linkedin.com/feed/",
+        "profile": "personal",
+        "entry": "linkedin"
+      }
+    },
+    {
+      "input": "s",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "steam",
+          "band": "prefix"
+        },
+        {
+          "name": "spotify",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.valvesoftware.steam",
+        "entry": "steam"
+      }
+    },
+    {
+      "input": "s",
+      "usage": {
+        "spotify": 3
+      },
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "spotify",
+          "band": "prefix"
+        },
+        {
+          "name": "steam",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.spotify.client",
+        "entry": "spotify"
+      }
+    },
+    {
+      "input": "c",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "vs code",
+          "band": "prefix"
+        },
+        {
+          "name": "claude",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.microsoft.VSCode",
+        "entry": "vs code"
+      }
+    },
+    {
+      "input": "c",
+      "usage": {
+        "claude": 5
+      },
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "prefix"
+        },
+        {
+          "name": "vs code",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://claude.ai",
+        "profile": "personal",
+        "entry": "claude"
+      }
+    },
+    {
+      "input": "g",
+      "usage": {
+        "gmail": 99
+      },
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "google",
+          "band": "exact"
+        },
+        {
+          "name": "gmail",
+          "band": "prefix"
+        },
+        {
+          "name": "github",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.google.com",
+        "profile": "personal",
+        "entry": "google"
+      }
+    },
+    {
+      "input": "",
+      "usage": {},
+      "mode": "empty",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "none"
+        },
+        {
+          "name": "desktop",
+          "band": "none"
+        },
+        {
+          "name": "downloads",
+          "band": "none"
+        },
+        {
+          "name": "github",
+          "band": "none"
+        }
+      ],
+      "plan": null
+    },
+    {
+      "input": "    ",
+      "usage": {},
+      "mode": "empty",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "none"
+        },
+        {
+          "name": "desktop",
+          "band": "none"
+        },
+        {
+          "name": "downloads",
+          "band": "none"
+        },
+        {
+          "name": "github",
+          "band": "none"
+        }
+      ],
+      "plan": null
+    },
+    {
+      "input": "!!!",
+      "usage": {},
+      "mode": "empty",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "none"
+        },
+        {
+          "name": "desktop",
+          "band": "none"
+        },
+        {
+          "name": "downloads",
+          "band": "none"
+        },
+        {
+          "name": "github",
+          "band": "none"
+        }
+      ],
+      "plan": null
+    },
+    {
+      "input": "zzz",
+      "usage": {},
+      "mode": "none",
+      "confident": false,
+      "query": null,
+      "results": [],
+      "plan": null
+    },
+    {
+      "input": "xbox",
+      "usage": {},
+      "mode": "none",
+      "confident": false,
+      "query": null,
+      "results": [],
+      "plan": null
+    },
+    {
+      "input": "clod",
+      "usage": {},
+      "mode": "none",
+      "confident": false,
+      "query": null,
+      "results": [],
+      "plan": null
+    },
+    {
+      "input": "yt berserk amv",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "berserk amv",
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com/results?search_query=berserk%20amv",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "youtube lofi",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "lofi",
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com/results?search_query=lofi",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "you tube lofi beats",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "lofi beats",
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com/results?search_query=lofi%20beats",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "g how to tune a guitar",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "how to tune a guitar",
+      "results": [
+        {
+          "name": "google",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.google.com/search?q=how%20to%20tune%20a%20guitar",
+        "profile": "personal",
+        "entry": "google"
+      }
+    },
+    {
+      "input": "google weather bengaluru",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "weather bengaluru",
+      "results": [
+        {
+          "name": "google",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.google.com/search?q=weather%20bengaluru",
+        "profile": "personal",
+        "entry": "google"
+      }
+    },
+    {
+      "input": "gh dynamicnotchkit",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "dynamicnotchkit",
+      "results": [
+        {
+          "name": "github",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://github.com/search?q=dynamicnotchkit",
+        "profile": "personal",
+        "entry": "github"
+      }
+    },
+    {
+      "input": "open yt arctic monkeys 505",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "arctic monkeys 505",
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com/results?search_query=arctic%20monkeys%20505",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "open youtube",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "play me some youtube",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "exact"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "brochacho open steam",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "steam",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.valvesoftware.steam",
+        "entry": "steam"
+      }
+    },
+    {
+      "input": "go to gmail",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "gmail inbox",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "downloads folder",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "downloads",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Downloads",
+        "entry": "downloads"
+      }
+    },
+    {
+      "input": "open the downloads folder",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "downloads",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openPath",
+        "path": "~/Downloads",
+        "entry": "downloads"
+      }
+    },
+    {
+      "input": "open",
+      "usage": {},
+      "mode": "none",
+      "confident": false,
+      "query": null,
+      "results": [],
+      "plan": null
+    },
+    {
+      "input": "g mail",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "gmail",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://mail.google.com",
+        "profile": "personal",
+        "entry": "gmail"
+      }
+    },
+    {
+      "input": "what's app",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "whatsapp",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "net.whatsapp.WhatsApp",
+        "entry": "whatsapp"
+      }
+    },
+    {
+      "input": "linked in",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "linkedin",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.linkedin.com/feed/",
+        "profile": "personal",
+        "entry": "linkedin"
+      }
+    },
+    {
+      "input": "you to",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "prefix"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "youto",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "prefixEdit"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "youtwo",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "prefixEdit"
+        },
+        {
+          "name": "youtube music",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "utube",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "youtube",
+          "band": "edit"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://www.youtube.com",
+        "profile": "personal",
+        "entry": "youtube"
+      }
+    },
+    {
+      "input": "spotifi",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "spotify",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.spotify.client",
+        "entry": "spotify"
+      }
+    },
+    {
+      "input": "get hub",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "github",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://github.com",
+        "profile": "personal",
+        "entry": "github"
+      }
+    },
+    {
+      "input": "steem",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "steam",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.valvesoftware.steam",
+        "entry": "steam"
+      }
+    },
+    {
+      "input": "cloud",
+      "usage": {},
+      "mode": "open",
+      "confident": false,
+      "query": null,
+      "results": [
+        {
+          "name": "claude",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openURL",
+        "url": "https://claude.ai",
+        "profile": "personal",
+        "entry": "claude"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brochacho notch — feel test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@500&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mat: #F2C21A;
+    --mat-deep: #D9A90C;
+    --ink: #17140C;
+    --paper: #FFF6D6;
+    --rule: #17140C;
+    --muted: #4A4020;
+    --phosphor: #FFB000;
+    --glow: 6px;
+    --notch-font: 'VT323', 'Courier New', monospace;
+    --notch-size: 22px;
+    --blink: 530ms;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --mat: #1B1706; --mat-deep: #2A2409; --ink: #F7E7A1; --paper: #26200A; --rule: #F2C21A; --muted: #C9B462;
+    }
+  }
+  :root[data-theme="dark"] {
+    --mat: #1B1706; --mat-deep: #2A2409; --ink: #F7E7A1; --paper: #26200A; --rule: #F2C21A; --muted: #C9B462;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--mat); color: var(--ink);
+    font-family: 'Archivo', 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.45;
+  }
+  .wrap { max-width: 600px; margin: 0 auto; padding: 20px 16px 64px; }
+  h1 { font-weight: 800; font-size: 26px; line-height: 1.1; margin: 4px 0 6px; letter-spacing: -0.01em; }
+  .lede { margin: 0 0 16px; color: var(--muted); max-width: 46ch; }
+
+  /* ---- the simulated Mac screen ---- */
+  .stage-holder { position: sticky; top: 0; z-index: 5; padding: 8px 0 10px; background: var(--mat); }
+  .stage {
+    position: relative; height: 270px; border-radius: 14px; overflow: hidden;
+    border: 3px solid var(--rule); box-shadow: 6px 6px 0 var(--rule);
+    background: linear-gradient(168deg, #3A5560 0%, #24353D 55%, #1A262C 100%);
+    touch-action: manipulation;
+  }
+  .menubar {
+    position: absolute; inset: 0 0 auto 0; height: 26px; display: flex; justify-content: space-between; align-items: center;
+    padding: 0 12px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.86); background: rgba(0,0,0,.22);
+  }
+  .menubar span + span { margin-left: 12px; }
+  .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    background: #000; overflow: hidden; border-radius: 0 0 9px 9px;
+    width: 130px; height: 26px; will-change: width, height; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .notch:focus-visible { outline: 3px solid var(--phosphor); outline-offset: 2px; }
+  .content {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    padding: 34px 16px 14px; color: var(--phosphor);
+    font-family: var(--notch-font); font-size: var(--notch-size); line-height: 1.15;
+    text-shadow: 0 0 var(--glow) var(--phosphor);
+  }
+  .content[hidden] { display: none; }
+  .inputrow { display: flex; align-items: center; gap: 8px; position: relative; min-height: 1.3em; }
+  .typed { white-space: pre; overflow: hidden; }
+  .cursor { display: inline-block; width: .55em; height: 1em; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor);
+    animation: blink var(--blink) steps(1) infinite; vertical-align: -0.12em; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #cmd {
+    position: absolute; inset: 0; width: 100%; opacity: 0; font-size: 16px; border: 0; background: transparent; color: transparent;
+    caret-color: transparent;
+  }
+  .go {
+    margin-left: auto; position: relative; z-index: 2; font: inherit; color: #000; background: var(--phosphor); border: 0;
+    padding: 0 10px; min-height: 30px; min-width: 44px; text-shadow: none; cursor: pointer;
+  }
+  .rows { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
+  .rows button {
+    all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; gap: 10px;
+    padding: 3px 8px; min-height: 32px; align-items: center; cursor: pointer; opacity: .72;
+  }
+  .rows button:focus-visible { outline: 2px solid var(--phosphor); }
+  .rows li:first-child button { background: var(--phosphor); color: #000; text-shadow: none; opacity: 1; }
+  .rows .where { font-size: .82em; white-space: nowrap; }
+  .line { min-height: 1.3em; }
+  .pulltitle { margin-bottom: 4px; }
+  .pullmeta { font-size: .8em; opacity: .75; overflow-wrap: anywhere; }
+  .pullbtn { all: unset; margin-top: 10px; padding: 2px 12px; min-height: 36px; display: inline-flex; align-items: center;
+    border: 2px solid var(--phosphor); cursor: pointer; }
+  .pullbtn:focus-visible { outline: 2px solid #fff; }
+  .log {
+    position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 13px; color: rgba(255,255,255,.92);
+    background: rgba(0,0,0,.35); padding: 6px 10px; border-radius: 8px; min-height: 32px; display: flex; align-items: center;
+    justify-content: space-between; gap: 10px;
+  }
+  .log .ms { font-variant-numeric: tabular-nums; white-space: nowrap; opacity: .8; }
+  .chip {
+    position: fixed; z-index: 20; padding: 4px 10px; background: var(--ink); color: var(--mat); font-size: 12px; font-weight: 600;
+    border-radius: 999px; pointer-events: none; transition: transform .42s cubic-bezier(.5,-0.2,.7,.4), opacity .42s;
+  }
+
+  /* ---- gesture buttons ---- */
+  .gestures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 6px 0 8px; }
+  .btn {
+    font: inherit; font-weight: 800; color: var(--ink); background: var(--paper); border: 3px solid var(--rule);
+    box-shadow: 4px 4px 0 var(--rule); padding: 10px 8px; min-height: 52px; cursor: pointer; border-radius: 0;
+  }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--rule); }
+  .btn:focus-visible { outline: 3px solid var(--phosphor); outline-offset: 2px; }
+  .btn small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
+  .droprow { display: flex; gap: 8px; margin: 0 0 18px; }
+  .droprow input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 8px 10px; border: 3px solid var(--rule);
+    background: var(--paper); color: var(--ink); border-radius: 0; }
+  .note { font-size: 14px; color: var(--muted); margin: 0 0 18px; max-width: 58ch; }
+
+  /* ---- tuning ---- */
+  details { border-top: 3px solid var(--rule); padding: 4px 0 8px; }
+  details:last-of-type { border-bottom: 3px solid var(--rule); }
+  summary { font-weight: 800; font-size: 19px; padding: 10px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-weight: 400; }
+  details[open] summary::after { content: '–'; }
+  summary:focus-visible { outline: 3px solid var(--phosphor); }
+  .field { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline; margin: 10px 0 14px; }
+  .field label { font-weight: 600; }
+  .field output { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .field input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--ink); min-height: 32px; }
+  .field select, .field input[type=color] { grid-column: 1 / -1; font: inherit; font-size: 16px; min-height: 44px; border: 3px solid var(--rule);
+    background: var(--paper); color: var(--ink); border-radius: 0; padding: 4px 8px; width: 100%; }
+  .swatches { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
+  .swatches button { width: 44px; height: 44px; border: 3px solid var(--rule); border-radius: 0; cursor: pointer; padding: 0; }
+  .swatches button[aria-pressed=true] { box-shadow: 0 0 0 3px var(--mat), 0 0 0 6px var(--rule); }
+  .hint { font-size: 14px; color: var(--muted); margin: -6px 0 12px; }
+  .rowbtns { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 12px; }
+  textarea { width: 100%; min-height: 230px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 10px; border: 3px solid var(--rule);
+    background: var(--paper); color: var(--ink); border-radius: 0; }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } .chip { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Brochacho, in the notch</h1>
+  <p class="lede">This is the top of your Mac screen, zoomed in. Try the three gestures, then tune the feel. The numbers you settle on go straight into the Mac app.</p>
+
+  <div class="stage-holder">
+    <div class="stage" id="stage">
+      <div class="menubar"><div><span>Brave</span><span>File</span><span>Edit</span></div><div id="clock"></div></div>
+      <div class="notch" id="notch" role="button" tabindex="0" aria-label="The notch. Tap to get something back from your stash.">
+        <div class="content" id="viewInput" hidden>
+          <div class="inputrow">
+            <span aria-hidden="true">&gt;</span><span class="typed" id="typed"></span><span class="cursor" aria-hidden="true"></span>
+            <label for="cmd" style="position:absolute;left:-9999px">Name of the thing to open</label>
+            <input id="cmd" type="text" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+            <button class="go" id="go" type="button" aria-label="Open the top match">&crarr;</button>
+          </div>
+          <ul class="rows" id="rows"></ul>
+        </div>
+        <div class="content" id="viewLine" hidden><div class="line" id="lineText"></div></div>
+        <div class="content" id="viewPull" hidden>
+          <div class="pulltitle" id="pullTitle"></div>
+          <div class="pullmeta" id="pullMeta"></div>
+          <button class="pullbtn" id="anotherBtn" type="button">another</button>
+        </div>
+      </div>
+      <div class="log" aria-live="polite"><span id="logText">Nothing opened yet.</span><span class="ms" id="logMs"></span></div>
+    </div>
+  </div>
+
+  <div class="gestures">
+    <button class="btn" id="btnType" type="button">Type<small>the hotkey</small></button>
+    <button class="btn" id="btnDrop" type="button">Drop<small>drag onto notch</small></button>
+    <button class="btn" id="btnPull" type="button">Pull<small>tap the notch</small></button>
+  </div>
+  <div class="droprow">
+    <label for="dropUrl" style="position:absolute;left:-9999px">Link to drop on the notch</label>
+    <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
+  </div>
+  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+
+  <details open>
+    <summary>Motion</summary>
+    <div class="field"><label for="stiffness">Snap</label><output id="o-stiffness"></output>
+      <input id="stiffness" type="range" min="80" max="700" step="10" data-key="motion.stiffness"></div>
+    <div class="field"><label for="damping">Settle</label><output id="o-damping"></output>
+      <input id="damping" type="range" min="8" max="50" step="1" data-key="motion.damping"></div>
+    <p class="hint" id="bounce"></p>
+    <div class="rowbtns"><button class="btn" id="replay" type="button">Replay open and close</button></div>
+  </details>
+
+  <details>
+    <summary>Look</summary>
+    <div class="field"><label>Phosphor</label><span></span>
+      <div class="swatches" id="swatches"></div></div>
+    <div class="field"><label for="custom">Your own colour</label><span></span>
+      <input id="custom" type="color" data-key="look.phosphor"></div>
+    <div class="field"><label for="glow">Glow</label><output id="o-glow"></output>
+      <input id="glow" type="range" min="0" max="16" step="1" data-key="look.glow"></div>
+    <div class="field"><label for="font">Typeface</label><span></span>
+      <select id="font" data-key="look.font">
+        <option value="VT323">VT323 (old terminal)</option>
+        <option value="Share Tech Mono">Share Tech Mono (sharper)</option>
+        <option value="IBM Plex Mono">IBM Plex Mono (cleanest)</option>
+      </select></div>
+    <div class="field"><label for="textSize">Text size</label><output id="o-textSize"></output>
+      <input id="textSize" type="range" min="16" max="30" step="1" data-key="look.textSize"></div>
+    <div class="field"><label for="blink">Cursor blink</label><output id="o-blink"></output>
+      <input id="blink" type="range" min="250" max="1000" step="10" data-key="look.cursorBlinkMs"></div>
+  </details>
+
+  <details>
+    <summary>Voice</summary>
+    <p class="hint" id="voiceNote"></p>
+    <div class="field"><label for="voice">Voice</label><span></span>
+      <select id="voice" data-key="voice.voiceName"></select></div>
+    <div class="field"><label for="rate">Speed</label><output id="o-rate"></output>
+      <input id="rate" type="range" min="0.6" max="1.4" step="0.05" data-key="voice.rate"></div>
+    <div class="field"><label for="pitch">Pitch</label><output id="o-pitch"></output>
+      <input id="pitch" type="range" min="0.5" max="1.5" step="0.05" data-key="voice.pitch"></div>
+    <div class="field"><label for="frequency">How often he talks</label><output id="o-frequency"></output>
+      <input id="frequency" type="range" min="0" max="1" step="0.05" data-key="voice.frequency"></div>
+    <p class="hint">The amber line always shows. This only controls how often it is also spoken.</p>
+    <div class="rowbtns">
+      <button class="btn" id="sayLine" type="button">Say a line</button>
+      <button class="btn" id="mute" type="button" aria-pressed="false">Mute him</button>
+    </div>
+  </details>
+
+  <details>
+    <summary>Settings to copy</summary>
+    <p class="hint">Copy this and keep it. It becomes the theme block in the Mac app's config file.</p>
+    <textarea id="export" readonly aria-label="Settings as JSON"></textarea>
+    <div class="rowbtns">
+      <button class="btn" id="copy" type="button">Copy settings</button>
+      <button class="btn" id="reset" type="button">Reset to defaults</button>
+    </div>
+  </details>
+</div>
+
+<script>/*
+ * Brochacho reference core.
+ *
+ * This file is the source of truth for HOW the brain behaves. The Swift
+ * package BrochachoCore is a port of this file and must reproduce the golden
+ * fixtures in /fixtures exactly. Keep it dependency-free and deterministic:
+ * time and randomness are always injected.
+ */
+(function (root) {
+  'use strict';
+
+  // ---------------------------------------------------------------- text ----
+
+  /** Lowercase and strip everything except a-z and 0-9. "You Tube!" -> "youtube" */
+  function normalize(s) {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  /** Lowercase words split on anything that is not a-z / 0-9. */
+  function words(s) {
+    return String(s || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  }
+
+  /** Classic Levenshtein distance. */
+  function editDistance(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    var prev = [];
+    for (var j = 0; j <= b.length; j++) prev.push(j);
+    for (var i = 1; i <= a.length; i++) {
+      var cur = [i];
+      for (var k = 1; k <= b.length; k++) {
+        var cost = a.charAt(i - 1) === b.charAt(k - 1) ? 0 : 1;
+        cur.push(Math.min(prev[k] + 1, cur[k - 1] + 1, prev[k - 1] + cost));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  /**
+   * Greedy earliest subsequence match. Returns the span (last index - first
+   * index + 1) the query covers inside key, or -1 when q is not a subsequence.
+   */
+  function subsequenceSpan(q, key) {
+    var first = -1, last = -1, qi = 0;
+    for (var i = 0; i < key.length && qi < q.length; i++) {
+      if (key.charAt(i) === q.charAt(qi)) {
+        if (first < 0) first = i;
+        last = i;
+        qi++;
+      }
+    }
+    return qi === q.length ? last - first + 1 : -1;
+  }
+
+  /** Percent-encode everything except RFC 3986 unreserved characters. */
+  function encodeQuery(s) {
+    var out = '';
+    var bytes = utf8Bytes(String(s));
+    for (var i = 0; i < bytes.length; i++) {
+      var c = bytes[i];
+      var unreserved =
+        (c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) ||
+        c === 0x2d || c === 0x2e || c === 0x5f || c === 0x7e;
+      out += unreserved ? String.fromCharCode(c) : '%' + (c < 16 ? '0' : '') + c.toString(16).toUpperCase();
+    }
+    return out;
+  }
+
+  function utf8Bytes(str) {
+    var bytes = [];
+    for (var i = 0; i < str.length; i++) {
+      var cp = str.codePointAt(i);
+      if (cp > 0xffff) i++;
+      if (cp < 0x80) bytes.push(cp);
+      else if (cp < 0x800) bytes.push(0xc0 | (cp >> 6), 0x80 | (cp & 63));
+      else if (cp < 0x10000) bytes.push(0xe0 | (cp >> 12), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
+      else bytes.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
+    }
+    return bytes;
+  }
+
+  // ------------------------------------------------------------- matcher ----
+
+  // Match quality bands, best first. "Strong" bands are safe to act on from
+  // speech without confirmation; weak ones need an Enter / tap.
+  var BAND = {
+    exact: 7,        // "yt" == alias "yt"
+    prefix: 6,       // "you" -> "youtube"
+    wordPrefix: 5,   // "code" -> "vs code"
+    acronym: 4,      // "vsc" -> "visual studio code"
+    subsequence: 3,  // "ytb" -> "youtube" (same first letter required)
+    prefixEdit: 2,   // "youto" -> "youtube" (speech mishearing)
+    edit: 1          // "utube" -> "youtube"
+  };
+  var STRONG_FROM = BAND.acronym;
+
+  function bandName(n) {
+    for (var k in BAND) if (BAND[k] === n) return k;
+    return 'none';
+  }
+
+  /** Score one normalized query against one raw key (a name or an alias). */
+  function scoreKey(q, rawKey) {
+    var key = normalize(rawKey);
+    if (!q || !key) return null;
+    if (q === key) return { band: BAND.exact, quality: 1 };
+    if (key.indexOf(q) === 0) return { band: BAND.prefix, quality: q.length / key.length };
+
+    var ws = words(rawKey);
+    if (q.length >= 2 && ws.length >= 2) {
+      for (var i = 1; i < ws.length; i++) {
+        if (ws[i].indexOf(q) === 0) return { band: BAND.wordPrefix, quality: q.length / ws[i].length };
+      }
+      var acr = ws.map(function (w) { return w.charAt(0); }).join('');
+      if (acr.indexOf(q) === 0) return { band: BAND.acronym, quality: q.length / acr.length };
+    }
+
+    if (q.length >= 2 && q.charAt(0) === key.charAt(0)) {
+      var span = subsequenceSpan(q, key);
+      if (span > 0) return { band: BAND.subsequence, quality: q.length / span };
+    }
+
+    if (q.length >= 4) {
+      var head = key.slice(0, q.length);
+      var pd = editDistance(q, head);
+      var pdMax = q.length >= 6 ? 2 : 1;
+      if (pd <= pdMax) return { band: BAND.prefixEdit, quality: -pd };
+
+      var d = editDistance(q, key);
+      var dMax = key.length <= 5 ? 1 : 2;
+      if (d <= dMax) return { band: BAND.edit, quality: -d };
+    }
+    return null;
+  }
+
+  /** Best score for an entry across its name and aliases. */
+  function scoreEntry(q, entry) {
+    var keys = [entry.name].concat(entry.aliases || []);
+    var best = null;
+    for (var i = 0; i < keys.length; i++) {
+      var s = scoreKey(q, keys[i]);
+      if (s && (!best || s.band > best.band || (s.band === best.band && s.quality > best.quality))) best = s;
+    }
+    return best;
+  }
+
+  /**
+   * Rank the catalog for a normalized query.
+   * Order: band desc, usage desc, quality desc, name asc.
+   * "Within the same match quality, the thing you open most wins."
+   */
+  function rank(q, catalog, usage) {
+    usage = usage || {};
+    var hits = [];
+    for (var i = 0; i < catalog.length; i++) {
+      var s = scoreEntry(q, catalog[i]);
+      if (s) hits.push({ entry: catalog[i], band: s.band, quality: s.quality, usage: usage[catalog[i].name] || 0 });
+    }
+    hits.sort(function (a, b) {
+      if (a.band !== b.band) return b.band - a.band;
+      if (a.usage !== b.usage) return b.usage - a.usage;
+      if (a.quality !== b.quality) return b.quality - a.quality;
+      return a.entry.name < b.entry.name ? -1 : a.entry.name > b.entry.name ? 1 : 0;
+    });
+    return hits;
+  }
+
+  function mostUsed(catalog, usage) {
+    usage = usage || {};
+    return catalog
+      .map(function (e) { return { entry: e, band: 0, quality: 0, usage: usage[e.name] || 0 }; })
+      .sort(function (a, b) {
+        if (a.usage !== b.usage) return b.usage - a.usage;
+        return a.entry.name < b.entry.name ? -1 : a.entry.name > b.entry.name ? 1 : 0;
+      });
+  }
+
+  function exactEntryWithSearch(head, catalog) {
+    for (var i = 0; i < catalog.length; i++) {
+      var e = catalog[i];
+      if (!e.searchTemplate) continue;
+      var keys = [e.name].concat(e.aliases || []);
+      for (var k = 0; k < keys.length; k++) if (normalize(keys[k]) === head) return e;
+    }
+    return null;
+  }
+
+  // Words people say (or type) around the name of a thing. They carry no
+  // meaning here, so they are dropped before matching. This is what lets
+  // "play me some youtube" and "open the downloads folder" work without
+  // there being any command language to learn.
+  var FILLER = ['open', 'launch', 'start', 'run', 'go', 'goto', 'to', 'play', 'me', 'some', 'the',
+    'my', 'show', 'please', 'hey', 'yo', 'brochacho', 'up', 'a'];
+
+  function stripLeadingFiller(tokens) {
+    var i = 0;
+    while (i < tokens.length && FILLER.indexOf(normalize(tokens[i])) >= 0) i++;
+    return i === tokens.length ? tokens : tokens.slice(i);
+  }
+
+  /**
+   * The one entry point. Raw text in (typed or spoken), decision out.
+   *   mode "empty"  -> nothing typed; results = most used
+   *   mode "open"   -> results ranked; results[0] is what Enter opens
+   *   mode "search" -> first word(s) named a searchable site; query = the rest
+   *   mode "none"   -> nothing matched
+   * `confident` is true when it is safe to act without a confirming Enter/tap
+   * (used for speech, where a wrong guess must never open the wrong thing).
+   *
+   * Steps, in order:
+   *   1. drop leading filler words
+   *   2. whole input is an exact name/alias            -> open
+   *   3. first 2 or 1 words exactly name a searchable site, more words follow -> search
+   *   4. whole input ranks strongly                    -> open
+   *   5. a shorter run of leading words ranks strongly -> open ("gmail inbox")
+   *   6. whole input ranks weakly                      -> open, not confident
+   *   7. otherwise                                     -> none
+   */
+  function match(input, catalog, usage, limit) {
+    limit = limit || 4;
+    usage = usage || {};
+    var rawTokens = String(input || '').trim().split(/\s+/).filter(Boolean);
+    if (!normalize(input)) return { mode: 'empty', results: mostUsed(catalog, usage).slice(0, limit), confident: false };
+
+    var tokens = stripLeadingFiller(rawTokens);
+    var whole = normalize(tokens.join(''));
+
+    var ranked = rank(whole, catalog, usage);
+    if (ranked.length && ranked[0].band === BAND.exact) {
+      return { mode: 'open', results: ranked.slice(0, limit), confident: true };
+    }
+
+    if (tokens.length >= 2) {
+      var maxHead = Math.min(2, tokens.length - 1);
+      for (var k = maxHead; k >= 1; k--) {
+        var head = normalize(tokens.slice(0, k).join(''));
+        var e = exactEntryWithSearch(head, catalog);
+        if (e) {
+          return {
+            mode: 'search',
+            query: tokens.slice(k).join(' '),
+            results: [{ entry: e, band: BAND.exact, quality: 1, usage: usage[e.name] || 0 }],
+            confident: true
+          };
+        }
+      }
+    }
+
+    if (ranked.length && ranked[0].band >= STRONG_FROM) {
+      return { mode: 'open', results: ranked.slice(0, limit), confident: true };
+    }
+
+    for (var n = tokens.length - 1; n >= 1; n--) {
+      var partial = rank(normalize(tokens.slice(0, n).join('')), catalog, usage);
+      if (partial.length && partial[0].band >= STRONG_FROM) {
+        return { mode: 'open', results: partial.slice(0, limit), confident: true };
+      }
+    }
+
+    if (ranked.length) return { mode: 'open', results: ranked.slice(0, limit), confident: false };
+    return { mode: 'none', results: [], confident: false };
+  }
+
+  // ---------------------------------------------------------- action plan ----
+
+  /** Turn a match decision into a plain description of what the shell should do. */
+  function plan(decision) {
+    if (!decision || !decision.results.length || decision.mode === 'empty' || decision.mode === 'none') return null;
+    var e = decision.results[0].entry;
+    if (decision.mode === 'search') {
+      return {
+        type: 'openURL',
+        url: e.searchTemplate.replace('{q}', encodeQuery(decision.query)),
+        profile: e.profile || 'personal',
+        entry: e.name
+      };
+    }
+    if (e.kind === 'site') return { type: 'openURL', url: e.target, profile: e.profile || 'personal', entry: e.name };
+    if (e.kind === 'app') return { type: 'openApp', bundleID: e.target, entry: e.name };
+    if (e.kind === 'path') return { type: 'openPath', path: e.target, entry: e.name };
+    return null;
+  }
+
+  // --------------------------------------------------------------- stash ----
+
+  var DAY_MS = 24 * 60 * 60 * 1000;
+  var FRESH_DAYS = 14;
+  var SKIP_LIMIT = 3;
+
+  /**
+   * Stash state is plain data so it can be saved as JSON as-is:
+   *   { items: [...], lastBucket: "fresh" | "old" | null, currentID: string | null }
+   * Item: { id, kind, payload, title, source, savedAt, servedAt, openedAt, skippedCount }
+   * All times are milliseconds since epoch.
+   */
+  function newStash() { return { items: [], lastBucket: null, currentID: null }; }
+
+  function addItem(stash, item, now) {
+    var payload = String(item.payload || '').trim();
+    if (!payload) return null;
+    // Saving the same thing twice just refreshes it instead of duplicating.
+    for (var i = 0; i < stash.items.length; i++) {
+      var it = stash.items[i];
+      if (it.payload === payload && it.kind === (item.kind || 'url')) {
+        it.savedAt = now; it.openedAt = null; it.skippedCount = 0;
+        return it;
+      }
+    }
+    var created = {
+      id: item.id || ('s' + now + '-' + stash.items.length),
+      kind: item.kind || 'url',
+      payload: payload,
+      title: item.title || null,
+      source: item.source || 'drop',
+      savedAt: now,
+      servedAt: null,
+      openedAt: null,
+      skippedCount: 0
+    };
+    stash.items.push(created);
+    return created;
+  }
+
+  function byAgeThenID(a, b) {
+    if (a.savedAt !== b.savedAt) return a.savedAt - b.savedAt;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  }
+
+  /**
+   * Serve one item. Consumes exactly ONE rng() value when it serves something,
+   * zero when the stash has nothing to give.
+   *  - never serves an opened item
+   *  - items skipped SKIP_LIMIT+ times only come back when nothing else is left
+   *  - alternates fresh (< 14 days) and old buckets, starting with fresh
+   */
+  function serve(stash, now, rng, excludeID) {
+    var pool = stash.items.filter(function (it) { return !it.openedAt; });
+    if (excludeID && pool.length > 1) pool = pool.filter(function (it) { return it.id !== excludeID; });
+    if (!pool.length) { stash.currentID = null; return null; }
+
+    var keen = pool.filter(function (it) { return it.skippedCount < SKIP_LIMIT; });
+    if (keen.length) pool = keen;
+
+    var fresh = pool.filter(function (it) { return now - it.savedAt < FRESH_DAYS * DAY_MS; }).sort(byAgeThenID);
+    var old = pool.filter(function (it) { return now - it.savedAt >= FRESH_DAYS * DAY_MS; }).sort(byAgeThenID);
+
+    var want = stash.lastBucket === 'fresh' ? 'old' : 'fresh';
+    var bucket = want === 'fresh' ? fresh : old;
+    if (!bucket.length) { want = want === 'fresh' ? 'old' : 'fresh'; bucket = want === 'fresh' ? fresh : old; }
+
+    var r = rng();
+    var idx = Math.min(bucket.length - 1, Math.floor(r * bucket.length));
+    var item = bucket[idx];
+    item.servedAt = now;
+    item.openedAt = now;
+    stash.lastBucket = want;
+    stash.currentID = item.id;
+    return item;
+  }
+
+  /** "Another": un-open the current item, count the skip, serve the next one. */
+  function another(stash, now, rng) {
+    var cur = null;
+    for (var i = 0; i < stash.items.length; i++) if (stash.items[i].id === stash.currentID) cur = stash.items[i];
+    if (cur) { cur.openedAt = null; cur.skippedCount += 1; }
+    return serve(stash, now, rng, cur ? cur.id : null);
+  }
+
+  function remaining(stash) {
+    return stash.items.filter(function (it) { return !it.openedAt; }).length;
+  }
+
+  // --------------------------------------------------------------- lines ----
+
+  var HISTORY = 5;
+  var TARGET_BIAS = 0.6;
+
+  /**
+   * bank:  { "open_site": [{id, text}], "target:youtube": [...], ... }
+   * state: { history: { category: [ids] } }   (persisted between picks)
+   *
+   * Consumes rng() in a FIXED order so ports stay in lockstep:
+   *   1. only when a target pool exists: one value to choose target vs generic
+   *   2. one value to choose the line
+   *   3. one value to decide whether it is spoken
+   * Returns { id, text, speak } or null when the bank has nothing for it.
+   */
+  function pickLine(bank, state, category, target, frequency, rng) {
+    var generic = bank[category] || [];
+    var targeted = target ? (bank['target:' + target] || []) : [];
+    var pool = generic, key = category;
+    if (targeted.length) {
+      var useTarget = rng() < TARGET_BIAS || !generic.length;
+      if (useTarget) { pool = targeted; key = 'target:' + target; }
+    }
+    if (!pool.length) return null;
+
+    state.history = state.history || {};
+    var hist = state.history[key] || [];
+    var open = pool.filter(function (l) { return hist.indexOf(l.id) < 0; });
+    if (!open.length) { hist = []; open = pool.slice(); }
+
+    var r = rng();
+    var line = open[Math.min(open.length - 1, Math.floor(r * open.length))];
+    // Remember the last few lines so he never hears the same one back to back.
+    // Never remember so many that the pool runs dry.
+    var keep = Math.max(0, Math.min(HISTORY, pool.length - 1));
+    hist = hist.concat([line.id]);
+    hist = keep === 0 ? [] : hist.slice(Math.max(0, hist.length - keep));
+    state.history[key] = hist;
+
+    var speak = rng() < frequency;
+    return { id: line.id, text: line.text, speak: speak };
+  }
+
+  // -------------------------------------------------------------- export ----
+
+  var api = {
+    normalize: normalize, words: words, editDistance: editDistance, subsequenceSpan: subsequenceSpan,
+    encodeQuery: encodeQuery, BAND: BAND, bandName: bandName, scoreKey: scoreKey, rank: rank,
+    match: match, plan: plan, FILLER: FILLER,
+    newStash: newStash, addItem: addItem, serve: serve, another: another, remaining: remaining,
+    FRESH_DAYS: FRESH_DAYS, SKIP_LIMIT: SKIP_LIMIT, DAY_MS: DAY_MS,
+    pickLine: pickLine
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.BrochachoCore = api;
+})(typeof self !== 'undefined' ? self : this);
+</script>
+<script>
+(function () {
+  'use strict';
+  var core = self.BrochachoCore;
+  var CATALOG = [{"name": "youtube", "display": "YouTube", "aliases": ["yt"], "kind": "site", "target": "https://www.youtube.com", "profile": "personal", "searchTemplate": "https://www.youtube.com/results?search_query={q}"}, {"name": "youtube music", "display": "YouTube Music", "aliases": ["ytm"], "kind": "site", "target": "https://music.youtube.com", "profile": "personal"}, {"name": "gmail", "display": "Gmail", "aliases": ["mail"], "kind": "site", "target": "https://mail.google.com", "profile": "personal"}, {"name": "google", "display": "Google", "aliases": ["g"], "kind": "site", "target": "https://www.google.com", "profile": "personal", "searchTemplate": "https://www.google.com/search?q={q}"}, {"name": "github", "display": "GitHub", "aliases": ["gh"], "kind": "site", "target": "https://github.com", "profile": "personal", "searchTemplate": "https://github.com/search?q={q}"}, {"name": "linkedin", "display": "LinkedIn", "aliases": ["li"], "kind": "site", "target": "https://www.linkedin.com/feed/", "profile": "personal"}, {"name": "claude", "display": "Claude", "aliases": [], "kind": "site", "target": "https://claude.ai", "profile": "personal"}, {"name": "whatsapp", "display": "WhatsApp", "aliases": ["wa"], "kind": "app", "target": "net.whatsapp.WhatsApp"}, {"name": "spotify", "display": "Spotify", "aliases": [], "kind": "app", "target": "com.spotify.client"}, {"name": "steam", "display": "Steam", "aliases": [], "kind": "app", "target": "com.valvesoftware.steam"}, {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"}, {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"}, {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"}];
+  var BANK = {"open_site": [{"id": "os01", "text": "It's done. Don't ask how."}, {"id": "os02", "text": "Consider it handled."}, {"id": "os03", "text": "For you? Anything."}, {"id": "os04", "text": "Ecco. There she is."}, {"id": "os05", "text": "Badabing. She's open."}, {"id": "os06", "text": "I know a guy. He opened it."}, {"id": "os07", "text": "Nobody saw nothing. It's open."}, {"id": "os08", "text": "Done. We never spoke."}, {"id": "os09", "text": "Mamma mia, that was fast."}, {"id": "os10", "text": "Open. Like it was never closed."}], "open_app": [{"id": "oa01", "text": "She's running, boss."}, {"id": "oa02", "text": "Up she goes."}, {"id": "oa03", "text": "I woke her up for you."}, {"id": "oa04", "text": "Badaboom. Running."}], "open_path": [{"id": "op01", "text": "The drawer is open."}, {"id": "op02", "text": "Here's where you keep things."}, {"id": "op03", "text": "I didn't touch nothing in there."}], "saved": [{"id": "sv01", "text": "I'll hold onto this."}, {"id": "sv02", "text": "In the vault."}, {"id": "sv03", "text": "Safe with me."}, {"id": "sv04", "text": "Nobody finds it but you."}, {"id": "sv05", "text": "Gulp. Delizioso."}], "pulled": [{"id": "pl01", "text": "From the vault, for you."}, {"id": "pl02", "text": "This one, you liked."}, {"id": "pl03", "text": "You got good taste, you know."}, {"id": "pl04", "text": "An oldie. A goodie."}], "another": [{"id": "an01", "text": "Fine. Another."}, {"id": "an02", "text": "Picky. I respect it."}, {"id": "an03", "text": "Next."}], "empty_stash": [{"id": "es01", "text": "The vault is empty, boss."}, {"id": "es02", "text": "Nothing in here. Drop me something."}], "unknown": [{"id": "un01", "text": "Never heard of it."}, {"id": "un02", "text": "That one, I don't know."}, {"id": "un03", "text": "Who? Never met him."}], "muted_on": [{"id": "mo01", "text": "My lips, sealed."}], "muted_off": [{"id": "mf01", "text": "I'm back."}], "target:youtube": [{"id": "yt01", "text": "Opening YouTube. Mamma mia."}, {"id": "yt02", "text": "YouTube. Some serious Italian business."}, {"id": "yt03", "text": "The tube of you. She's open."}, {"id": "yt04", "text": "YouTube, capisce?"}, {"id": "yt05", "text": "Roll the pictures."}], "target:youtube music": [{"id": "ym01", "text": "Music, maestro."}], "target:gmail": [{"id": "gm01", "text": "The mail. Nobody read it, I swear."}, {"id": "gm02", "text": "Letters for the boss."}], "target:google": [{"id": "gg01", "text": "Go ask the big book."}], "target:github": [{"id": "gh01", "text": "The code vault. She's open."}, {"id": "gh02", "text": "Go push something beautiful."}], "target:linkedin": [{"id": "li01", "text": "Put on the nice suit."}, {"id": "li02", "text": "LinkedIn. Go shake some hands."}], "target:claude": [{"id": "cl01", "text": "Go ask the professor."}, {"id": "cl02", "text": "The smart one. She's open."}], "target:whatsapp": [{"id": "wa01", "text": "Go talk to your people."}], "target:spotify": [{"id": "sp01", "text": "Music, maestro."}], "target:steam": [{"id": "st01", "text": "Go. Make the family proud."}, {"id": "st02", "text": "Steam. Shoot straight, eh?"}], "target:vs code": [{"id": "vc01", "text": "Back to the workshop."}, {"id": "vc02", "text": "The tools are on the table."}]};
+
+  var DEFAULTS = {
+    motion: { stiffness: 260, damping: 24 },
+    look: { phosphor: '#FFB000', glow: 6, font: 'VT323', textSize: 22, cursorBlinkMs: 530 },
+    voice: { voiceName: '', rate: 0.95, pitch: 0.9, frequency: 0.6 }
+  };
+  var SWATCHES = ['#FFB000', '#7CFF6B', '#CFE8FF', '#FF5A4E', '#F2C21A'];
+  var FONT_SCALE = { 'VT323': 1.22, 'Share Tech Mono': 1, 'IBM Plex Mono': 0.95 };
+  var STORE = 'brochacho.feel.v1';
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function $(id) { return document.getElementById(id); }
+  function get(obj, path) { return path.split('.').reduce(function (o, k) { return o[k]; }, obj); }
+  function set(obj, path, v) { var ks = path.split('.'); var last = ks.pop(); ks.reduce(function (o, k) { return o[k]; }, obj)[last] = v; }
+
+  var settings = clone(DEFAULTS);
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (saved) ['motion', 'look', 'voice'].forEach(function (g) { for (var k in DEFAULTS[g]) if (saved[g] && saved[g][k] !== undefined) settings[g][k] = saved[g][k]; });
+  } catch (e) { /* storage can be unavailable; defaults are fine */ }
+  function persist() { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }
+
+  // ---------------------------------------------------------------- state
+  var usage = {}, lineState = {}, muted = false;
+  var stash = core.newStash();
+  var NOW = Date.now();
+  core.addItem(stash, { id: 'sample1', payload: 'https://example.com/a-video-you-saved', title: 'Sample: a video you saved on Tuesday' }, NOW - 3 * core.DAY_MS);
+  core.addItem(stash, { id: 'sample2', payload: 'https://example.com/that-tee', title: 'Sample: the page with that tee' }, NOW - 40 * core.DAY_MS);
+  core.addItem(stash, { id: 'sample3', payload: 'https://example.com/long-article', title: 'Sample: an article from four months ago' }, NOW - 120 * core.DAY_MS);
+
+  var mode = 'closed';            // closed | input | line | pull
+  var closeTimer = null;
+
+  var stage = $('stage'), notch = $('notch'), cmd = $('cmd');
+  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull') };
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ------------------------------------------------------- spring physics
+  // Same equation SwiftUI's interpolatingSpring(mass: 1, stiffness:, damping:)
+  // solves, so the numbers tuned here carry over to the Mac app unchanged.
+  function Spring(x) { this.x = x; this.v = 0; this.target = x; }
+  var open = new Spring(0), tall = new Spring(26), gulp = new Spring(0);
+  var geo = { notchW: 130, notchH: 26, panelW: 330 };
+  var running = false, lastT = 0;
+
+  function measure() {
+    var w = stage.clientWidth;
+    geo.panelW = Math.min(w * 0.92, 440);
+    geo.notchW = Math.round(geo.panelW * 0.36);
+    Object.keys(views).forEach(function (k) { views[k].style.width = geo.panelW + 'px'; });
+  }
+  function stepSpring(s, k, c, dt) { var a = -k * (s.x - s.target) - c * s.v; s.v += a * dt; s.x += s.v * dt; }
+  function atRest(s, eps) { return Math.abs(s.x - s.target) < eps && Math.abs(s.v) < eps; }
+
+  function paint() {
+    var p = open.x;
+    var w = geo.notchW + (geo.panelW - geo.notchW) * p + gulp.x;
+    var h = geo.notchH + (tall.x - geo.notchH) * Math.max(0, p) + gulp.x * 0.35;
+    notch.style.width = Math.max(40, w) + 'px';
+    notch.style.height = Math.max(geo.notchH, h) + 'px';
+    var r = 9 + 11 * Math.max(0, Math.min(1, p));
+    notch.style.borderRadius = '0 0 ' + r + 'px ' + r + 'px';
+    var vis = Math.max(0, Math.min(1, (p - 0.35) / 0.5));
+    Object.keys(views).forEach(function (k) { views[k].style.opacity = vis; });
+  }
+  function frame(t) {
+    var dt = Math.min(0.032, (t - lastT) / 1000 || 0.016); lastT = t;
+    var k = settings.motion.stiffness, c = settings.motion.damping, h = 1 / 240;
+    for (var left = dt; left > 0; left -= h) {
+      var d = Math.min(h, left);
+      stepSpring(open, k, c, d); stepSpring(tall, k, c, d); stepSpring(gulp, 420, 14, d);
+    }
+    paint();
+    if (atRest(open, 0.0005) && atRest(tall, 0.05) && atRest(gulp, 0.02)) {
+      open.x = open.target; tall.x = tall.target; gulp.x = 0; gulp.v = 0; paint(); running = false; return;
+    }
+    requestAnimationFrame(frame);
+  }
+  function kick() {
+    if (reduced) { open.x = open.target; tall.x = tall.target; gulp.x = 0; open.v = tall.v = gulp.v = 0; paint(); return; }
+    if (!running) { running = true; lastT = performance.now(); requestAnimationFrame(frame); }
+  }
+
+  // ---------------------------------------------------------------- views
+  function show(which) {
+    Object.keys(views).forEach(function (k) { views[k].hidden = k !== which; });
+    mode = which;
+    tall.target = views[which].offsetHeight;
+    if (open.target === 0) tall.x = tall.target;   // opening from closed: no height chase
+    open.target = 1;
+    notch.setAttribute('aria-expanded', 'true');
+    kick();
+  }
+  function close() {
+    clearTimeout(closeTimer);
+    mode = 'closed'; open.target = 0; cmd.blur();
+    notch.setAttribute('aria-expanded', 'false');
+    kick();
+  }
+  function closeAfter(ms) { clearTimeout(closeTimer); closeTimer = setTimeout(close, ms); }
+  function refit() { if (mode !== 'closed') { tall.target = views[mode].offsetHeight; kick(); } }
+
+  function log(text, ms) {
+    $('logText').textContent = text;
+    $('logMs').textContent = ms == null ? '' : 'matched in ' + (ms < 0.1 ? '<0.1' : ms.toFixed(1)) + ' ms';
+  }
+
+  // ---------------------------------------------------------------- voice
+  var voices = [], unlocked = false;
+  var canSpeak = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  function loadVoices() {
+    if (!canSpeak) return;
+    var all = speechSynthesis.getVoices() || [];
+    voices = all.filter(function (v) { return /^it([-_]|$)/i.test(v.lang); });
+    var sel = $('voice'); sel.innerHTML = '';
+    if (!voices.length) {
+      var o = document.createElement('option'); o.value = ''; o.textContent = all.length ? 'No Italian voice here, using the default' : 'Loading voices'; sel.appendChild(o);
+    }
+    voices.forEach(function (v) { var o = document.createElement('option'); o.value = v.name; o.textContent = v.name + ' (' + v.lang + ')'; sel.appendChild(o); });
+    if (voices.length && !voices.some(function (v) { return v.name === settings.voice.voiceName; })) settings.voice.voiceName = voices[0].name;
+    sel.value = settings.voice.voiceName;
+    $('voiceNote').textContent = voices.length
+      ? 'This is your phone\u2019s Italian voice reading English. The Mac has its own Italian voices and will sound different, so treat this as a preview of the idea.'
+      : 'This browser has no Italian voice, so you will hear the default one. The Mac ships with Italian voices.';
+    renderExport();
+  }
+  function unlockVoice() {
+    if (!canSpeak || unlocked) return; unlocked = true;
+    try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  }
+  function speak(text) {
+    if (!canSpeak || muted) return;
+    try {
+      var u = new SpeechSynthesisUtterance(text);
+      var v = voices.filter(function (x) { return x.name === settings.voice.voiceName; })[0];
+      if (v) { u.voice = v; u.lang = v.lang; } else if (voices.length === 0) { u.lang = 'it-IT'; }
+      u.rate = settings.voice.rate; u.pitch = settings.voice.pitch;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function sayLine(category, target, forceSpeak) {
+    var pick = core.pickLine(BANK, lineState, category, target, forceSpeak ? 1 : settings.voice.frequency, Math.random);
+    if (!pick) return null;
+    if (pick.speak) speak(pick.text);
+    return pick;
+  }
+
+  // -------------------------------------------------------------- gestures
+  function whereText(entry, decision) {
+    if (decision && decision.mode === 'search') return 'search';
+    if (entry.kind === 'site') return 'Brave / ' + (entry.profile || 'personal');
+    if (entry.kind === 'app') return 'app';
+    return 'Finder';
+  }
+  function renderRows() {
+    $('typed').textContent = cmd.value;
+    var decision = core.match(cmd.value, CATALOG, usage);
+    var ul = $('rows'); ul.innerHTML = '';
+    decision.results.forEach(function (r, i) {
+      var li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button';
+      var a = document.createElement('span'); a.textContent = (r.entry.display || r.entry.name) + (decision.mode === 'search' ? '  \u203A  ' + decision.query : '');
+      var w = document.createElement('span'); w.className = 'where'; w.textContent = whereText(r.entry, decision);
+      b.appendChild(a); b.appendChild(w);
+      b.addEventListener('click', function (ev) { ev.stopPropagation(); run(i); });
+      li.appendChild(b); ul.appendChild(li);
+    });
+    if (decision.mode === 'none') {
+      var li2 = document.createElement('li'); li2.style.opacity = .7; li2.style.padding = '3px 8px'; li2.textContent = '?'; ul.appendChild(li2);
+    }
+    refit();
+  }
+  function startTyping() {
+    unlockVoice(); clearTimeout(closeTimer);
+    cmd.value = ''; renderRows(); show('input');
+    cmd.focus({ preventScroll: true });
+  }
+  function actionText(plan, decision) {
+    var e = decision.results[0].entry, name = e.display || e.name;
+    if (decision.mode === 'search') return 'Searched ' + name + ' for \u201C' + decision.query + '\u201D in Brave, ' + plan.profile + ' profile';
+    if (plan.type === 'openURL') return 'Opened ' + name + ' in Brave, ' + plan.profile + ' profile';
+    if (plan.type === 'openApp') return 'Opened the ' + name + ' app';
+    return 'Opened ' + plan.path + ' in Finder';
+  }
+  function showLine(pick, holdMs) {
+    $('lineText').textContent = pick ? pick.text : '';
+    show('line');
+    closeAfter(holdMs || (1300 + (pick ? pick.text.length : 0) * 45));
+  }
+  function run(index) {
+    var t0 = performance.now();
+    var decision = core.match(cmd.value, CATALOG, usage);
+    var ms = performance.now() - t0;
+    if (decision.mode === 'empty' && index == null) return;
+    if (decision.mode === 'none') {
+      log('Nothing called \u201C' + cmd.value.trim() + '\u201D. You would add it to the config.', ms);
+      showLine(sayLine('unknown', null)); return;
+    }
+    // Tapping a row opens that row; Enter opens the top one.
+    decision = { mode: decision.mode === 'empty' ? 'open' : decision.mode, query: decision.query,
+      results: [decision.results[index == null ? 0 : index]] };
+    var plan = core.plan(decision); if (!plan) return;
+    var entry = decision.results[0].entry;
+    usage[entry.name] = (usage[entry.name] || 0) + 1;
+    // Action first. The line comes after, and never holds the action up.
+    log(actionText(plan, decision), ms);
+    cmd.blur();
+    var category = plan.type === 'openURL' ? 'open_site' : plan.type === 'openApp' ? 'open_app' : 'open_path';
+    showLine(sayLine(category, entry.name));
+  }
+  function pull(isAnother) {
+    unlockVoice(); clearTimeout(closeTimer);
+    var item = isAnother ? core.another(stash, Date.now(), Math.random) : core.serve(stash, Date.now(), Math.random);
+    if (!item) { log('Your stash has nothing left to give back.'); showLine(sayLine('empty_stash', null)); return; }
+    $('pullTitle').textContent = item.title || item.payload;
+    var days = Math.round((Date.now() - item.savedAt) / core.DAY_MS);
+    $('pullMeta').textContent = (days <= 0 ? 'saved today' : 'saved ' + days + (days === 1 ? ' day ago' : ' days ago')) + '  ' + item.payload.replace(/^https?:\/\//, '');
+    log('Opened from your stash: ' + (item.title || item.payload));
+    sayLine(isAnother ? 'another' : 'pulled', null);
+    show('pull'); closeAfter(6000);
+  }
+  function drop() {
+    unlockVoice();
+    var url = $('dropUrl').value.trim() || 'https://example.com/something-cool';
+    var from = $('btnDrop').getBoundingClientRect(), to = notch.getBoundingClientRect();
+    var chip = document.createElement('div'); chip.className = 'chip';
+    chip.textContent = url.replace(/^https?:\/\//, '').slice(0, 28);
+    chip.style.left = (from.left + from.width / 2 - 40) + 'px'; chip.style.top = from.top + 'px';
+    document.body.appendChild(chip);
+    var dx = (to.left + to.width / 2) - (from.left + from.width / 2), dy = to.top - from.top;
+    requestAnimationFrame(function () { chip.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(.4)'; chip.style.opacity = '.2'; });
+    setTimeout(function () {
+      chip.remove();
+      core.addItem(stash, { payload: url, source: 'drop' }, Date.now());
+      gulp.v += 600; kick();
+      log('Saved to your stash: ' + url.replace(/^https?:\/\//, ''));
+      $('dropUrl').value = '';
+      showLine(sayLine('saved', null), 1500);
+    }, reduced ? 0 : 430);
+  }
+
+  // ---------------------------------------------------------------- wiring
+  $('btnType').addEventListener('click', startTyping);
+  $('btnPull').addEventListener('click', function () { pull(false); });
+  $('btnDrop').addEventListener('click', drop);
+  $('anotherBtn').addEventListener('click', function (e) { e.stopPropagation(); pull(true); });
+  $('go').addEventListener('click', function (e) { e.stopPropagation(); run(); });
+  notch.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (mode === 'closed') pull(false);
+    else if (mode === 'input') cmd.focus({ preventScroll: true });
+  });
+  notch.addEventListener('keydown', function (e) {
+    if (e.target === notch && (e.key === 'Enter' || e.key === ' ') && mode === 'closed') { e.preventDefault(); pull(false); }
+  });
+  stage.addEventListener('click', function () { if (mode !== 'closed') close(); });
+  cmd.addEventListener('input', renderRows);
+  cmd.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); run(); }
+    else if (e.key === 'Escape') { close(); }
+  });
+  $('replay').addEventListener('click', function () {
+    cmd.value = 'yt'; renderRows(); show('input'); closeAfter(1400);
+  });
+  $('sayLine').addEventListener('click', function () {
+    unlockVoice(); var was = muted; muted = false;
+    var pick = sayLine('open_site', 'youtube', true); muted = was; showLine(pick);
+  });
+  $('mute').addEventListener('click', function () {
+    muted = !muted; this.setAttribute('aria-pressed', String(muted)); this.textContent = muted ? 'Unmute him' : 'Mute him';
+    if (muted && canSpeak) speechSynthesis.cancel();
+    var pick = core.pickLine(BANK, lineState, muted ? 'muted_on' : 'muted_off', null, 1, Math.random);
+    if (!muted && pick) speak(pick.text);
+    showLine(pick);
+  });
+  $('copy').addEventListener('click', function () {
+    var ta = $('export'), btn = this;
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy settings'; }, 1400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); });
+    else { ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+  });
+  $('reset').addEventListener('click', function () { var v = settings.voice.voiceName; settings = clone(DEFAULTS); settings.voice.voiceName = v; persist(); syncControls(); apply(); });
+
+  // -------------------------------------------------------------- settings
+  function bounceWord() {
+    var z = settings.motion.damping / (2 * Math.sqrt(settings.motion.stiffness));
+    var w = z >= 1 ? 'no bounce, it just arrives' : z >= 0.8 ? 'a hint of bounce' : z >= 0.55 ? 'lively' : 'wobbly';
+    return 'Feel: ' + w + '. On the Mac this is interpolatingSpring(stiffness: ' + settings.motion.stiffness + ', damping: ' + settings.motion.damping + ').';
+  }
+  function apply() {
+    var r = document.documentElement.style, L = settings.look;
+    r.setProperty('--phosphor', L.phosphor);
+    r.setProperty('--glow', L.glow + 'px');
+    r.setProperty('--notch-font', "'" + L.font + "', 'Courier New', monospace");
+    r.setProperty('--notch-size', Math.round(L.textSize * (FONT_SCALE[L.font] || 1)) + 'px');
+    r.setProperty('--blink', (L.cursorBlinkMs * 2) + 'ms');
+    $('bounce').textContent = bounceWord();
+    Array.prototype.forEach.call($('swatches').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.c.toLowerCase() === L.phosphor.toLowerCase())); });
+    renderExport(); refit();
+  }
+  function renderExport() { $('export').value = JSON.stringify({ theme: settings }, null, 2); }
+  function syncControls() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
+      var v = get(settings, el.dataset.key);
+      if (el.tagName === 'SELECT' && el.id === 'voice') return;
+      el.value = v;
+      var out = $('o-' + el.id); if (out) out.textContent = el.id === 'frequency' ? Math.round(v * 100) + '%' : el.id === 'blink' ? v + ' ms' : v;
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
+    el.addEventListener('input', function () {
+      var v = el.type === 'range' ? parseFloat(el.value) : el.value;
+      set(settings, el.dataset.key, v); persist(); syncControls(); apply();
+    });
+  });
+  SWATCHES.forEach(function (c) {
+    var b = document.createElement('button'); b.type = 'button'; b.dataset.c = c; b.style.background = c; b.setAttribute('aria-label', 'Phosphor ' + c);
+    b.addEventListener('click', function () { settings.look.phosphor = c; persist(); syncControls(); apply(); });
+    $('swatches').appendChild(b);
+  });
+
+  function tick() { var d = new Date(); $('clock').textContent = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) + '  ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); }
+  tick(); setInterval(tick, 30000);
+
+  measure(); syncControls(); apply(); paint();
+  window.addEventListener('resize', function () { measure(); refit(); paint(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { refit(); });
+  loadVoices();
+  if (canSpeak) speechSynthesis.onvoiceschanged = loadVoices;
+  else $('voiceNote').textContent = 'This viewer cannot speak. Open the page in your browser to hear him.';
+
+  window.__brochacho = { run: run, startTyping: startTyping, pull: pull, drop: drop, state: function () { return { mode: mode, open: open.x, log: $('logText').textContent, line: $('lineText').textContent }; } };
+})();
+</script>
+</body>
+</html>

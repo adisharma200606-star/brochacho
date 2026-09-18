@@ -1,0 +1,171 @@
+{
+  "bank": {
+    "open_site": [
+      {
+        "id": "os1",
+        "text": "generic 1"
+      },
+      {
+        "id": "os2",
+        "text": "generic 2"
+      },
+      {
+        "id": "os3",
+        "text": "generic 3"
+      },
+      {
+        "id": "os4",
+        "text": "generic 4"
+      },
+      {
+        "id": "os5",
+        "text": "generic 5"
+      },
+      {
+        "id": "os6",
+        "text": "generic 6"
+      },
+      {
+        "id": "os7",
+        "text": "generic 7"
+      },
+      {
+        "id": "os8",
+        "text": "generic 8"
+      }
+    ],
+    "target:youtube": [
+      {
+        "id": "yt1",
+        "text": "youtube 1"
+      },
+      {
+        "id": "yt2",
+        "text": "youtube 2"
+      },
+      {
+        "id": "yt3",
+        "text": "youtube 3"
+      }
+    ],
+    "saved": [
+      {
+        "id": "sv1",
+        "text": "only one"
+      }
+    ]
+  },
+  "rngValues": [
+    0.1,
+    0.5,
+    0.2,
+    0.7,
+    0.9,
+    0.95,
+    0.3,
+    0.3,
+    0.3,
+    0.61,
+    0,
+    0,
+    0.2,
+    0.99,
+    0.4,
+    0.05,
+    0.5,
+    0.5
+  ],
+  "picks": [
+    {
+      "category": "open_site",
+      "target": "youtube",
+      "frequency": 0.6,
+      "picked": {
+        "id": "yt2",
+        "text": "youtube 2",
+        "speak": true
+      },
+      "rngUsed": 3
+    },
+    {
+      "category": "open_site",
+      "target": "youtube",
+      "frequency": 0.6,
+      "picked": {
+        "id": "os8",
+        "text": "generic 8",
+        "speak": false
+      },
+      "rngUsed": 6
+    },
+    {
+      "category": "open_site",
+      "target": null,
+      "frequency": 0.6,
+      "picked": {
+        "id": "os3",
+        "text": "generic 3",
+        "speak": true
+      },
+      "rngUsed": 8
+    },
+    {
+      "category": "open_site",
+      "target": "youtube",
+      "frequency": 0.6,
+      "picked": {
+        "id": "yt3",
+        "text": "youtube 3",
+        "speak": true
+      },
+      "rngUsed": 11
+    },
+    {
+      "category": "saved",
+      "target": null,
+      "frequency": 1,
+      "picked": {
+        "id": "sv1",
+        "text": "only one",
+        "speak": true
+      },
+      "rngUsed": 13
+    },
+    {
+      "category": "open_site",
+      "target": "steam",
+      "frequency": 0,
+      "picked": {
+        "id": "os7",
+        "text": "generic 7",
+        "speak": false
+      },
+      "rngUsed": 15
+    },
+    {
+      "category": "open_site",
+      "target": "youtube",
+      "frequency": 0.6,
+      "picked": {
+        "id": "yt1",
+        "text": "youtube 1",
+        "speak": true
+      },
+      "rngUsed": 18
+    }
+  ],
+  "finalState": {
+    "history": {
+      "target:youtube": [
+        "yt3",
+        "yt1"
+      ],
+      "open_site": [
+        "os8",
+        "os3",
+        "os7"
+      ],
+      "saved": []
+    }
+  }
+}

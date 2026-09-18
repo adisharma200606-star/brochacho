@@ -1,0 +1,92 @@
+# Compiles and tests Brochacho on a real Mac in the cloud.
+#
+# Why this exists: the code was written on a phone, with no Mac and no Swift compiler to hand.
+# Every push to main runs the tests on a GitHub macOS machine, so "never been compiled" stops being true.
+#
+# The full logs are also pushed to a branch called `ci-logs`, so they can be read with a plain
+# `git fetch` (handy when the Actions log viewer is awkward on a phone).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JavaScript reference tests
+        id: js
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          node --version | tee js.log
+          node --test reference-js/core.test.js 2>&1 | tee -a js.log
+
+      - name: Golden fixtures are up to date
+        id: fixtures
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          git status --porcelain fixtures | tee fixtures.log
+          test -z "$(git status --porcelain fixtures)"
+
+      - name: Swift core tests
+        id: core
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          swift --version 2>&1 | tee core.log
+          swift test 2>&1 | tee -a core.log
+
+      - name: Build the notch app
+        id: app
+        if: hashFiles('App/project.yml') != ''
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          xcodebuild -version 2>&1 | tee app.log
+          brew install xcodegen 2>&1 | tail -3 | tee -a app.log
+          cd App
+          xcodegen generate 2>&1 | tee -a ../app.log
+          xcodebuild -project Brochacho.xcodeproj -scheme Brochacho -configuration Debug \
+            -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ../app-full.log | grep -E "error:|warning: unre|BUILD|\*\*" | tee -a ../app.log
+
+      - name: Publish logs to the ci-logs branch
+        if: always()
+        run: |
+          mkdir -p /tmp/ci-logs
+          cp ./*.log /tmp/ci-logs/ 2>/dev/null || true
+          {
+            echo "commit:   $GITHUB_SHA"
+            echo "js:       ${{ steps.js.outcome }}"
+            echo "fixtures: ${{ steps.fixtures.outcome }}"
+            echo "core:     ${{ steps.core.outcome }}"
+            echo "app:      ${{ steps.app.outcome }}"
+          } > /tmp/ci-logs/SUMMARY.txt
+          git config user.name "brochacho-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout --orphan ci-logs-new
+          git rm -rf --quiet . || true
+          git clean -fdx --quiet || true
+          cp /tmp/ci-logs/* .
+          git add -A
+          git commit --quiet -m "logs for $GITHUB_SHA"
+          git push --force origin ci-logs-new:ci-logs
+
+      - name: Fail the run if anything failed
+        if: always()
+        run: |
+          cat /tmp/ci-logs/SUMMARY.txt
+          if grep -q "failure" /tmp/ci-logs/SUMMARY.txt; then exit 1; fi

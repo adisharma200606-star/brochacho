@@ -1,0 +1,222 @@
+{
+  "initial": {
+    "items": [
+      {
+        "id": "old1",
+        "kind": "url",
+        "payload": "https://example.com/old1",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1779451200000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      },
+      {
+        "id": "old2",
+        "kind": "url",
+        "payload": "https://example.com/old2",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1786363200000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      },
+      {
+        "id": "new1",
+        "kind": "url",
+        "payload": "https://example.com/new1",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789560000000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      },
+      {
+        "id": "new2",
+        "kind": "url",
+        "payload": "https://example.com/new2",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789732800000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      },
+      {
+        "id": "new3",
+        "kind": "url",
+        "payload": "https://example.com/new3",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789387200000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      },
+      {
+        "id": "old3",
+        "kind": "url",
+        "payload": "https://example.com/old3",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1788523200000,
+        "servedAt": null,
+        "openedAt": null,
+        "skippedCount": 0
+      }
+    ],
+    "lastBucket": null,
+    "currentID": null
+  },
+  "rngValues": [
+    0.5,
+    0.1,
+    0.9,
+    0.34,
+    0,
+    0.72,
+    0.5,
+    0.99,
+    0.2,
+    0.6,
+    0.45,
+    0.8
+  ],
+  "steps": [
+    {
+      "op": "serve",
+      "now": 1789819201000,
+      "served": "new1",
+      "rngUsed": 1
+    },
+    {
+      "op": "another",
+      "now": 1789819202000,
+      "served": "old1",
+      "rngUsed": 2
+    },
+    {
+      "op": "another",
+      "now": 1789819203000,
+      "served": "new2",
+      "rngUsed": 3
+    },
+    {
+      "op": "serve",
+      "now": 1789819204000,
+      "served": "old2",
+      "rngUsed": 4
+    },
+    {
+      "op": "serve",
+      "now": 1789819205000,
+      "served": "new3",
+      "rngUsed": 5
+    },
+    {
+      "op": "another",
+      "now": 1789819206000,
+      "served": "old3",
+      "rngUsed": 6
+    },
+    {
+      "op": "serve",
+      "now": 1789819207000,
+      "served": "new1",
+      "rngUsed": 7
+    },
+    {
+      "op": "serve",
+      "now": 1789819208000,
+      "served": "old1",
+      "rngUsed": 8
+    },
+    {
+      "op": "serve",
+      "now": 1789819209000,
+      "served": "new3",
+      "rngUsed": 9
+    },
+    {
+      "op": "serve",
+      "now": 1789819210000,
+      "served": null,
+      "rngUsed": 9
+    }
+  ],
+  "final": {
+    "items": [
+      {
+        "id": "old1",
+        "kind": "url",
+        "payload": "https://example.com/old1",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1779451200000,
+        "servedAt": 1789819208000,
+        "openedAt": 1789819208000,
+        "skippedCount": 1
+      },
+      {
+        "id": "old2",
+        "kind": "url",
+        "payload": "https://example.com/old2",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1786363200000,
+        "servedAt": 1789819204000,
+        "openedAt": 1789819204000,
+        "skippedCount": 0
+      },
+      {
+        "id": "new1",
+        "kind": "url",
+        "payload": "https://example.com/new1",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789560000000,
+        "servedAt": 1789819207000,
+        "openedAt": 1789819207000,
+        "skippedCount": 1
+      },
+      {
+        "id": "new2",
+        "kind": "url",
+        "payload": "https://example.com/new2",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789732800000,
+        "servedAt": 1789819203000,
+        "openedAt": 1789819203000,
+        "skippedCount": 0
+      },
+      {
+        "id": "new3",
+        "kind": "url",
+        "payload": "https://example.com/new3",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1789387200000,
+        "servedAt": 1789819209000,
+        "openedAt": 1789819209000,
+        "skippedCount": 1
+      },
+      {
+        "id": "old3",
+        "kind": "url",
+        "payload": "https://example.com/old3",
+        "title": null,
+        "source": "drop",
+        "savedAt": 1788523200000,
+        "servedAt": 1789819206000,
+        "openedAt": 1789819206000,
+        "skippedCount": 0
+      }
+    ],
+    "lastBucket": "fresh",
+    "currentID": null
+  }
+}
