@@ -104,6 +104,23 @@
     border-radius: 999px; pointer-events: none; transition: transform .42s cubic-bezier(.5,-0.2,.7,.4), opacity .42s;
   }
 
+  /* ---- tuner ---- */
+  .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .8em; }
+  .tunehead button { all: unset; min-width: 40px; min-height: 36px; text-align: center; cursor: pointer; border: 2px solid var(--phosphor); box-sizing: border-box; }
+  .tunehead button:focus-visible { outline: 2px solid #fff; }
+  .strings { display: flex; justify-content: space-between; gap: 4px; margin: 8px 0 6px; }
+  .strings span { flex: 1; text-align: center; padding: 1px 0; opacity: .55; border-bottom: 2px solid transparent; }
+  .strings span.active { opacity: 1; background: var(--phosphor); color: #000; text-shadow: none; }
+  .strings span.locked { border-bottom-color: var(--phosphor); opacity: .9; }
+  .scale { position: relative; height: 26px; border: 2px solid var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); }
+  .scale::before { content: ''; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--phosphor); opacity: .7; }
+  .scale.intune { background: var(--phosphor); }
+  .scale.intune .needle { background: #000; box-shadow: none; }
+  .needle { position: absolute; top: 3px; bottom: 3px; width: 12px; margin-left: -6px; left: 50%; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); transition: left .09s linear; }
+  .readout { display: flex; justify-content: space-between; margin-top: 6px; font-size: .85em; min-height: 1.2em; }
+  .tunerpad { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
+  @media (prefers-reduced-motion: reduce) { .needle { transition: none; } }
+
   /* ---- gesture buttons ---- */
   .gestures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 6px 0 8px; }
   .btn {
@@ -161,6 +178,16 @@
           <ul class="rows" id="rows"></ul>
         </div>
         <div class="content" id="viewLine" hidden><div class="line" id="lineText"></div></div>
+        <div class="content" id="viewTuner" hidden>
+          <div class="tunehead">
+            <button id="tunePrev" type="button" aria-label="Previous tuning">&lsaquo;</button>
+            <span id="tuneName"></span>
+            <button id="tuneNext" type="button" aria-label="Next tuning">&rsaquo;</button>
+          </div>
+          <div class="strings" id="tuneStrings"></div>
+          <div class="scale" id="tuneScale"><div class="needle" id="tuneNeedle"></div></div>
+          <div class="readout"><span id="tuneNote"></span><span id="tuneCents"></span></div>
+        </div>
         <div class="content" id="viewPull" hidden>
           <div class="pulltitle" id="pullTitle"></div>
           <div class="pullmeta" id="pullMeta"></div>
@@ -181,6 +208,13 @@
     <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
   </div>
   <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+
+  <div class="tunerpad">
+    <button class="btn" id="btnTune" type="button">Tuner<small>type &ldquo;tune&rdquo;</small></button>
+    <button class="btn" id="btnPluck" type="button">Pluck for me<small>fake guitar</small></button>
+    <button class="btn" id="btnMic" type="button">Use my mic<small>real guitar</small></button>
+  </div>
+  <p class="note" id="tunerNote">The tuner runs the real pitch detector. &ldquo;Pluck for me&rdquo; plays a slightly flat string and slowly tunes it up, so you can watch the needle. 13 guitar tunings, 4 ukulele tunings, and a chromatic mode.</p>
 
   <details open>
     <summary>Motion</summary>
@@ -242,12 +276,15 @@
 </div>
 
 <script>/*__CORE__*/</script>
+<script>/*__TUNER__*/</script>
 <script>
 (function () {
   'use strict';
   var core = self.BrochachoCore;
   var CATALOG = /*__CATALOG__*/[];
   var BANK = /*__LINES__*/{};
+  var tunerCore = self.BrochachoTuner;
+  var TUNINGS = /*__TUNINGS__*/[];
 
   var DEFAULTS = {
     motion: { stiffness: 260, damping: 24 },
@@ -282,7 +319,7 @@
   var closeTimer = null;
 
   var stage = $('stage'), notch = $('notch'), cmd = $('cmd');
-  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull') };
+  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull'), tuner: $('viewTuner') };
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ------------------------------------------------------- spring physics
@@ -343,6 +380,7 @@
   }
   function close() {
     clearTimeout(closeTimer);
+    if (typeof stopSources === 'function') stopSources();
     mode = 'closed'; open.target = 0; cmd.blur();
     notch.setAttribute('aria-expanded', 'false');
     kick();
@@ -400,6 +438,7 @@
     if (decision && decision.mode === 'search') return 'search';
     if (entry.kind === 'site') return 'Brave / ' + (entry.profile || 'personal');
     if (entry.kind === 'app') return 'app';
+    if (entry.kind === 'tool') return 'in the notch';
     return 'Finder';
   }
   function renderRows() {
@@ -430,6 +469,7 @@
     if (decision.mode === 'search') return 'Searched ' + name + ' for \u201C' + decision.query + '\u201D in Brave, ' + plan.profile + ' profile';
     if (plan.type === 'openURL') return 'Opened ' + name + ' in Brave, ' + plan.profile + ' profile';
     if (plan.type === 'openApp') return 'Opened the ' + name + ' app';
+    if (plan.type === 'openTool') return 'Opened the ' + name + ' in the notch';
     return 'Opened ' + plan.path + ' in Finder';
   }
   function showLine(pick, holdMs) {
@@ -455,6 +495,7 @@
     // Action first. The line comes after, and never holds the action up.
     log(actionText(plan, decision), ms);
     cmd.blur();
+    if (plan.type === 'openTool') { sayLine('open_tool', entry.name); openTuner(); return; }
     var category = plan.type === 'openURL' ? 'open_site' : plan.type === 'openApp' ? 'open_app' : 'open_path';
     showLine(sayLine(category, entry.name));
   }
@@ -488,6 +529,103 @@
       showLine(sayLine('saved', null), 1500);
     }, reduced ? 0 : 430);
   }
+
+
+  // ---------------------------------------------------------------- tuner
+  var tuningIndex = 0, tuneSession = tunerCore.newSession(), resolvedTuning = null, tuneTimer = null;
+  var audioCtx = null, osc = null, oscGain = null, micStream = null, analyser = null, micBuffer = null;
+  var MODES = TUNINGS.concat([{ id: 'chromatic', instrument: 'any', name: 'Chromatic', strings: [] }]);
+
+  function setTuning(i) {
+    tuningIndex = (i + MODES.length) % MODES.length;
+    var t = MODES[tuningIndex];
+    resolvedTuning = t.strings.length ? tunerCore.resolveTuning(t, 440) : null;
+    tuneSession = tunerCore.newSession();
+    $('tuneName').textContent = (t.instrument === 'any' ? '' : t.instrument + ' / ') + t.name;
+    var row = $('tuneStrings'); row.innerHTML = '';
+    t.strings.forEach(function (n) { var sp = document.createElement('span'); sp.textContent = n; row.appendChild(sp); });
+    paintTuner({ state: 'idle', cents: 0, inTune: false, label: null });
+    refit();
+  }
+  function paintTuner(d) {
+    var spans = $('tuneStrings').children;
+    for (var i = 0; i < spans.length; i++) {
+      spans[i].classList.toggle('active', d.state !== 'idle' && d.stringIndex === i);
+      spans[i].classList.toggle('locked', tuneSession.lockedStrings.indexOf(i) >= 0);
+    }
+    var c = Math.max(-50, Math.min(50, d.cents || 0));
+    $('tuneNeedle').style.left = (50 + c) + '%';
+    $('tuneNeedle').style.opacity = d.state === 'idle' ? .25 : 1;
+    $('tuneScale').classList.toggle('intune', !!d.inTune);
+    if (d.state === 'idle') { $('tuneNote').textContent = 'pluck a string'; $('tuneCents').textContent = ''; return; }
+    $('tuneNote').textContent = d.label + (d.octave == null ? '' : d.octave);
+    var r = Math.round(d.cents);
+    $('tuneCents').textContent = d.inTune ? 'in tune' : (r > 0 ? '+' : '') + r + ' cents, ' + (r < 0 ? 'tune up' : 'tune down');
+  }
+  function heard(reading) {
+    var d = tunerCore.feed(tuneSession, reading, Date.now(), resolvedTuning, 440);
+    paintTuner(d);
+    if (d.allInTuneNow) { var pick = sayLine('all_in_tune', null, true); if (pick) log('Every string locked. He says: ' + pick.text); }
+  }
+  function openTuner() {
+    unlockVoice(); clearTimeout(closeTimer);
+    setTuning(tuningIndex); show('tuner');
+    log('Opened the Tuner in the notch');
+  }
+  function stopSources() {
+    clearInterval(tuneTimer); tuneTimer = null;
+    if (oscGain) { try { oscGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05); } catch (e) {} }
+    if (micStream) { micStream.getTracks().forEach(function (t) { t.stop(); }); micStream = null; analyser = null; }
+  }
+  function ensureAudio() {
+    if (!audioCtx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false; audioCtx = new AC(); }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return true;
+  }
+  // A fake guitar: each string starts flat and is slowly "tuned up", through the real detector.
+  function pluckForMe() {
+    if (mode !== 'tuner') openTuner();
+    stopSources();
+    if (!resolvedTuning) setTuning(0);
+    var strings = resolvedTuning.strings, si = 0, tick = 0, PER = 34, sound = ensureAudio();
+    if (sound) {
+      if (!osc) { osc = audioCtx.createOscillator(); osc.type = 'triangle'; oscGain = audioCtx.createGain(); oscGain.gain.value = 0; osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(); }
+    }
+    tuneTimer = setInterval(function () {
+      if (mode !== 'tuner') { stopSources(); return; }
+      if (si >= strings.length) { stopSources(); heard(null); return; }
+      var progress = Math.min(1, tick / 22);
+      var cents = -38 * (1 - progress) * (1 - progress);
+      var f = strings[si].frequency * Math.pow(2, cents / 1200);
+      if (sound) { osc.frequency.setTargetAtTime(f, audioCtx.currentTime, 0.02); oscGain.gain.setTargetAtTime(tick % PER < PER - 3 ? 0.12 : 0, audioCtx.currentTime, 0.03); }
+      heard(tunerCore.detectPitch(tunerCore.synthString(f, 44100, 4096, { weakFundamental: f < 100, noise: 0.01 }), 44100));
+      tick++;
+      if (tick >= PER) { tick = 0; si++; }
+    }, 100);
+  }
+  function useMic() {
+    if (mode !== 'tuner') openTuner();
+    stopSources();
+    var note = $('tunerNote');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !ensureAudio()) { note.textContent = 'This viewer does not allow the microphone. The Mac app will use the real one.'; return; }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }).then(function (stream) {
+      micStream = stream;
+      var src = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 4096; src.connect(analyser);
+      micBuffer = new Float32Array(4096);
+      note.textContent = 'Listening on your phone\u2019s mic. Pluck a string near it.';
+      tuneTimer = setInterval(function () {
+        if (mode !== 'tuner' || !analyser) { stopSources(); return; }
+        analyser.getFloatTimeDomainData(micBuffer);
+        heard(tunerCore.detectPitch(Array.prototype.slice.call(micBuffer), audioCtx.sampleRate));
+      }, 90);
+    }).catch(function () { note.textContent = 'The microphone is blocked here. Try opening the page in your browser, or use \u201CPluck for me\u201D.'; });
+  }
+  $('btnTune').addEventListener('click', openTuner);
+  $('btnPluck').addEventListener('click', pluckForMe);
+  $('btnMic').addEventListener('click', useMic);
+  $('tunePrev').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex - 1); });
+  $('tuneNext').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex + 1); });
 
   // ---------------------------------------------------------------- wiring
   $('btnType').addEventListener('click', startTyping);
@@ -579,7 +717,7 @@
   if (canSpeak) speechSynthesis.onvoiceschanged = loadVoices;
   else $('voiceNote').textContent = 'This viewer cannot speak. Open the page in your browser to hear him.';
 
-  window.__brochacho = { run: run, startTyping: startTyping, pull: pull, drop: drop, state: function () { return { mode: mode, open: open.x, log: $('logText').textContent, line: $('lineText').textContent }; } };
+  window.__brochacho = { openTuner: openTuner, pluckForMe: pluckForMe, run: run, startTyping: startTyping, pull: pull, drop: drop, state: function () { return { mode: mode, open: open.x, log: $('logText').textContent, line: $('lineText').textContent }; } };
 })();
 </script>
 </body>

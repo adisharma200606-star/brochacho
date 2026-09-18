@@ -1,0 +1,715 @@
+{
+  "tunings": [
+    {
+      "id": "guitar-standard",
+      "instrument": "guitar",
+      "name": "Standard",
+      "strings": [
+        "E2",
+        "A2",
+        "D3",
+        "G3",
+        "B3",
+        "E4"
+      ]
+    },
+    {
+      "id": "guitar-half-down",
+      "instrument": "guitar",
+      "name": "Half step down",
+      "strings": [
+        "Eb2",
+        "Ab2",
+        "Db3",
+        "Gb3",
+        "Bb3",
+        "Eb4"
+      ]
+    },
+    {
+      "id": "guitar-full-down",
+      "instrument": "guitar",
+      "name": "Full step down",
+      "strings": [
+        "D2",
+        "G2",
+        "C3",
+        "F3",
+        "A3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-drop-d",
+      "instrument": "guitar",
+      "name": "Drop D",
+      "strings": [
+        "D2",
+        "A2",
+        "D3",
+        "G3",
+        "B3",
+        "E4"
+      ]
+    },
+    {
+      "id": "guitar-double-drop-d",
+      "instrument": "guitar",
+      "name": "Double drop D",
+      "strings": [
+        "D2",
+        "A2",
+        "D3",
+        "G3",
+        "B3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-dadgad",
+      "instrument": "guitar",
+      "name": "DADGAD",
+      "strings": [
+        "D2",
+        "A2",
+        "D3",
+        "G3",
+        "A3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-open-g",
+      "instrument": "guitar",
+      "name": "Open G",
+      "strings": [
+        "D2",
+        "G2",
+        "D3",
+        "G3",
+        "B3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-open-d",
+      "instrument": "guitar",
+      "name": "Open D",
+      "strings": [
+        "D2",
+        "A2",
+        "D3",
+        "F#3",
+        "A3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-open-e",
+      "instrument": "guitar",
+      "name": "Open E",
+      "strings": [
+        "E2",
+        "B2",
+        "E3",
+        "G#3",
+        "B3",
+        "E4"
+      ]
+    },
+    {
+      "id": "guitar-open-c",
+      "instrument": "guitar",
+      "name": "Open C",
+      "strings": [
+        "C2",
+        "G2",
+        "C3",
+        "G3",
+        "C4",
+        "E4"
+      ]
+    },
+    {
+      "id": "guitar-drop-c",
+      "instrument": "guitar",
+      "name": "Drop C",
+      "strings": [
+        "C2",
+        "G2",
+        "C3",
+        "F3",
+        "A3",
+        "D4"
+      ]
+    },
+    {
+      "id": "guitar-drop-b",
+      "instrument": "guitar",
+      "name": "Drop B",
+      "strings": [
+        "B1",
+        "F#2",
+        "B2",
+        "E3",
+        "G#3",
+        "C#4"
+      ]
+    },
+    {
+      "id": "guitar-drop-a",
+      "instrument": "guitar",
+      "name": "Drop A",
+      "strings": [
+        "A1",
+        "E2",
+        "A2",
+        "D3",
+        "F#3",
+        "B3"
+      ]
+    },
+    {
+      "id": "ukulele-standard",
+      "instrument": "ukulele",
+      "name": "Standard (high G)",
+      "strings": [
+        "G4",
+        "C4",
+        "E4",
+        "A4"
+      ]
+    },
+    {
+      "id": "ukulele-low-g",
+      "instrument": "ukulele",
+      "name": "Low G",
+      "strings": [
+        "G3",
+        "C4",
+        "E4",
+        "A4"
+      ]
+    },
+    {
+      "id": "ukulele-baritone",
+      "instrument": "ukulele",
+      "name": "Baritone",
+      "strings": [
+        "D3",
+        "G3",
+        "B3",
+        "E4"
+      ]
+    },
+    {
+      "id": "ukulele-d",
+      "instrument": "ukulele",
+      "name": "D tuning",
+      "strings": [
+        "A4",
+        "D4",
+        "F#4",
+        "B4"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "note": "A1",
+      "midi": 33,
+      "frequency": 55
+    },
+    {
+      "note": "B1",
+      "midi": 35,
+      "frequency": 61.7354126570155
+    },
+    {
+      "note": "C2",
+      "midi": 36,
+      "frequency": 65.40639132514966
+    },
+    {
+      "note": "D2",
+      "midi": 38,
+      "frequency": 73.41619197935188
+    },
+    {
+      "note": "Eb2",
+      "midi": 39,
+      "frequency": 77.78174593052022
+    },
+    {
+      "note": "E2",
+      "midi": 40,
+      "frequency": 82.40688922821748
+    },
+    {
+      "note": "F#2",
+      "midi": 42,
+      "frequency": 92.49860567790861
+    },
+    {
+      "note": "G2",
+      "midi": 43,
+      "frequency": 97.99885899543733
+    },
+    {
+      "note": "Ab2",
+      "midi": 44,
+      "frequency": 103.82617439498628
+    },
+    {
+      "note": "A2",
+      "midi": 45,
+      "frequency": 110
+    },
+    {
+      "note": "B2",
+      "midi": 47,
+      "frequency": 123.47082531403103
+    },
+    {
+      "note": "C3",
+      "midi": 48,
+      "frequency": 130.8127826502993
+    },
+    {
+      "note": "Db3",
+      "midi": 49,
+      "frequency": 138.59131548843604
+    },
+    {
+      "note": "D3",
+      "midi": 50,
+      "frequency": 146.8323839587038
+    },
+    {
+      "note": "E3",
+      "midi": 52,
+      "frequency": 164.81377845643496
+    },
+    {
+      "note": "F3",
+      "midi": 53,
+      "frequency": 174.61411571650194
+    },
+    {
+      "note": "Gb3",
+      "midi": 54,
+      "frequency": 184.99721135581723
+    },
+    {
+      "note": "F#3",
+      "midi": 54,
+      "frequency": 184.99721135581723
+    },
+    {
+      "note": "G3",
+      "midi": 55,
+      "frequency": 195.99771799087463
+    },
+    {
+      "note": "G#3",
+      "midi": 56,
+      "frequency": 207.65234878997256
+    },
+    {
+      "note": "A3",
+      "midi": 57,
+      "frequency": 220
+    },
+    {
+      "note": "Bb3",
+      "midi": 58,
+      "frequency": 233.08188075904496
+    },
+    {
+      "note": "B3",
+      "midi": 59,
+      "frequency": 246.94165062806206
+    },
+    {
+      "note": "C4",
+      "midi": 60,
+      "frequency": 261.6255653005986
+    },
+    {
+      "note": "C#4",
+      "midi": 61,
+      "frequency": 277.1826309768721
+    },
+    {
+      "note": "D4",
+      "midi": 62,
+      "frequency": 293.6647679174076
+    },
+    {
+      "note": "Eb4",
+      "midi": 63,
+      "frequency": 311.12698372208087
+    },
+    {
+      "note": "E4",
+      "midi": 64,
+      "frequency": 329.6275569128699
+    },
+    {
+      "note": "F#4",
+      "midi": 66,
+      "frequency": 369.99442271163446
+    },
+    {
+      "note": "G4",
+      "midi": 67,
+      "frequency": 391.99543598174927
+    },
+    {
+      "note": "A4",
+      "midi": 69,
+      "frequency": 440
+    },
+    {
+      "note": "B4",
+      "midi": 71,
+      "frequency": 493.8833012561241
+    }
+  ],
+  "stringCases": [
+    {
+      "frequency": 82,
+      "tuning": "guitar-standard",
+      "index": 0,
+      "note": "E2",
+      "cents": -8.569250687890976
+    },
+    {
+      "frequency": 111.3,
+      "tuning": "guitar-standard",
+      "index": 1,
+      "note": "A2",
+      "cents": 20.340082715924865
+    },
+    {
+      "frequency": 330.5,
+      "tuning": "guitar-standard",
+      "index": 5,
+      "note": "E4",
+      "cents": 4.576097579638612
+    },
+    {
+      "frequency": 196,
+      "tuning": "ukulele-standard",
+      "index": 1,
+      "note": "C4",
+      "cents": -499.97984329134164
+    },
+    {
+      "frequency": 255,
+      "tuning": "ukulele-standard",
+      "index": 1,
+      "note": "C4",
+      "cents": -44.407531998961844
+    },
+    {
+      "frequency": 441,
+      "tuning": "ukulele-standard",
+      "index": 3,
+      "note": "A4",
+      "cents": 3.93015843943305
+    },
+    {
+      "frequency": 61,
+      "tuning": "guitar-drop-b",
+      "index": 0,
+      "note": "B1",
+      "cents": -20.746851154127558
+    },
+    {
+      "frequency": 56.2,
+      "tuning": "guitar-drop-a",
+      "index": 0,
+      "note": "A1",
+      "cents": 37.36621417068522
+    }
+  ],
+  "session": [
+    {
+      "reading": null,
+      "at": 0,
+      "display": {
+        "state": "idle",
+        "label": null,
+        "octave": null,
+        "stringIndex": null,
+        "cents": 0,
+        "inTune": false,
+        "frequency": null,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 81.55452645917605,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 100,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": -17.999999999999908,
+        "inTune": false,
+        "frequency": 81.55452645917605,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 81.6487963845977,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 150,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": -16.999999999999893,
+        "inTune": false,
+        "frequency": 81.6487963845977,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 85.31296190085541,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 200,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": -15.999999999999881,
+        "inTune": false,
+        "frequency": 85.31296190085541,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.50214441071999,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 900,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 2.0000000000000973,
+        "inTune": false,
+        "frequency": 82.50214441071999,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.45450306408136,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 1100,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 1.5000000000000395,
+        "inTune": false,
+        "frequency": 82.45450306408136,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.35930288724207,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 1300,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 0.999999999999982,
+        "inTune": true,
+        "frequency": 82.35930288724207,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": null,
+      "at": 1500,
+      "display": {
+        "state": "holding",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 0.999999999999982,
+        "inTune": true,
+        "frequency": 82.35930288724207,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": null,
+      "at": 2600,
+      "display": {
+        "state": "idle",
+        "label": null,
+        "octave": null,
+        "stringIndex": null,
+        "cents": 0,
+        "inTune": false,
+        "frequency": null,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.59750969991235,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2700,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 3.999999999999901,
+        "inTune": false,
+        "frequency": 82.59750969991235,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.83640547525735,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2750,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 6.4999999999999964,
+        "inTune": false,
+        "frequency": 82.83640547525735,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.54981328402879,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2800,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 3.999999999999901,
+        "inTune": false,
+        "frequency": 82.54981328402879,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 110.4,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2850,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 3.999999999999901,
+        "inTune": false,
+        "frequency": 82.54981328402879,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 82.50214441071999,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2900,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 3.499999999999968,
+        "inTune": false,
+        "frequency": 82.50214441071999,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 110.4,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 2950,
+      "display": {
+        "state": "listening",
+        "label": "E2",
+        "octave": null,
+        "stringIndex": 0,
+        "cents": 3.499999999999968,
+        "inTune": false,
+        "frequency": 82.50214441071999,
+        "allInTuneNow": false
+      }
+    },
+    {
+      "reading": {
+        "frequency": 110.4,
+        "clarity": 0.97,
+        "rms": 0.2
+      },
+      "at": 3000,
+      "display": {
+        "state": "listening",
+        "label": "A2",
+        "octave": null,
+        "stringIndex": 1,
+        "cents": 6.283978039376564,
+        "inTune": false,
+        "frequency": 110.4,
+        "allInTuneNow": false
+      }
+    }
+  ]
+}

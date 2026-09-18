@@ -5,6 +5,8 @@ public enum EntryKind: String, Codable, Equatable {
     case site
     case app
     case path
+    /// Something built into Brochacho itself, like the tuner. `target` names the tool.
+    case tool
 }
 
 /// One thing Brochacho can open. Adding a thing to the app means adding one of these to the config.
@@ -16,7 +18,7 @@ public struct CatalogEntry: Codable, Equatable {
     /// Other things he might type or say for it ("yt").
     public var aliases: [String]
     public var kind: EntryKind
-    /// A URL for sites, a bundle identifier for apps, a file path for paths.
+    /// A URL for sites, a bundle identifier for apps, a file path for paths, a tool name for tools.
     public var target: String
     /// Which Brave profile a site opens in: "personal" or "work". Sites only.
     public var profile: String?

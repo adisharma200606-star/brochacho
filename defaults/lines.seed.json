@@ -1,89 +1,310 @@
 {
   "open_site": [
-    { "id": "os01", "text": "It's done. Don't ask how." },
-    { "id": "os02", "text": "Consider it handled." },
-    { "id": "os03", "text": "For you? Anything." },
-    { "id": "os04", "text": "Ecco. There she is." },
-    { "id": "os05", "text": "Badabing. She's open." },
-    { "id": "os06", "text": "I know a guy. He opened it." },
-    { "id": "os07", "text": "Nobody saw nothing. It's open." },
-    { "id": "os08", "text": "Done. We never spoke." },
-    { "id": "os09", "text": "Mamma mia, that was fast." },
-    { "id": "os10", "text": "Open. Like it was never closed." }
+    {
+      "id": "os01",
+      "text": "It's done. Don't ask how."
+    },
+    {
+      "id": "os02",
+      "text": "Consider it handled."
+    },
+    {
+      "id": "os03",
+      "text": "For you? Anything."
+    },
+    {
+      "id": "os04",
+      "text": "Ecco. There she is."
+    },
+    {
+      "id": "os05",
+      "text": "Badabing. She's open."
+    },
+    {
+      "id": "os06",
+      "text": "I know a guy. He opened it."
+    },
+    {
+      "id": "os07",
+      "text": "Nobody saw nothing. It's open."
+    },
+    {
+      "id": "os08",
+      "text": "Done. We never spoke."
+    },
+    {
+      "id": "os09",
+      "text": "Mamma mia, that was fast."
+    },
+    {
+      "id": "os10",
+      "text": "Open. Like it was never closed."
+    }
   ],
   "open_app": [
-    { "id": "oa01", "text": "She's running, boss." },
-    { "id": "oa02", "text": "Up she goes." },
-    { "id": "oa03", "text": "I woke her up for you." },
-    { "id": "oa04", "text": "Badaboom. Running." }
+    {
+      "id": "oa01",
+      "text": "She's running, boss."
+    },
+    {
+      "id": "oa02",
+      "text": "Up she goes."
+    },
+    {
+      "id": "oa03",
+      "text": "I woke her up for you."
+    },
+    {
+      "id": "oa04",
+      "text": "Badaboom. Running."
+    }
   ],
   "open_path": [
-    { "id": "op01", "text": "The drawer is open." },
-    { "id": "op02", "text": "Here's where you keep things." },
-    { "id": "op03", "text": "I didn't touch nothing in there." }
+    {
+      "id": "op01",
+      "text": "The drawer is open."
+    },
+    {
+      "id": "op02",
+      "text": "Here's where you keep things."
+    },
+    {
+      "id": "op03",
+      "text": "I didn't touch nothing in there."
+    }
   ],
   "saved": [
-    { "id": "sv01", "text": "I'll hold onto this." },
-    { "id": "sv02", "text": "In the vault." },
-    { "id": "sv03", "text": "Safe with me." },
-    { "id": "sv04", "text": "Nobody finds it but you." },
-    { "id": "sv05", "text": "Gulp. Delizioso." }
+    {
+      "id": "sv01",
+      "text": "I'll hold onto this."
+    },
+    {
+      "id": "sv02",
+      "text": "In the vault."
+    },
+    {
+      "id": "sv03",
+      "text": "Safe with me."
+    },
+    {
+      "id": "sv04",
+      "text": "Nobody finds it but you."
+    },
+    {
+      "id": "sv05",
+      "text": "Gulp. Delizioso."
+    }
   ],
   "pulled": [
-    { "id": "pl01", "text": "From the vault, for you." },
-    { "id": "pl02", "text": "This one, you liked." },
-    { "id": "pl03", "text": "You got good taste, you know." },
-    { "id": "pl04", "text": "An oldie. A goodie." }
+    {
+      "id": "pl01",
+      "text": "From the vault, for you."
+    },
+    {
+      "id": "pl02",
+      "text": "This one, you liked."
+    },
+    {
+      "id": "pl03",
+      "text": "You got good taste, you know."
+    },
+    {
+      "id": "pl04",
+      "text": "An oldie. A goodie."
+    }
   ],
   "another": [
-    { "id": "an01", "text": "Fine. Another." },
-    { "id": "an02", "text": "Picky. I respect it." },
-    { "id": "an03", "text": "Next." }
+    {
+      "id": "an01",
+      "text": "Fine. Another."
+    },
+    {
+      "id": "an02",
+      "text": "Picky. I respect it."
+    },
+    {
+      "id": "an03",
+      "text": "Next."
+    }
   ],
   "empty_stash": [
-    { "id": "es01", "text": "The vault is empty, boss." },
-    { "id": "es02", "text": "Nothing in here. Drop me something." }
+    {
+      "id": "es01",
+      "text": "The vault is empty, boss."
+    },
+    {
+      "id": "es02",
+      "text": "Nothing in here. Drop me something."
+    }
   ],
   "unknown": [
-    { "id": "un01", "text": "Never heard of it." },
-    { "id": "un02", "text": "That one, I don't know." },
-    { "id": "un03", "text": "Who? Never met him." }
+    {
+      "id": "un01",
+      "text": "Never heard of it."
+    },
+    {
+      "id": "un02",
+      "text": "That one, I don't know."
+    },
+    {
+      "id": "un03",
+      "text": "Who? Never met him."
+    }
   ],
-  "muted_on": [ { "id": "mo01", "text": "My lips, sealed." } ],
-  "muted_off": [ { "id": "mf01", "text": "I'm back." } ],
+  "muted_on": [
+    {
+      "id": "mo01",
+      "text": "My lips, sealed."
+    }
+  ],
+  "muted_off": [
+    {
+      "id": "mf01",
+      "text": "I'm back."
+    }
+  ],
   "target:youtube": [
-    { "id": "yt01", "text": "Opening YouTube. Mamma mia." },
-    { "id": "yt02", "text": "YouTube. Some serious Italian business." },
-    { "id": "yt03", "text": "The tube of you. She's open." },
-    { "id": "yt04", "text": "YouTube, capisce?" },
-    { "id": "yt05", "text": "Roll the pictures." }
+    {
+      "id": "yt01",
+      "text": "Opening YouTube. Mamma mia."
+    },
+    {
+      "id": "yt02",
+      "text": "YouTube. Some serious Italian business."
+    },
+    {
+      "id": "yt03",
+      "text": "The tube of you. She's open."
+    },
+    {
+      "id": "yt04",
+      "text": "YouTube, capisce?"
+    },
+    {
+      "id": "yt05",
+      "text": "Roll the pictures."
+    }
   ],
-  "target:youtube music": [ { "id": "ym01", "text": "Music, maestro." } ],
+  "target:youtube music": [
+    {
+      "id": "ym01",
+      "text": "Music, maestro."
+    }
+  ],
   "target:gmail": [
-    { "id": "gm01", "text": "The mail. Nobody read it, I swear." },
-    { "id": "gm02", "text": "Letters for the boss." }
+    {
+      "id": "gm01",
+      "text": "The mail. Nobody read it, I swear."
+    },
+    {
+      "id": "gm02",
+      "text": "Letters for the boss."
+    }
   ],
-  "target:google": [ { "id": "gg01", "text": "Go ask the big book." } ],
+  "target:google": [
+    {
+      "id": "gg01",
+      "text": "Go ask the big book."
+    }
+  ],
   "target:github": [
-    { "id": "gh01", "text": "The code vault. She's open." },
-    { "id": "gh02", "text": "Go push something beautiful." }
+    {
+      "id": "gh01",
+      "text": "The code vault. She's open."
+    },
+    {
+      "id": "gh02",
+      "text": "Go push something beautiful."
+    }
   ],
   "target:linkedin": [
-    { "id": "li01", "text": "Put on the nice suit." },
-    { "id": "li02", "text": "LinkedIn. Go shake some hands." }
+    {
+      "id": "li01",
+      "text": "Put on the nice suit."
+    },
+    {
+      "id": "li02",
+      "text": "LinkedIn. Go shake some hands."
+    }
   ],
   "target:claude": [
-    { "id": "cl01", "text": "Go ask the professor." },
-    { "id": "cl02", "text": "The smart one. She's open." }
+    {
+      "id": "cl01",
+      "text": "Go ask the professor."
+    },
+    {
+      "id": "cl02",
+      "text": "The smart one. She's open."
+    }
   ],
-  "target:whatsapp": [ { "id": "wa01", "text": "Go talk to your people." } ],
-  "target:spotify": [ { "id": "sp01", "text": "Music, maestro." } ],
+  "target:whatsapp": [
+    {
+      "id": "wa01",
+      "text": "Go talk to your people."
+    }
+  ],
+  "target:spotify": [
+    {
+      "id": "sp01",
+      "text": "Music, maestro."
+    }
+  ],
   "target:steam": [
-    { "id": "st01", "text": "Go. Make the family proud." },
-    { "id": "st02", "text": "Steam. Shoot straight, eh?" }
+    {
+      "id": "st01",
+      "text": "Go. Make the family proud."
+    },
+    {
+      "id": "st02",
+      "text": "Steam. Shoot straight, eh?"
+    }
   ],
   "target:vs code": [
-    { "id": "vc01", "text": "Back to the workshop." },
-    { "id": "vc02", "text": "The tools are on the table." }
+    {
+      "id": "vc01",
+      "text": "Back to the workshop."
+    },
+    {
+      "id": "vc02",
+      "text": "The tools are on the table."
+    }
+  ],
+  "open_tool": [
+    {
+      "id": "ot01",
+      "text": "At your service."
+    },
+    {
+      "id": "ot02",
+      "text": "Right away, boss."
+    }
+  ],
+  "target:tuner": [
+    {
+      "id": "tu01",
+      "text": "Let's hear her sing."
+    },
+    {
+      "id": "tu02",
+      "text": "Strings, eh? We fix them."
+    },
+    {
+      "id": "tu03",
+      "text": "Pluck. I listen."
+    }
+  ],
+  "all_in_tune": [
+    {
+      "id": "at01",
+      "text": "Bellissimo. She sings."
+    },
+    {
+      "id": "at02",
+      "text": "Perfetto. Now play something."
+    },
+    {
+      "id": "at03",
+      "text": "In tune. Like family."
+    }
   ]
 }

@@ -104,6 +104,23 @@
     border-radius: 999px; pointer-events: none; transition: transform .42s cubic-bezier(.5,-0.2,.7,.4), opacity .42s;
   }
 
+  /* ---- tuner ---- */
+  .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .8em; }
+  .tunehead button { all: unset; min-width: 40px; min-height: 36px; text-align: center; cursor: pointer; border: 2px solid var(--phosphor); box-sizing: border-box; }
+  .tunehead button:focus-visible { outline: 2px solid #fff; }
+  .strings { display: flex; justify-content: space-between; gap: 4px; margin: 8px 0 6px; }
+  .strings span { flex: 1; text-align: center; padding: 1px 0; opacity: .55; border-bottom: 2px solid transparent; }
+  .strings span.active { opacity: 1; background: var(--phosphor); color: #000; text-shadow: none; }
+  .strings span.locked { border-bottom-color: var(--phosphor); opacity: .9; }
+  .scale { position: relative; height: 26px; border: 2px solid var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); }
+  .scale::before { content: ''; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--phosphor); opacity: .7; }
+  .scale.intune { background: var(--phosphor); }
+  .scale.intune .needle { background: #000; box-shadow: none; }
+  .needle { position: absolute; top: 3px; bottom: 3px; width: 12px; margin-left: -6px; left: 50%; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); transition: left .09s linear; }
+  .readout { display: flex; justify-content: space-between; margin-top: 6px; font-size: .85em; min-height: 1.2em; }
+  .tunerpad { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
+  @media (prefers-reduced-motion: reduce) { .needle { transition: none; } }
+
   /* ---- gesture buttons ---- */
   .gestures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 6px 0 8px; }
   .btn {
@@ -161,6 +178,16 @@
           <ul class="rows" id="rows"></ul>
         </div>
         <div class="content" id="viewLine" hidden><div class="line" id="lineText"></div></div>
+        <div class="content" id="viewTuner" hidden>
+          <div class="tunehead">
+            <button id="tunePrev" type="button" aria-label="Previous tuning">&lsaquo;</button>
+            <span id="tuneName"></span>
+            <button id="tuneNext" type="button" aria-label="Next tuning">&rsaquo;</button>
+          </div>
+          <div class="strings" id="tuneStrings"></div>
+          <div class="scale" id="tuneScale"><div class="needle" id="tuneNeedle"></div></div>
+          <div class="readout"><span id="tuneNote"></span><span id="tuneCents"></span></div>
+        </div>
         <div class="content" id="viewPull" hidden>
           <div class="pulltitle" id="pullTitle"></div>
           <div class="pullmeta" id="pullMeta"></div>
@@ -181,6 +208,13 @@
     <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
   </div>
   <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+
+  <div class="tunerpad">
+    <button class="btn" id="btnTune" type="button">Tuner<small>type &ldquo;tune&rdquo;</small></button>
+    <button class="btn" id="btnPluck" type="button">Pluck for me<small>fake guitar</small></button>
+    <button class="btn" id="btnMic" type="button">Use my mic<small>real guitar</small></button>
+  </div>
+  <p class="note" id="tunerNote">The tuner runs the real pitch detector. &ldquo;Pluck for me&rdquo; plays a slightly flat string and slowly tunes it up, so you can watch the needle. 13 guitar tunings, 4 ukulele tunings, and a chromatic mode.</p>
 
   <details open>
     <summary>Motion</summary>
@@ -524,6 +558,7 @@
     if (e.kind === 'site') return { type: 'openURL', url: e.target, profile: e.profile || 'personal', entry: e.name };
     if (e.kind === 'app') return { type: 'openApp', bundleID: e.target, entry: e.name };
     if (e.kind === 'path') return { type: 'openPath', path: e.target, entry: e.name };
+    if (e.kind === 'tool') return { type: 'openTool', tool: e.target, entry: e.name };
     return null;
   }
 
@@ -673,12 +708,288 @@
   else root.BrochachoCore = api;
 })(typeof self !== 'undefined' ? self : this);
 </script>
+<script>/*
+ * Brochacho tuner: reference implementation.
+ *
+ * Pure maths, no microphone. The Swift package ports this file. It has three layers:
+ *   1. notes      note names <-> MIDI numbers <-> frequencies
+ *   2. detect     YIN pitch detection on a buffer of samples
+ *   3. session    turns a jumpy stream of readings into a steady display
+ */
+(function (root) {
+  'use strict';
+
+  // ---------------------------------------------------------------- notes ----
+
+  var NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  var BASE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+  /** "E2", "F#3", "Bb3" -> MIDI note number. Returns null when it cannot be read. */
+  function parseNote(name) {
+    var m = /^([A-Ga-g])([#b]?)(-?\d+)$/.exec(String(name || '').trim());
+    if (!m) return null;
+    var semitone = BASE[m[1].toUpperCase()] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+    return (parseInt(m[3], 10) + 1) * 12 + semitone;
+  }
+
+  function midiToFrequency(midi, a4) { return (a4 || 440) * Math.pow(2, (midi - 69) / 12); }
+  function frequencyToMidi(freq, a4) { return 69 + 12 * (Math.log(freq / (a4 || 440)) / Math.LN2); }
+  function centsBetween(freq, target) { return 1200 * (Math.log(freq / target) / Math.LN2); }
+
+  /** Nearest note to a frequency, and how many cents sharp (+) or flat (-) it is. */
+  function describe(freq, a4) {
+    var exact = frequencyToMidi(freq, a4);
+    var nearest = Math.round(exact);
+    var pitchClass = ((nearest % 12) + 12) % 12;
+    return { midi: nearest, name: NAMES[pitchClass], octave: Math.floor(nearest / 12) - 1, cents: (exact - nearest) * 100 };
+  }
+
+  /** Expand a tuning's note names into MIDI numbers and target frequencies. */
+  function resolveTuning(tuning, a4) {
+    return {
+      id: tuning.id, instrument: tuning.instrument, name: tuning.name,
+      strings: tuning.strings.map(function (note) {
+        var midi = parseNote(note);
+        return { note: note, midi: midi, frequency: midiToFrequency(midi, a4) };
+      })
+    };
+  }
+
+  // --------------------------------------------------------------- detect ----
+
+  var DEFAULTS = { minFrequency: 45, maxFrequency: 1200, threshold: 0.12, giveUpAbove: 0.35 };
+
+  /**
+   * YIN pitch detection (de Cheveigne and Kawahara, 2002).
+   * samples: array of numbers in -1...1. 4096 samples at 44.1 or 48 kHz reaches down to about 45 Hz,
+   * which covers Drop A (55 Hz).
+   * Returns { frequency, clarity, rms } or null when the sound has no clear pitch.
+   *   clarity: 0...1, how confident the match is. rms: loudness, for a noise gate.
+   */
+  function detectPitch(samples, sampleRate, options) {
+    var o = options || {};
+    var minF = o.minFrequency || DEFAULTS.minFrequency, maxF = o.maxFrequency || DEFAULTS.maxFrequency;
+    var threshold = o.threshold || DEFAULTS.threshold, giveUpAbove = o.giveUpAbove || DEFAULTS.giveUpAbove;
+    var n = samples.length;
+    if (n < 64) return null;
+
+    var tauMax = Math.min(Math.floor(sampleRate / minF), Math.floor(n / 2));
+    var tauMin = Math.max(2, Math.floor(sampleRate / maxF));
+    if (tauMax <= tauMin + 2) return null;
+    var windowLength = n - tauMax;
+
+    // Remove any constant offset, and measure loudness.
+    var mean = 0, i;
+    for (i = 0; i < n; i++) mean += samples[i];
+    mean /= n;
+    var x = new Array(n), energy = 0;
+    for (i = 0; i < n; i++) { x[i] = samples[i] - mean; energy += x[i] * x[i]; }
+    var rms = Math.sqrt(energy / n);
+    if (rms === 0) return null;
+
+    // Step 1 and 2: the difference function.
+    var diff = new Array(tauMax + 1);
+    diff[0] = 0;
+    for (var tau = 1; tau <= tauMax; tau++) {
+      var sum = 0;
+      for (var j = 0; j < windowLength; j++) { var delta = x[j] - x[j + tau]; sum += delta * delta; }
+      diff[tau] = sum;
+    }
+
+    // Step 3: cumulative mean normalised difference.
+    var cmnd = new Array(tauMax + 1);
+    cmnd[0] = 1;
+    var running = 0;
+    for (tau = 1; tau <= tauMax; tau++) {
+      running += diff[tau];
+      cmnd[tau] = running === 0 ? 1 : diff[tau] * tau / running;
+    }
+
+    // Step 4: the first dip under the threshold, followed down to its lowest point.
+    var found = -1;
+    for (tau = tauMin; tau <= tauMax; tau++) {
+      if (cmnd[tau] < threshold) {
+        while (tau + 1 <= tauMax && cmnd[tau + 1] < cmnd[tau]) tau++;
+        found = tau;
+        break;
+      }
+    }
+    if (found < 0) {
+      // Nothing clearly periodic. Take the best dip if it is at least plausible.
+      var best = tauMin;
+      for (tau = tauMin + 1; tau <= tauMax; tau++) if (cmnd[tau] < cmnd[best]) best = tau;
+      if (cmnd[best] > giveUpAbove) return null;
+      found = best;
+    }
+
+    // Step 5: parabolic interpolation on the raw difference function for a sub-sample period.
+    var period = found;
+    if (found > 1 && found < tauMax) {
+      var s0 = diff[found - 1], s1 = diff[found], s2 = diff[found + 1];
+      var denominator = s0 + s2 - 2 * s1;
+      if (denominator !== 0) {
+        var shift = (s0 - s2) / (2 * denominator);
+        if (shift > -1 && shift < 1) period = found + shift;
+      }
+    }
+
+    return { frequency: sampleRate / period, clarity: Math.max(0, Math.min(1, 1 - cmnd[found])), rms: rms };
+  }
+
+  // -------------------------------------------------------------- strings ----
+
+  /**
+   * Which string of the tuning is this closest to, and how far off is it?
+   *
+   * Deliberately simple: nearest string, nothing clever. An earlier version tried to "fold" readings
+   * that were an octave out onto the right string, but that makes a slack new string passing through
+   * 55 Hz read as "A2, in tune". Stray octave slips are handled in the session instead, by ignoring a
+   * change of string until two readings in a row agree.
+   */
+  function matchString(freq, resolved) {
+    var bestIndex = 0, bestCents = Infinity;
+    for (var i = 0; i < resolved.strings.length; i++) {
+      var c = centsBetween(freq, resolved.strings[i].frequency);
+      if (Math.abs(c) < Math.abs(bestCents)) { bestCents = c; bestIndex = i; }
+    }
+    var s = resolved.strings[bestIndex];
+    return { index: bestIndex, note: s.note, targetFrequency: s.frequency, cents: bestCents };
+  }
+
+  // -------------------------------------------------------------- session ----
+
+  var SESSION = { minClarity: 0.85, minRms: 0.01, toleranceCents: 5, lockAfterMs: 350, holdMs: 1200, windowMs: 600, keep: 7, switchAfter: 2 };
+
+  function newSession(options) {
+    var o = {}, k;
+    for (k in SESSION) o[k] = SESSION[k];
+    for (k in (options || {})) o[k] = options[k];
+    return { options: o, key: null, pendingKey: null, pendingCount: 0, readings: [], inTuneSince: null, lastValidAt: null, last: null,
+      lockedStrings: [], celebrated: false };
+  }
+
+  function median(values) {
+    var s = values.slice().sort(function (a, b) { return a - b; });
+    var mid = Math.floor(s.length / 2);
+    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+  }
+
+  /**
+   * Feed one detector reading (or null for "no pitch") and get back what the notch should show.
+   * resolved: a resolved tuning, or null for chromatic mode (nearest note of any kind).
+   *
+   * state: "idle"      nothing heard for a while; show "pluck a string"
+   *        "listening" a fresh reading; cents is the smoothed value
+   *        "holding"   the note has just stopped ringing; keep the last display briefly
+   */
+  function feed(session, reading, nowMs, resolved, a4) {
+    var o = session.options;
+    var valid = !!reading && reading.clarity >= o.minClarity && reading.rms >= o.minRms && reading.frequency > 0;
+
+    if (!valid) {
+      if (session.last && session.lastValidAt !== null && nowMs - session.lastValidAt <= o.holdMs) {
+        var held = {}; for (var k in session.last) held[k] = session.last[k];
+        held.state = 'holding'; held.allInTuneNow = false;
+        return held;
+      }
+      session.key = null; session.pendingKey = null; session.pendingCount = 0;
+      session.readings = []; session.inTuneSince = null; session.last = null;
+      return { state: 'idle', label: null, octave: null, stringIndex: null, cents: 0, inTune: false, frequency: null, allInTuneNow: false };
+    }
+
+    var key, label, octave, stringIndex, cents;
+    if (resolved) {
+      var m = matchString(reading.frequency, resolved);
+      key = 's' + m.index; label = m.note; octave = null; stringIndex = m.index; cents = m.cents;
+    } else {
+      var d = describe(reading.frequency, a4);
+      key = 'm' + d.midi; label = d.name; octave = d.octave; stringIndex = null; cents = d.cents;
+    }
+
+    // A different string or note only takes over once `switchAfter` readings in a row agree on it.
+    // One stray reading (an octave slip, a knock on the desk) changes nothing.
+    if (key !== session.key && session.key !== null) {
+      if (key === session.pendingKey) session.pendingCount += 1;
+      else { session.pendingKey = key; session.pendingCount = 1; }
+      if (session.pendingCount < o.switchAfter) {
+        session.lastValidAt = nowMs;
+        var kept = {}; for (var p in session.last) kept[p] = session.last[p];
+        kept.allInTuneNow = false;
+        return kept;
+      }
+    }
+    if (key !== session.key) { session.key = key; session.readings = []; session.inTuneSince = null; }
+    session.pendingKey = null; session.pendingCount = 0;
+    session.readings.push({ cents: cents, at: nowMs });
+    session.readings = session.readings.filter(function (r) { return nowMs - r.at <= o.windowMs; });
+    if (session.readings.length > o.keep) session.readings = session.readings.slice(session.readings.length - o.keep);
+
+    var smoothed = median(session.readings.map(function (r) { return r.cents; }));
+    if (Math.abs(smoothed) <= o.toleranceCents) {
+      if (session.inTuneSince === null) session.inTuneSince = nowMs;
+    } else {
+      session.inTuneSince = null;
+    }
+    var locked = session.inTuneSince !== null && nowMs - session.inTuneSince >= o.lockAfterMs;
+
+    // The one moment worth a line from the voice: every string of the tuning has locked at least once.
+    var allInTuneNow = false;
+    if (locked && resolved && stringIndex !== null && session.lockedStrings.indexOf(stringIndex) < 0) {
+      session.lockedStrings.push(stringIndex);
+      if (!session.celebrated && session.lockedStrings.length === resolved.strings.length) {
+        session.celebrated = true; allInTuneNow = true;
+      }
+    }
+
+    session.lastValidAt = nowMs;
+    session.last = { state: 'listening', label: label, octave: octave, stringIndex: stringIndex, cents: smoothed, inTune: locked, frequency: reading.frequency };
+    var shown = {}; for (var f in session.last) shown[f] = session.last[f];
+    shown.allInTuneNow = allInTuneNow;
+    return shown;
+  }
+
+  // ------------------------------------------------------- test signals ----
+
+  /**
+   * A plucked-string-like test tone: a stack of harmonics that die away, with a deliberately weak
+   * fundamental when `weakFundamental` is set, which is what a laptop microphone does to low strings.
+   * `noise` adds deterministic pseudo-random hiss (Park-Miller, which stays exact in a double, so every port makes the same numbers).
+   */
+  function synthString(frequency, sampleRate, length, options) {
+    var o = options || {};
+    var amps = o.weakFundamental ? [0.08, 1.0, 0.7, 0.45, 0.3, 0.2] : [1.0, 0.6, 0.4, 0.25, 0.15, 0.1];
+    var noise = o.noise || 0, seed = 12345, out = new Array(length), peak = 0, i, h;
+    for (i = 0; i < length; i++) {
+      var t = i / sampleRate, v = 0;
+      for (h = 0; h < amps.length; h++) {
+        var f = frequency * (h + 1);
+        if (f < sampleRate / 2) v += amps[h] * Math.sin(2 * Math.PI * f * t + h * 0.7) * Math.exp(-t * (1.5 + h));
+      }
+      if (noise) { seed = (seed * 48271) % 2147483647; v += noise * (seed / 2147483647 * 2 - 1); }
+      out[i] = v; if (Math.abs(v) > peak) peak = Math.abs(v);
+    }
+    for (i = 0; i < length; i++) out[i] = out[i] / (peak || 1) * 0.5;
+    return out;
+  }
+
+  var api = {
+    NAMES: NAMES, parseNote: parseNote, midiToFrequency: midiToFrequency, frequencyToMidi: frequencyToMidi,
+    centsBetween: centsBetween, describe: describe, resolveTuning: resolveTuning,
+    detectPitch: detectPitch, matchString: matchString,
+    newSession: newSession, feed: feed, median: median, synthString: synthString, SESSION: SESSION
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.BrochachoTuner = api;
+})(typeof self !== 'undefined' ? self : this);
+</script>
 <script>
 (function () {
   'use strict';
   var core = self.BrochachoCore;
-  var CATALOG = [{"name": "youtube", "display": "YouTube", "aliases": ["yt"], "kind": "site", "target": "https://www.youtube.com", "profile": "personal", "searchTemplate": "https://www.youtube.com/results?search_query={q}"}, {"name": "youtube music", "display": "YouTube Music", "aliases": ["ytm"], "kind": "site", "target": "https://music.youtube.com", "profile": "personal"}, {"name": "gmail", "display": "Gmail", "aliases": ["mail"], "kind": "site", "target": "https://mail.google.com", "profile": "personal"}, {"name": "google", "display": "Google", "aliases": ["g"], "kind": "site", "target": "https://www.google.com", "profile": "personal", "searchTemplate": "https://www.google.com/search?q={q}"}, {"name": "github", "display": "GitHub", "aliases": ["gh"], "kind": "site", "target": "https://github.com", "profile": "personal", "searchTemplate": "https://github.com/search?q={q}"}, {"name": "linkedin", "display": "LinkedIn", "aliases": ["li"], "kind": "site", "target": "https://www.linkedin.com/feed/", "profile": "personal"}, {"name": "claude", "display": "Claude", "aliases": [], "kind": "site", "target": "https://claude.ai", "profile": "personal"}, {"name": "whatsapp", "display": "WhatsApp", "aliases": ["wa"], "kind": "app", "target": "net.whatsapp.WhatsApp"}, {"name": "spotify", "display": "Spotify", "aliases": [], "kind": "app", "target": "com.spotify.client"}, {"name": "steam", "display": "Steam", "aliases": [], "kind": "app", "target": "com.valvesoftware.steam"}, {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"}, {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"}, {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"}];
-  var BANK = {"open_site": [{"id": "os01", "text": "It's done. Don't ask how."}, {"id": "os02", "text": "Consider it handled."}, {"id": "os03", "text": "For you? Anything."}, {"id": "os04", "text": "Ecco. There she is."}, {"id": "os05", "text": "Badabing. She's open."}, {"id": "os06", "text": "I know a guy. He opened it."}, {"id": "os07", "text": "Nobody saw nothing. It's open."}, {"id": "os08", "text": "Done. We never spoke."}, {"id": "os09", "text": "Mamma mia, that was fast."}, {"id": "os10", "text": "Open. Like it was never closed."}], "open_app": [{"id": "oa01", "text": "She's running, boss."}, {"id": "oa02", "text": "Up she goes."}, {"id": "oa03", "text": "I woke her up for you."}, {"id": "oa04", "text": "Badaboom. Running."}], "open_path": [{"id": "op01", "text": "The drawer is open."}, {"id": "op02", "text": "Here's where you keep things."}, {"id": "op03", "text": "I didn't touch nothing in there."}], "saved": [{"id": "sv01", "text": "I'll hold onto this."}, {"id": "sv02", "text": "In the vault."}, {"id": "sv03", "text": "Safe with me."}, {"id": "sv04", "text": "Nobody finds it but you."}, {"id": "sv05", "text": "Gulp. Delizioso."}], "pulled": [{"id": "pl01", "text": "From the vault, for you."}, {"id": "pl02", "text": "This one, you liked."}, {"id": "pl03", "text": "You got good taste, you know."}, {"id": "pl04", "text": "An oldie. A goodie."}], "another": [{"id": "an01", "text": "Fine. Another."}, {"id": "an02", "text": "Picky. I respect it."}, {"id": "an03", "text": "Next."}], "empty_stash": [{"id": "es01", "text": "The vault is empty, boss."}, {"id": "es02", "text": "Nothing in here. Drop me something."}], "unknown": [{"id": "un01", "text": "Never heard of it."}, {"id": "un02", "text": "That one, I don't know."}, {"id": "un03", "text": "Who? Never met him."}], "muted_on": [{"id": "mo01", "text": "My lips, sealed."}], "muted_off": [{"id": "mf01", "text": "I'm back."}], "target:youtube": [{"id": "yt01", "text": "Opening YouTube. Mamma mia."}, {"id": "yt02", "text": "YouTube. Some serious Italian business."}, {"id": "yt03", "text": "The tube of you. She's open."}, {"id": "yt04", "text": "YouTube, capisce?"}, {"id": "yt05", "text": "Roll the pictures."}], "target:youtube music": [{"id": "ym01", "text": "Music, maestro."}], "target:gmail": [{"id": "gm01", "text": "The mail. Nobody read it, I swear."}, {"id": "gm02", "text": "Letters for the boss."}], "target:google": [{"id": "gg01", "text": "Go ask the big book."}], "target:github": [{"id": "gh01", "text": "The code vault. She's open."}, {"id": "gh02", "text": "Go push something beautiful."}], "target:linkedin": [{"id": "li01", "text": "Put on the nice suit."}, {"id": "li02", "text": "LinkedIn. Go shake some hands."}], "target:claude": [{"id": "cl01", "text": "Go ask the professor."}, {"id": "cl02", "text": "The smart one. She's open."}], "target:whatsapp": [{"id": "wa01", "text": "Go talk to your people."}], "target:spotify": [{"id": "sp01", "text": "Music, maestro."}], "target:steam": [{"id": "st01", "text": "Go. Make the family proud."}, {"id": "st02", "text": "Steam. Shoot straight, eh?"}], "target:vs code": [{"id": "vc01", "text": "Back to the workshop."}, {"id": "vc02", "text": "The tools are on the table."}]};
+  var CATALOG = [{"name": "youtube", "display": "YouTube", "aliases": ["yt"], "kind": "site", "target": "https://www.youtube.com", "profile": "personal", "searchTemplate": "https://www.youtube.com/results?search_query={q}"}, {"name": "youtube music", "display": "YouTube Music", "aliases": ["ytm"], "kind": "site", "target": "https://music.youtube.com", "profile": "personal"}, {"name": "gmail", "display": "Gmail", "aliases": ["mail"], "kind": "site", "target": "https://mail.google.com", "profile": "personal"}, {"name": "google", "display": "Google", "aliases": ["g"], "kind": "site", "target": "https://www.google.com", "profile": "personal", "searchTemplate": "https://www.google.com/search?q={q}"}, {"name": "github", "display": "GitHub", "aliases": ["gh"], "kind": "site", "target": "https://github.com", "profile": "personal", "searchTemplate": "https://github.com/search?q={q}"}, {"name": "linkedin", "display": "LinkedIn", "aliases": ["li"], "kind": "site", "target": "https://www.linkedin.com/feed/", "profile": "personal"}, {"name": "claude", "display": "Claude", "aliases": [], "kind": "site", "target": "https://claude.ai", "profile": "personal"}, {"name": "whatsapp", "display": "WhatsApp", "aliases": ["wa"], "kind": "app", "target": "net.whatsapp.WhatsApp"}, {"name": "spotify", "display": "Spotify", "aliases": [], "kind": "app", "target": "com.spotify.client"}, {"name": "steam", "display": "Steam", "aliases": [], "kind": "app", "target": "com.valvesoftware.steam"}, {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"}, {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"}, {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"}, {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"}];
+  var BANK = {"open_site": [{"id": "os01", "text": "It's done. Don't ask how."}, {"id": "os02", "text": "Consider it handled."}, {"id": "os03", "text": "For you? Anything."}, {"id": "os04", "text": "Ecco. There she is."}, {"id": "os05", "text": "Badabing. She's open."}, {"id": "os06", "text": "I know a guy. He opened it."}, {"id": "os07", "text": "Nobody saw nothing. It's open."}, {"id": "os08", "text": "Done. We never spoke."}, {"id": "os09", "text": "Mamma mia, that was fast."}, {"id": "os10", "text": "Open. Like it was never closed."}], "open_app": [{"id": "oa01", "text": "She's running, boss."}, {"id": "oa02", "text": "Up she goes."}, {"id": "oa03", "text": "I woke her up for you."}, {"id": "oa04", "text": "Badaboom. Running."}], "open_path": [{"id": "op01", "text": "The drawer is open."}, {"id": "op02", "text": "Here's where you keep things."}, {"id": "op03", "text": "I didn't touch nothing in there."}], "saved": [{"id": "sv01", "text": "I'll hold onto this."}, {"id": "sv02", "text": "In the vault."}, {"id": "sv03", "text": "Safe with me."}, {"id": "sv04", "text": "Nobody finds it but you."}, {"id": "sv05", "text": "Gulp. Delizioso."}], "pulled": [{"id": "pl01", "text": "From the vault, for you."}, {"id": "pl02", "text": "This one, you liked."}, {"id": "pl03", "text": "You got good taste, you know."}, {"id": "pl04", "text": "An oldie. A goodie."}], "another": [{"id": "an01", "text": "Fine. Another."}, {"id": "an02", "text": "Picky. I respect it."}, {"id": "an03", "text": "Next."}], "empty_stash": [{"id": "es01", "text": "The vault is empty, boss."}, {"id": "es02", "text": "Nothing in here. Drop me something."}], "unknown": [{"id": "un01", "text": "Never heard of it."}, {"id": "un02", "text": "That one, I don't know."}, {"id": "un03", "text": "Who? Never met him."}], "muted_on": [{"id": "mo01", "text": "My lips, sealed."}], "muted_off": [{"id": "mf01", "text": "I'm back."}], "target:youtube": [{"id": "yt01", "text": "Opening YouTube. Mamma mia."}, {"id": "yt02", "text": "YouTube. Some serious Italian business."}, {"id": "yt03", "text": "The tube of you. She's open."}, {"id": "yt04", "text": "YouTube, capisce?"}, {"id": "yt05", "text": "Roll the pictures."}], "target:youtube music": [{"id": "ym01", "text": "Music, maestro."}], "target:gmail": [{"id": "gm01", "text": "The mail. Nobody read it, I swear."}, {"id": "gm02", "text": "Letters for the boss."}], "target:google": [{"id": "gg01", "text": "Go ask the big book."}], "target:github": [{"id": "gh01", "text": "The code vault. She's open."}, {"id": "gh02", "text": "Go push something beautiful."}], "target:linkedin": [{"id": "li01", "text": "Put on the nice suit."}, {"id": "li02", "text": "LinkedIn. Go shake some hands."}], "target:claude": [{"id": "cl01", "text": "Go ask the professor."}, {"id": "cl02", "text": "The smart one. She's open."}], "target:whatsapp": [{"id": "wa01", "text": "Go talk to your people."}], "target:spotify": [{"id": "sp01", "text": "Music, maestro."}], "target:steam": [{"id": "st01", "text": "Go. Make the family proud."}, {"id": "st02", "text": "Steam. Shoot straight, eh?"}], "target:vs code": [{"id": "vc01", "text": "Back to the workshop."}, {"id": "vc02", "text": "The tools are on the table."}], "open_tool": [{"id": "ot01", "text": "At your service."}, {"id": "ot02", "text": "Right away, boss."}], "target:tuner": [{"id": "tu01", "text": "Let's hear her sing."}, {"id": "tu02", "text": "Strings, eh? We fix them."}, {"id": "tu03", "text": "Pluck. I listen."}], "all_in_tune": [{"id": "at01", "text": "Bellissimo. She sings."}, {"id": "at02", "text": "Perfetto. Now play something."}, {"id": "at03", "text": "In tune. Like family."}]};
+  var tunerCore = self.BrochachoTuner;
+  var TUNINGS = [{"id": "guitar-standard", "instrument": "guitar", "name": "Standard", "strings": ["E2", "A2", "D3", "G3", "B3", "E4"]}, {"id": "guitar-half-down", "instrument": "guitar", "name": "Half step down", "strings": ["Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4"]}, {"id": "guitar-full-down", "instrument": "guitar", "name": "Full step down", "strings": ["D2", "G2", "C3", "F3", "A3", "D4"]}, {"id": "guitar-drop-d", "instrument": "guitar", "name": "Drop D", "strings": ["D2", "A2", "D3", "G3", "B3", "E4"]}, {"id": "guitar-double-drop-d", "instrument": "guitar", "name": "Double drop D", "strings": ["D2", "A2", "D3", "G3", "B3", "D4"]}, {"id": "guitar-dadgad", "instrument": "guitar", "name": "DADGAD", "strings": ["D2", "A2", "D3", "G3", "A3", "D4"]}, {"id": "guitar-open-g", "instrument": "guitar", "name": "Open G", "strings": ["D2", "G2", "D3", "G3", "B3", "D4"]}, {"id": "guitar-open-d", "instrument": "guitar", "name": "Open D", "strings": ["D2", "A2", "D3", "F#3", "A3", "D4"]}, {"id": "guitar-open-e", "instrument": "guitar", "name": "Open E", "strings": ["E2", "B2", "E3", "G#3", "B3", "E4"]}, {"id": "guitar-open-c", "instrument": "guitar", "name": "Open C", "strings": ["C2", "G2", "C3", "G3", "C4", "E4"]}, {"id": "guitar-drop-c", "instrument": "guitar", "name": "Drop C", "strings": ["C2", "G2", "C3", "F3", "A3", "D4"]}, {"id": "guitar-drop-b", "instrument": "guitar", "name": "Drop B", "strings": ["B1", "F#2", "B2", "E3", "G#3", "C#4"]}, {"id": "guitar-drop-a", "instrument": "guitar", "name": "Drop A", "strings": ["A1", "E2", "A2", "D3", "F#3", "B3"]}, {"id": "ukulele-standard", "instrument": "ukulele", "name": "Standard (high G)", "strings": ["G4", "C4", "E4", "A4"]}, {"id": "ukulele-low-g", "instrument": "ukulele", "name": "Low G", "strings": ["G3", "C4", "E4", "A4"]}, {"id": "ukulele-baritone", "instrument": "ukulele", "name": "Baritone", "strings": ["D3", "G3", "B3", "E4"]}, {"id": "ukulele-d", "instrument": "ukulele", "name": "D tuning", "strings": ["A4", "D4", "F#4", "B4"]}];
 
   var DEFAULTS = {
     motion: { stiffness: 260, damping: 24 },
@@ -713,7 +1024,7 @@
   var closeTimer = null;
 
   var stage = $('stage'), notch = $('notch'), cmd = $('cmd');
-  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull') };
+  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull'), tuner: $('viewTuner') };
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ------------------------------------------------------- spring physics
@@ -774,6 +1085,7 @@
   }
   function close() {
     clearTimeout(closeTimer);
+    if (typeof stopSources === 'function') stopSources();
     mode = 'closed'; open.target = 0; cmd.blur();
     notch.setAttribute('aria-expanded', 'false');
     kick();
@@ -831,6 +1143,7 @@
     if (decision && decision.mode === 'search') return 'search';
     if (entry.kind === 'site') return 'Brave / ' + (entry.profile || 'personal');
     if (entry.kind === 'app') return 'app';
+    if (entry.kind === 'tool') return 'in the notch';
     return 'Finder';
   }
   function renderRows() {
@@ -861,6 +1174,7 @@
     if (decision.mode === 'search') return 'Searched ' + name + ' for \u201C' + decision.query + '\u201D in Brave, ' + plan.profile + ' profile';
     if (plan.type === 'openURL') return 'Opened ' + name + ' in Brave, ' + plan.profile + ' profile';
     if (plan.type === 'openApp') return 'Opened the ' + name + ' app';
+    if (plan.type === 'openTool') return 'Opened the ' + name + ' in the notch';
     return 'Opened ' + plan.path + ' in Finder';
   }
   function showLine(pick, holdMs) {
@@ -886,6 +1200,7 @@
     // Action first. The line comes after, and never holds the action up.
     log(actionText(plan, decision), ms);
     cmd.blur();
+    if (plan.type === 'openTool') { sayLine('open_tool', entry.name); openTuner(); return; }
     var category = plan.type === 'openURL' ? 'open_site' : plan.type === 'openApp' ? 'open_app' : 'open_path';
     showLine(sayLine(category, entry.name));
   }
@@ -919,6 +1234,103 @@
       showLine(sayLine('saved', null), 1500);
     }, reduced ? 0 : 430);
   }
+
+
+  // ---------------------------------------------------------------- tuner
+  var tuningIndex = 0, tuneSession = tunerCore.newSession(), resolvedTuning = null, tuneTimer = null;
+  var audioCtx = null, osc = null, oscGain = null, micStream = null, analyser = null, micBuffer = null;
+  var MODES = TUNINGS.concat([{ id: 'chromatic', instrument: 'any', name: 'Chromatic', strings: [] }]);
+
+  function setTuning(i) {
+    tuningIndex = (i + MODES.length) % MODES.length;
+    var t = MODES[tuningIndex];
+    resolvedTuning = t.strings.length ? tunerCore.resolveTuning(t, 440) : null;
+    tuneSession = tunerCore.newSession();
+    $('tuneName').textContent = (t.instrument === 'any' ? '' : t.instrument + ' / ') + t.name;
+    var row = $('tuneStrings'); row.innerHTML = '';
+    t.strings.forEach(function (n) { var sp = document.createElement('span'); sp.textContent = n; row.appendChild(sp); });
+    paintTuner({ state: 'idle', cents: 0, inTune: false, label: null });
+    refit();
+  }
+  function paintTuner(d) {
+    var spans = $('tuneStrings').children;
+    for (var i = 0; i < spans.length; i++) {
+      spans[i].classList.toggle('active', d.state !== 'idle' && d.stringIndex === i);
+      spans[i].classList.toggle('locked', tuneSession.lockedStrings.indexOf(i) >= 0);
+    }
+    var c = Math.max(-50, Math.min(50, d.cents || 0));
+    $('tuneNeedle').style.left = (50 + c) + '%';
+    $('tuneNeedle').style.opacity = d.state === 'idle' ? .25 : 1;
+    $('tuneScale').classList.toggle('intune', !!d.inTune);
+    if (d.state === 'idle') { $('tuneNote').textContent = 'pluck a string'; $('tuneCents').textContent = ''; return; }
+    $('tuneNote').textContent = d.label + (d.octave == null ? '' : d.octave);
+    var r = Math.round(d.cents);
+    $('tuneCents').textContent = d.inTune ? 'in tune' : (r > 0 ? '+' : '') + r + ' cents, ' + (r < 0 ? 'tune up' : 'tune down');
+  }
+  function heard(reading) {
+    var d = tunerCore.feed(tuneSession, reading, Date.now(), resolvedTuning, 440);
+    paintTuner(d);
+    if (d.allInTuneNow) { var pick = sayLine('all_in_tune', null, true); if (pick) log('Every string locked. He says: ' + pick.text); }
+  }
+  function openTuner() {
+    unlockVoice(); clearTimeout(closeTimer);
+    setTuning(tuningIndex); show('tuner');
+    log('Opened the Tuner in the notch');
+  }
+  function stopSources() {
+    clearInterval(tuneTimer); tuneTimer = null;
+    if (oscGain) { try { oscGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05); } catch (e) {} }
+    if (micStream) { micStream.getTracks().forEach(function (t) { t.stop(); }); micStream = null; analyser = null; }
+  }
+  function ensureAudio() {
+    if (!audioCtx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false; audioCtx = new AC(); }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return true;
+  }
+  // A fake guitar: each string starts flat and is slowly "tuned up", through the real detector.
+  function pluckForMe() {
+    if (mode !== 'tuner') openTuner();
+    stopSources();
+    if (!resolvedTuning) setTuning(0);
+    var strings = resolvedTuning.strings, si = 0, tick = 0, PER = 34, sound = ensureAudio();
+    if (sound) {
+      if (!osc) { osc = audioCtx.createOscillator(); osc.type = 'triangle'; oscGain = audioCtx.createGain(); oscGain.gain.value = 0; osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(); }
+    }
+    tuneTimer = setInterval(function () {
+      if (mode !== 'tuner') { stopSources(); return; }
+      if (si >= strings.length) { stopSources(); heard(null); return; }
+      var progress = Math.min(1, tick / 22);
+      var cents = -38 * (1 - progress) * (1 - progress);
+      var f = strings[si].frequency * Math.pow(2, cents / 1200);
+      if (sound) { osc.frequency.setTargetAtTime(f, audioCtx.currentTime, 0.02); oscGain.gain.setTargetAtTime(tick % PER < PER - 3 ? 0.12 : 0, audioCtx.currentTime, 0.03); }
+      heard(tunerCore.detectPitch(tunerCore.synthString(f, 44100, 4096, { weakFundamental: f < 100, noise: 0.01 }), 44100));
+      tick++;
+      if (tick >= PER) { tick = 0; si++; }
+    }, 100);
+  }
+  function useMic() {
+    if (mode !== 'tuner') openTuner();
+    stopSources();
+    var note = $('tunerNote');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !ensureAudio()) { note.textContent = 'This viewer does not allow the microphone. The Mac app will use the real one.'; return; }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }).then(function (stream) {
+      micStream = stream;
+      var src = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 4096; src.connect(analyser);
+      micBuffer = new Float32Array(4096);
+      note.textContent = 'Listening on your phone\u2019s mic. Pluck a string near it.';
+      tuneTimer = setInterval(function () {
+        if (mode !== 'tuner' || !analyser) { stopSources(); return; }
+        analyser.getFloatTimeDomainData(micBuffer);
+        heard(tunerCore.detectPitch(Array.prototype.slice.call(micBuffer), audioCtx.sampleRate));
+      }, 90);
+    }).catch(function () { note.textContent = 'The microphone is blocked here. Try opening the page in your browser, or use \u201CPluck for me\u201D.'; });
+  }
+  $('btnTune').addEventListener('click', openTuner);
+  $('btnPluck').addEventListener('click', pluckForMe);
+  $('btnMic').addEventListener('click', useMic);
+  $('tunePrev').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex - 1); });
+  $('tuneNext').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex + 1); });
 
   // ---------------------------------------------------------------- wiring
   $('btnType').addEventListener('click', startTyping);
@@ -1010,7 +1422,7 @@
   if (canSpeak) speechSynthesis.onvoiceschanged = loadVoices;
   else $('voiceNote').textContent = 'This viewer cannot speak. Open the page in your browser to hear him.';
 
-  window.__brochacho = { run: run, startTyping: startTyping, pull: pull, drop: drop, state: function () { return { mode: mode, open: open.x, log: $('logText').textContent, line: $('lineText').textContent }; } };
+  window.__brochacho = { openTuner: openTuner, pluckForMe: pluckForMe, run: run, startTyping: startTyping, pull: pull, drop: drop, state: function () { return { mode: mode, open: open.x, log: $('logText').textContent, line: $('lineText').textContent }; } };
 })();
 </script>
 </body>

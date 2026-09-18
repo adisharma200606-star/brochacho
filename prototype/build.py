@@ -11,6 +11,10 @@ if not lines_path.exists():
 lines = json.loads(lines_path.read_text())
 assert '</script' not in core
 html = html.replace('/*__CORE__*/', core)
+tuner = (root / 'reference-js' / 'tuner.js').read_text()
+assert '</script' not in tuner
+html = html.replace('/*__TUNER__*/', tuner)
+html = html.replace('/*__TUNINGS__*/[]', json.dumps(json.loads((root / 'defaults' / 'tunings.json').read_text())))
 html = html.replace('/*__CATALOG__*/[]', json.dumps(catalog))
 html = html.replace('/*__LINES__*/{}', json.dumps(lines))
 out = root / 'prototype' / 'index.html'

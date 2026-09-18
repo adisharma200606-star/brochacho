@@ -71,6 +71,13 @@ const MATCH_CASES = [
   ['c', 'open', 'claude', null, { claude: 5 }, true],
   ['g', 'open', 'google', null, { gmail: 99 }, true], // exact alias still beats a popular prefix
 
+  // built-in tools are just more names in the catalog
+  ['tune', 'open', 'tuner', null, {}, true],
+  ['tuner', 'open', 'tuner', null, {}, true],
+  ['guitar tuner', 'open', 'tuner', null, {}, true],
+  ['uke', 'open', 'tuner', null, {}, true],
+  ['open the tuner', 'open', 'tuner', null, {}, true],
+
   // nothing
   ['', 'empty', null, null, {}, false],
   ['    ', 'empty', null, null, {}, false],
@@ -142,6 +149,7 @@ test('plan: sites, apps, paths and searches', () => {
     'https://www.youtube.com/results?search_query=berserk%20%26%20guts%3A%201997%20ost');
   assert.strictEqual(core.plan(core.match('g café ☕', catalog)).url,
     'https://www.google.com/search?q=caf%C3%A9%20%E2%98%95');
+  assert.deepStrictEqual(core.plan(core.match('tune', catalog)), { type: 'openTool', tool: 'tuner', entry: 'tuner' });
   assert.strictEqual(core.plan(core.match('zzz', catalog)), null);
   assert.strictEqual(core.plan(core.match('', catalog)), null);
 });

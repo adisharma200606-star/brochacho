@@ -90,6 +90,8 @@ public enum Lines {
         "open_site": [Line(id: "fb-os1", text: "It's done. Don't ask how.")],
         "open_app": [Line(id: "fb-oa1", text: "She's running, boss.")],
         "open_path": [Line(id: "fb-op1", text: "The drawer is open.")],
+        "open_tool": [Line(id: "fb-ot1", text: "At your service.")],
+        "all_in_tune": [Line(id: "fb-at1", text: "Bellissimo. She sings.")],
         "saved": [Line(id: "fb-sv1", text: "I'll hold onto this.")],
         "pulled": [Line(id: "fb-pl1", text: "From the vault, for you.")],
         "another": [Line(id: "fb-an1", text: "Fine. Another.")],

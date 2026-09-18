@@ -1,0 +1,19 @@
+[
+  { "id": "guitar-standard",   "instrument": "guitar",  "name": "Standard",        "strings": ["E2", "A2", "D3", "G3", "B3", "E4"] },
+  { "id": "guitar-half-down",  "instrument": "guitar",  "name": "Half step down",  "strings": ["Eb2", "Ab2", "Db3", "Gb3", "Bb3", "Eb4"] },
+  { "id": "guitar-full-down",  "instrument": "guitar",  "name": "Full step down",  "strings": ["D2", "G2", "C3", "F3", "A3", "D4"] },
+  { "id": "guitar-drop-d",     "instrument": "guitar",  "name": "Drop D",          "strings": ["D2", "A2", "D3", "G3", "B3", "E4"] },
+  { "id": "guitar-double-drop-d", "instrument": "guitar", "name": "Double drop D", "strings": ["D2", "A2", "D3", "G3", "B3", "D4"] },
+  { "id": "guitar-dadgad",     "instrument": "guitar",  "name": "DADGAD",          "strings": ["D2", "A2", "D3", "G3", "A3", "D4"] },
+  { "id": "guitar-open-g",     "instrument": "guitar",  "name": "Open G",          "strings": ["D2", "G2", "D3", "G3", "B3", "D4"] },
+  { "id": "guitar-open-d",     "instrument": "guitar",  "name": "Open D",          "strings": ["D2", "A2", "D3", "F#3", "A3", "D4"] },
+  { "id": "guitar-open-e",     "instrument": "guitar",  "name": "Open E",          "strings": ["E2", "B2", "E3", "G#3", "B3", "E4"] },
+  { "id": "guitar-open-c",     "instrument": "guitar",  "name": "Open C",          "strings": ["C2", "G2", "C3", "G3", "C4", "E4"] },
+  { "id": "guitar-drop-c",     "instrument": "guitar",  "name": "Drop C",          "strings": ["C2", "G2", "C3", "F3", "A3", "D4"] },
+  { "id": "guitar-drop-b",     "instrument": "guitar",  "name": "Drop B",          "strings": ["B1", "F#2", "B2", "E3", "G#3", "C#4"] },
+  { "id": "guitar-drop-a",     "instrument": "guitar",  "name": "Drop A",          "strings": ["A1", "E2", "A2", "D3", "F#3", "B3"] },
+  { "id": "ukulele-standard",  "instrument": "ukulele", "name": "Standard (high G)", "strings": ["G4", "C4", "E4", "A4"] },
+  { "id": "ukulele-low-g",     "instrument": "ukulele", "name": "Low G",           "strings": ["G3", "C4", "E4", "A4"] },
+  { "id": "ukulele-baritone",  "instrument": "ukulele", "name": "Baritone",        "strings": ["D3", "G3", "B3", "E4"] },
+  { "id": "ukulele-d",         "instrument": "ukulele", "name": "D tuning",        "strings": ["A4", "D4", "F#4", "B4"] }
+]

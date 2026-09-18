@@ -281,6 +281,7 @@
     if (e.kind === 'site') return { type: 'openURL', url: e.target, profile: e.profile || 'personal', entry: e.name };
     if (e.kind === 'app') return { type: 'openApp', bundleID: e.target, entry: e.name };
     if (e.kind === 'path') return { type: 'openPath', path: e.target, entry: e.name };
+    if (e.kind === 'tool') return { type: 'openTool', tool: e.target, entry: e.name };
     return null;
   }
 

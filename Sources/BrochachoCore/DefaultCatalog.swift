@@ -15,6 +15,7 @@ public enum DefaultCatalog {
         CatalogEntry(name: "steam", display: "Steam", aliases: [], kind: .app, target: "com.valvesoftware.steam", profile: nil, searchTemplate: nil),
         CatalogEntry(name: "vs code", display: "VS Code", aliases: ["code", "visual studio code"], kind: .app, target: "com.microsoft.VSCode", profile: nil, searchTemplate: nil),
         CatalogEntry(name: "downloads", display: "Downloads", aliases: ["dl"], kind: .path, target: "~/Downloads", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "desktop", display: "Desktop", aliases: [], kind: .path, target: "~/Desktop", profile: nil, searchTemplate: nil)
+        CatalogEntry(name: "desktop", display: "Desktop", aliases: [], kind: .path, target: "~/Desktop", profile: nil, searchTemplate: nil),
+        CatalogEntry(name: "tuner", display: "Tuner", aliases: ["tune", "guitar tuner", "ukulele tuner", "uke"], kind: .tool, target: "tuner", profile: nil, searchTemplate: nil)
     ]
 }

@@ -119,6 +119,18 @@
       "aliases": [],
       "kind": "path",
       "target": "~/Desktop"
+    },
+    {
+      "name": "tuner",
+      "display": "Tuner",
+      "aliases": [
+        "tune",
+        "guitar tuner",
+        "ukulele tuner",
+        "uke"
+      ],
+      "kind": "tool",
+      "target": "tuner"
     }
   ],
   "cases": [
@@ -292,6 +304,10 @@
         },
         {
           "name": "gmail",
+          "band": "prefix"
+        },
+        {
+          "name": "tuner",
           "band": "prefix"
         }
       ],
@@ -616,6 +632,10 @@
         {
           "name": "github",
           "band": "prefix"
+        },
+        {
+          "name": "tuner",
+          "band": "subsequence"
         }
       ],
       "plan": {
@@ -1003,6 +1023,10 @@
         {
           "name": "github",
           "band": "prefix"
+        },
+        {
+          "name": "tuner",
+          "band": "prefix"
         }
       ],
       "plan": {
@@ -1010,6 +1034,96 @@
         "url": "https://www.google.com",
         "profile": "personal",
         "entry": "google"
+      }
+    },
+    {
+      "input": "tune",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
+      }
+    },
+    {
+      "input": "tuner",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
+      }
+    },
+    {
+      "input": "guitar tuner",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
+      }
+    },
+    {
+      "input": "uke",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
+      }
+    },
+    {
+      "input": "open the tuner",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
       }
     },
     {

@@ -177,24 +177,60 @@ public struct Theme: Codable, Equatable {
     }
 }
 
+public struct TunerConfig: Codable, Equatable {
+    /// Reference pitch for A4 in Hz. 440 unless he is playing along with something tuned differently.
+    public var a4: Double
+    /// How close, in cents, counts as in tune.
+    public var toleranceCents: Double
+    /// The tuning the tuner opens on. "chromatic" means any note.
+    public var lastTuningID: String
+    /// His own tunings, shown after the built-in ones.
+    public var customTunings: [Tuning]
+
+    public init(a4: Double = 440, toleranceCents: Double = 5, lastTuningID: String = "guitar-standard", customTunings: [Tuning] = []) {
+        self.a4 = a4
+        self.toleranceCents = toleranceCents
+        self.lastTuningID = lastTuningID
+        self.customTunings = customTunings
+    }
+
+    private enum CodingKeys: String, CodingKey { case a4, toleranceCents, lastTuningID, customTunings }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = TunerConfig()
+        a4 = try c.decodeIfPresent(Double.self, forKey: .a4) ?? d.a4
+        toleranceCents = try c.decodeIfPresent(Double.self, forKey: .toleranceCents) ?? d.toleranceCents
+        lastTuningID = try c.decodeIfPresent(String.self, forKey: .lastTuningID) ?? d.lastTuningID
+        customTunings = try c.decodeIfPresent([Tuning].self, forKey: .customTunings) ?? d.customTunings
+    }
+
+    /// Built-in tunings followed by his own.
+    public var allTunings: [Tuning] {
+        return DefaultTunings.all + customTunings
+    }
+}
+
 public struct Config: Codable, Equatable {
     public var hotkeys: Hotkeys
     public var brave: BraveConfig
     /// Master switch for the voice. The amber line shows either way.
     public var speak: Bool
     public var theme: Theme
+    public var tuner: TunerConfig
     public var catalog: [CatalogEntry]
 
     public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true,
-                theme: Theme = Theme(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
+                theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
         self.speak = speak
         self.theme = theme
+        self.tuner = tuner
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -202,6 +238,7 @@ public struct Config: Codable, Equatable {
         brave = try c.decodeIfPresent(BraveConfig.self, forKey: .brave) ?? BraveConfig()
         speak = try c.decodeIfPresent(Bool.self, forKey: .speak) ?? true
         theme = try c.decodeIfPresent(Theme.self, forKey: .theme) ?? Theme()
+        tuner = try c.decodeIfPresent(TunerConfig.self, forKey: .tuner) ?? TunerConfig()
         catalog = try c.decodeIfPresent([CatalogEntry].self, forKey: .catalog) ?? DefaultCatalog.entries
     }
 }

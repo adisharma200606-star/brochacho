@@ -8,6 +8,8 @@ public enum ActionPlan: Equatable {
     case openApp(bundleID: String, entry: String)
     /// Open a file or folder. The path may start with "~".
     case openPath(path: String, entry: String)
+    /// Show something built into Brochacho in the notch. "tuner" is the only tool so far.
+    case openTool(tool: String, entry: String)
 
     /// The catalog entry name this plan came from. Used to count usage and to pick a line.
     public var entryName: String {
@@ -15,6 +17,7 @@ public enum ActionPlan: Equatable {
         case .openURL(_, _, let entry): return entry
         case .openApp(_, let entry): return entry
         case .openPath(_, let entry): return entry
+        case .openTool(_, let entry): return entry
         }
     }
 
@@ -24,6 +27,7 @@ public enum ActionPlan: Equatable {
         case .openURL: return "open_site"
         case .openApp: return "open_app"
         case .openPath: return "open_path"
+        case .openTool: return "open_tool"
         }
     }
 
@@ -47,6 +51,7 @@ public enum ActionPlan: Equatable {
         case .site: return .openURL(url: entry.target, profile: entry.profile ?? "personal", entry: entry.name)
         case .app: return .openApp(bundleID: entry.target, entry: entry.name)
         case .path: return .openPath(path: entry.target, entry: entry.name)
+        case .tool: return .openTool(tool: entry.target, entry: entry.name)
         }
     }
 

@@ -11,5 +11,6 @@
   {"name": "steam", "display": "Steam", "aliases": [], "kind": "app", "target": "com.valvesoftware.steam"},
   {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"},
   {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"},
-  {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"}
+  {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"},
+  {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"}
 ]
