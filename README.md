@@ -11,10 +11,17 @@ A voice that lives in the MacBook notch. See `SPEC.md` for the full design.
 | `defaults/` | The default list of things to open (`catalog.json`) and the seed line bank. | Done, editable. |
 | `prototype/` | A phone-friendly page that simulates the notch with real spring physics, the real matcher, the stash and a browser Italian voice. `python3 prototype/build.py` rebuilds `index.html`. | Works in a browser. Used to tune the feel before the Mac exists. |
 
+| `Sources/BrochachoCore/` + `Tests/` | The brain ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Written, syntax-checked, never compiled.** `swift test` on a Mac, or let CI do it. |
+| `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and (once `App/` exists) builds the app. Logs are also pushed to the `ci-logs` branch. | Ready. Runs as soon as the repo is on GitHub. |
+
 ## What does not exist yet
 
-- `Sources/BrochachoCore` — the Swift port of `reference-js/core.js`.
 - `App/` — the macOS notch app (SwiftUI + DynamicNotchKit).
+- The full 200-line bank (`defaults/lines.json`). `defaults/lines.seed.json` has the first 57.
 - `DAY_ONE.md`, `BLIND_SPOTS.md`, `REFERENCES.md`.
 
-Nothing in Swift has been compiled. No Swift toolchain could be installed in the build sandbox (swift.org is blocked there), which is why the brain was built and tested in JavaScript first.
+## Honest status of the Swift code
+
+No Swift toolchain could be installed where this was written (swift.org is blocked there), so the Swift
+has passed a syntax check (tree-sitter) and a careful read, and nothing more. The CI workflow exists to
+fix that: the first push compiles it on a real Mac.
