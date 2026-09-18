@@ -131,6 +131,16 @@
       ],
       "kind": "tool",
       "target": "tuner"
+    },
+    {
+      "name": "timer",
+      "display": "Timer",
+      "aliases": [
+        "countdown"
+      ],
+      "kind": "tool",
+      "target": "timer",
+      "takesWords": true
     }
   ],
   "cases": [
@@ -970,6 +980,10 @@
         {
           "name": "claude",
           "band": "prefix"
+        },
+        {
+          "name": "timer",
+          "band": "prefix"
         }
       ],
       "plan": {
@@ -993,6 +1007,10 @@
         },
         {
           "name": "vs code",
+          "band": "prefix"
+        },
+        {
+          "name": "timer",
           "band": "prefix"
         }
       ],
@@ -1118,6 +1136,136 @@
         {
           "name": "tuner",
           "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "tuner",
+        "entry": "tuner"
+      }
+    },
+    {
+      "input": "timer",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "timer",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "timer 10",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "10",
+      "results": [
+        {
+          "name": "timer",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "argument": "10",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "countdown 1:30",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "1:30",
+      "results": [
+        {
+          "name": "timer",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "argument": "1:30",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "set a timer for 10 minutes",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "for 10 minutes",
+      "results": [
+        {
+          "name": "timer",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "argument": "for 10 minutes",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "10 min timer",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "10 min",
+      "results": [
+        {
+          "name": "timer",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "argument": "10 min",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "ti",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "timer",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "timer",
+        "entry": "timer"
+      }
+    },
+    {
+      "input": "tu",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "tuner",
+          "band": "prefix"
         }
       ],
       "plan": {

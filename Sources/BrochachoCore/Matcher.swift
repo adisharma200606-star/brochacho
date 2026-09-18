@@ -82,7 +82,7 @@ public enum Matcher {
     /// dropped before matching. This is what lets "play me some youtube" work without a command language.
     public static let filler: [String] = [
         "open", "launch", "start", "run", "go", "goto", "to", "play", "me", "some", "the",
-        "my", "show", "please", "hey", "yo", "brochacho", "up", "a"
+        "my", "show", "please", "hey", "yo", "brochacho", "up", "a", "set"
     ]
 
     private struct Score {
@@ -176,8 +176,12 @@ public enum Matcher {
         return hits
     }
 
-    private static func exactEntryWithSearch(_ head: String, catalog: [CatalogEntry]) -> CatalogEntry? {
-        for entry in catalog where entry.searchTemplate != nil {
+    /// Entries that accept more words around their name: searchable sites ("yt berserk amv") and tools that
+    /// take words ("timer 10"). `toolsOnly` is used for the trailing form ("10 min timer").
+    private static func exactEntryWithSearch(_ head: String, catalog: [CatalogEntry], toolsOnly: Bool = false) -> CatalogEntry? {
+        for entry in catalog {
+            let takes = toolsOnly ? (entry.kind == .tool && entry.takesWords) : (entry.searchTemplate != nil || entry.takesWords)
+            if !takes { continue }
             for key in entry.keys where Text.normalize(key) == head {
                 return entry
             }
@@ -198,7 +202,8 @@ public enum Matcher {
     /// Steps, in order:
     ///  1. drop leading filler words
     ///  2. the whole input is an exact name or alias: open
-    ///  3. the first two or one words exactly name a searchable site and more words follow: search
+    ///  3. the first two or one words exactly name a searchable site, or a tool that takes words: search
+    ///  3b. the last two or one words exactly name a tool that takes words ("10 min timer"): search
     ///  4. the whole input ranks strongly: open
     ///  5. a shorter run of leading words ranks strongly: open ("gmail inbox")
     ///  6. the whole input ranks weakly: open, not confident
@@ -229,6 +234,20 @@ public enum Matcher {
                     return Decision(mode: .search, results: [hit], query: query, confident: true)
                 }
                 k -= 1
+            }
+        }
+
+        // The same, the other way round, for tools only: "10 min timer".
+        if tokens.count >= 2 {
+            var t = Swift.min(2, tokens.count - 1)
+            while t >= 1 {
+                let tail = Text.normalize(tokens[(tokens.count - t)...].joined())
+                if let tool = exactEntryWithSearch(tail, catalog: catalog, toolsOnly: true) {
+                    let hit = Hit(entry: tool, band: .exact, quality: 1, usage: usage[tool.name] ?? 0)
+                    let query = tokens[0..<(tokens.count - t)].joined(separator: " ")
+                    return Decision(mode: .search, results: [hit], query: query, confident: true)
+                }
+                t -= 1
             }
         }
 

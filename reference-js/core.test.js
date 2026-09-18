@@ -78,6 +78,15 @@ const MATCH_CASES = [
   ['uke', 'open', 'tuner', null, {}, true],
   ['open the tuner', 'open', 'tuner', null, {}, true],
 
+  // a tool that takes words: the timer
+  ['timer', 'open', 'timer', null, {}, true],
+  ['timer 10', 'search', 'timer', '10', {}, true],
+  ['countdown 1:30', 'search', 'timer', '1:30', {}, true],
+  ['set a timer for 10 minutes', 'search', 'timer', 'for 10 minutes', {}, true],
+  ['10 min timer', 'search', 'timer', '10 min', {}, true],
+  ['ti', 'open', 'timer', null, {}, true],
+  ['tu', 'open', 'tuner', null, {}, true],
+
   // nothing
   ['', 'empty', null, null, {}, false],
   ['    ', 'empty', null, null, {}, false],
@@ -150,6 +159,7 @@ test('plan: sites, apps, paths and searches', () => {
   assert.strictEqual(core.plan(core.match('g café ☕', catalog)).url,
     'https://www.google.com/search?q=caf%C3%A9%20%E2%98%95');
   assert.deepStrictEqual(core.plan(core.match('tune', catalog)), { type: 'openTool', tool: 'tuner', entry: 'tuner' });
+  assert.deepStrictEqual(core.plan(core.match('timer 10', catalog)), { type: 'openTool', tool: 'timer', argument: '10', entry: 'timer' });
   assert.strictEqual(core.plan(core.match('zzz', catalog)), null);
   assert.strictEqual(core.plan(core.match('', catalog)), null);
 });

@@ -3,19 +3,20 @@ import Foundation
 
 public enum DefaultCatalog {
     public static let entries: [CatalogEntry] = [
-        CatalogEntry(name: "youtube", display: "YouTube", aliases: ["yt"], kind: .site, target: "https://www.youtube.com", profile: "personal", searchTemplate: "https://www.youtube.com/results?search_query={q}"),
-        CatalogEntry(name: "youtube music", display: "YouTube Music", aliases: ["ytm"], kind: .site, target: "https://music.youtube.com", profile: "personal", searchTemplate: nil),
-        CatalogEntry(name: "gmail", display: "Gmail", aliases: ["mail"], kind: .site, target: "https://mail.google.com", profile: "personal", searchTemplate: nil),
-        CatalogEntry(name: "google", display: "Google", aliases: ["g"], kind: .site, target: "https://www.google.com", profile: "personal", searchTemplate: "https://www.google.com/search?q={q}"),
-        CatalogEntry(name: "github", display: "GitHub", aliases: ["gh"], kind: .site, target: "https://github.com", profile: "personal", searchTemplate: "https://github.com/search?q={q}"),
-        CatalogEntry(name: "linkedin", display: "LinkedIn", aliases: ["li"], kind: .site, target: "https://www.linkedin.com/feed/", profile: "personal", searchTemplate: nil),
-        CatalogEntry(name: "claude", display: "Claude", aliases: [], kind: .site, target: "https://claude.ai", profile: "personal", searchTemplate: nil),
-        CatalogEntry(name: "whatsapp", display: "WhatsApp", aliases: ["wa"], kind: .app, target: "net.whatsapp.WhatsApp", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "spotify", display: "Spotify", aliases: [], kind: .app, target: "com.spotify.client", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "steam", display: "Steam", aliases: [], kind: .app, target: "com.valvesoftware.steam", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "vs code", display: "VS Code", aliases: ["code", "visual studio code"], kind: .app, target: "com.microsoft.VSCode", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "downloads", display: "Downloads", aliases: ["dl"], kind: .path, target: "~/Downloads", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "desktop", display: "Desktop", aliases: [], kind: .path, target: "~/Desktop", profile: nil, searchTemplate: nil),
-        CatalogEntry(name: "tuner", display: "Tuner", aliases: ["tune", "guitar tuner", "ukulele tuner", "uke"], kind: .tool, target: "tuner", profile: nil, searchTemplate: nil)
+        CatalogEntry(name: "youtube", display: "YouTube", aliases: ["yt"], kind: .site, target: "https://www.youtube.com", profile: "personal", searchTemplate: "https://www.youtube.com/results?search_query={q}", takesWords: false, living: false),
+        CatalogEntry(name: "youtube music", display: "YouTube Music", aliases: ["ytm"], kind: .site, target: "https://music.youtube.com", profile: "personal", searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "gmail", display: "Gmail", aliases: ["mail"], kind: .site, target: "https://mail.google.com", profile: "personal", searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "google", display: "Google", aliases: ["g"], kind: .site, target: "https://www.google.com", profile: "personal", searchTemplate: "https://www.google.com/search?q={q}", takesWords: false, living: false),
+        CatalogEntry(name: "github", display: "GitHub", aliases: ["gh"], kind: .site, target: "https://github.com", profile: "personal", searchTemplate: "https://github.com/search?q={q}", takesWords: false, living: false),
+        CatalogEntry(name: "linkedin", display: "LinkedIn", aliases: ["li"], kind: .site, target: "https://www.linkedin.com/feed/", profile: "personal", searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "claude", display: "Claude", aliases: [], kind: .site, target: "https://claude.ai", profile: "personal", searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "whatsapp", display: "WhatsApp", aliases: ["wa"], kind: .app, target: "net.whatsapp.WhatsApp", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "spotify", display: "Spotify", aliases: [], kind: .app, target: "com.spotify.client", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "steam", display: "Steam", aliases: [], kind: .app, target: "com.valvesoftware.steam", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "vs code", display: "VS Code", aliases: ["code", "visual studio code"], kind: .app, target: "com.microsoft.VSCode", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "downloads", display: "Downloads", aliases: ["dl"], kind: .path, target: "~/Downloads", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "desktop", display: "Desktop", aliases: [], kind: .path, target: "~/Desktop", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "tuner", display: "Tuner", aliases: ["tune", "guitar tuner", "ukulele tuner", "uke"], kind: .tool, target: "tuner", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "timer", display: "Timer", aliases: ["countdown"], kind: .tool, target: "timer", profile: nil, searchTemplate: nil, takesWords: true, living: false)
     ]
 }

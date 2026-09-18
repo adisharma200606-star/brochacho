@@ -12,6 +12,7 @@ final class MatcherTests: XCTestCase {
         let bundleID: String?
         let path: String?
         let tool: String?
+        let argument: String?
         let entry: String
     }
 
@@ -66,9 +67,10 @@ final class MatcherTests: XCTestCase {
                 XCTAssertEqual(expected.type, "openPath", "plan type for \(label)")
                 XCTAssertEqual(path, expected.path, "plan path for \(label)")
                 XCTAssertEqual(entry, expected.entry, "plan entry for \(label)")
-            case (.some(.openTool(let tool, let entry)), .some(let expected)):
+            case (.some(.openTool(let tool, let argument, let entry)), .some(let expected)):
                 XCTAssertEqual(expected.type, "openTool", "plan type for \(label)")
                 XCTAssertEqual(tool, expected.tool, "plan tool for \(label)")
+                XCTAssertEqual(argument, expected.argument, "plan argument for \(label)")
                 XCTAssertEqual(entry, expected.entry, "plan entry for \(label)")
             default:
                 XCTFail("one side has a plan and the other does not, for \(label)")

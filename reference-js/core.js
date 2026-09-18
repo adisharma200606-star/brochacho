@@ -178,10 +178,13 @@
       });
   }
 
-  function exactEntryWithSearch(head, catalog) {
+  // Entries that accept more words after their name: searchable sites ("yt berserk amv")
+  // and tools that take an argument ("timer 10"). `toolsOnly` is used for the trailing form ("10 min timer").
+  function exactEntryWithSearch(head, catalog, toolsOnly) {
     for (var i = 0; i < catalog.length; i++) {
       var e = catalog[i];
-      if (!e.searchTemplate) continue;
+      var takes = toolsOnly ? (e.kind === 'tool' && e.takesWords === true) : (!!e.searchTemplate || e.takesWords === true);
+      if (!takes) continue;
       var keys = [e.name].concat(e.aliases || []);
       for (var k = 0; k < keys.length; k++) if (normalize(keys[k]) === head) return e;
     }
@@ -193,7 +196,7 @@
   // "play me some youtube" and "open the downloads folder" work without
   // there being any command language to learn.
   var FILLER = ['open', 'launch', 'start', 'run', 'go', 'goto', 'to', 'play', 'me', 'some', 'the',
-    'my', 'show', 'please', 'hey', 'yo', 'brochacho', 'up', 'a'];
+    'my', 'show', 'please', 'hey', 'yo', 'brochacho', 'up', 'a', 'set'];
 
   function stripLeadingFiller(tokens) {
     var i = 0;
@@ -213,7 +216,8 @@
    * Steps, in order:
    *   1. drop leading filler words
    *   2. whole input is an exact name/alias            -> open
-   *   3. first 2 or 1 words exactly name a searchable site, more words follow -> search
+   *   3. first 2 or 1 words exactly name a searchable site or a tool that takes words -> search
+   *  3b. last 2 or 1 words exactly name a tool that takes words ("10 min timer")       -> search
    *   4. whole input ranks strongly                    -> open
    *   5. a shorter run of leading words ranks strongly -> open ("gmail inbox")
    *   6. whole input ranks weakly                      -> open, not confident
@@ -249,6 +253,23 @@
       }
     }
 
+    // The same, the other way round, for tools only: "10 min timer".
+    if (tokens.length >= 2) {
+      var maxTail = Math.min(2, tokens.length - 1);
+      for (var t = maxTail; t >= 1; t--) {
+        var tail = normalize(tokens.slice(tokens.length - t).join(''));
+        var tool = exactEntryWithSearch(tail, catalog, true);
+        if (tool) {
+          return {
+            mode: 'search',
+            query: tokens.slice(0, tokens.length - t).join(' '),
+            results: [{ entry: tool, band: BAND.exact, quality: 1, usage: usage[tool.name] || 0 }],
+            confident: true
+          };
+        }
+      }
+    }
+
     if (ranked.length && ranked[0].band >= STRONG_FROM) {
       return { mode: 'open', results: ranked.slice(0, limit), confident: true };
     }
@@ -270,6 +291,9 @@
   function plan(decision) {
     if (!decision || !decision.results.length || decision.mode === 'empty' || decision.mode === 'none') return null;
     var e = decision.results[0].entry;
+    if (decision.mode === 'search' && e.kind === 'tool') {
+      return { type: 'openTool', tool: e.target, argument: decision.query, entry: e.name };
+    }
     if (decision.mode === 'search') {
       return {
         type: 'openURL',

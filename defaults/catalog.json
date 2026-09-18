@@ -12,5 +12,6 @@
   {"name": "vs code", "display": "VS Code", "aliases": ["code", "visual studio code"], "kind": "app", "target": "com.microsoft.VSCode"},
   {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"},
   {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"},
-  {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"}
+  {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"},
+  {"name": "timer", "display": "Timer", "aliases": ["countdown"], "kind": "tool", "target": "timer", "takesWords": true}
 ]

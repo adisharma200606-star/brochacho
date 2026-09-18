@@ -8,8 +8,9 @@ public enum ActionPlan: Equatable {
     case openApp(bundleID: String, entry: String)
     /// Open a file or folder. The path may start with "~".
     case openPath(path: String, entry: String)
-    /// Show something built into Brochacho in the notch. "tuner" is the only tool so far.
-    case openTool(tool: String, entry: String)
+    /// Show something built into Brochacho in the notch: "tuner" or "timer".
+    /// `argument` holds any words typed with the name, so "timer 10" arrives as tool "timer", argument "10".
+    case openTool(tool: String, argument: String?, entry: String)
 
     /// The catalog entry name this plan came from. Used to count usage and to pick a line.
     public var entryName: String {
@@ -17,7 +18,7 @@ public enum ActionPlan: Equatable {
         case .openURL(_, _, let entry): return entry
         case .openApp(_, let entry): return entry
         case .openPath(_, let entry): return entry
-        case .openTool(_, let entry): return entry
+        case .openTool(_, _, let entry): return entry
         }
     }
 
@@ -37,6 +38,10 @@ public enum ActionPlan: Equatable {
         if decision.mode == .empty || decision.mode == .nothing { return nil }
         let entry = first.entry
 
+        if decision.mode == .search && entry.kind == .tool {
+            return .openTool(tool: entry.target, argument: decision.query, entry: entry.name)
+        }
+
         if decision.mode == .search {
             guard let template = entry.searchTemplate else { return nil }
             let encoded = Text.encodeQuery(decision.query ?? "")
@@ -51,7 +56,7 @@ public enum ActionPlan: Equatable {
         case .site: return .openURL(url: entry.target, profile: entry.profile ?? "personal", entry: entry.name)
         case .app: return .openApp(bundleID: entry.target, entry: entry.name)
         case .path: return .openPath(path: entry.target, entry: entry.name)
-        case .tool: return .openTool(tool: entry.target, entry: entry.name)
+        case .tool: return .openTool(tool: entry.target, argument: nil, entry: entry.name)
         }
     }
 

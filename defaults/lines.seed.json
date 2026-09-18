@@ -306,5 +306,49 @@
       "id": "at03",
       "text": "In tune. Like family."
     }
+  ],
+  "target:timer": [
+    {
+      "id": "tm01",
+      "text": "The clock, she's running."
+    },
+    {
+      "id": "tm02",
+      "text": "I watch the time. You work."
+    }
+  ],
+  "timer_done": [
+    {
+      "id": "td01",
+      "text": "Time's up, boss."
+    },
+    {
+      "id": "td02",
+      "text": "Basta. That's the time."
+    },
+    {
+      "id": "td03",
+      "text": "Ding. Finito."
+    }
+  ],
+  "bookmark_moved": [
+    {
+      "id": "bm01",
+      "text": "I remember where you stopped."
+    },
+    {
+      "id": "bm02",
+      "text": "Page marked. Go live your life."
+    }
+  ],
+  "explained": [
+    {
+      "id": "ex01",
+      "text": "Here. In plain words."
+    },
+    {
+      "id": "ex02",
+      "text": "I asked the professor."
+    }
   ]
 }

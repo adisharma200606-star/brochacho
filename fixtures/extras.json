@@ -1,0 +1,330 @@
+{
+  "durations": [
+    {
+      "text": "10",
+      "seconds": 600
+    },
+    {
+      "text": "1",
+      "seconds": 60
+    },
+    {
+      "text": "1.5",
+      "seconds": 90
+    },
+    {
+      "text": "0.5",
+      "seconds": 30
+    },
+    {
+      "text": "25",
+      "seconds": 1500
+    },
+    {
+      "text": "90s",
+      "seconds": 90
+    },
+    {
+      "text": "90 sec",
+      "seconds": 90
+    },
+    {
+      "text": "45 seconds",
+      "seconds": 45
+    },
+    {
+      "text": "10m",
+      "seconds": 600
+    },
+    {
+      "text": "10 min",
+      "seconds": 600
+    },
+    {
+      "text": "10 minutes",
+      "seconds": 600
+    },
+    {
+      "text": "1 minute",
+      "seconds": 60
+    },
+    {
+      "text": "1h",
+      "seconds": 3600
+    },
+    {
+      "text": "2 hours",
+      "seconds": 7200
+    },
+    {
+      "text": "1h30",
+      "seconds": 5400
+    },
+    {
+      "text": "1h 30m",
+      "seconds": 5400
+    },
+    {
+      "text": "1 hour 30 minutes",
+      "seconds": 5400
+    },
+    {
+      "text": "1 hour and 30 minutes",
+      "seconds": 5400
+    },
+    {
+      "text": "5m30",
+      "seconds": 330
+    },
+    {
+      "text": "5m 30s",
+      "seconds": 330
+    },
+    {
+      "text": "1h 2m 3s",
+      "seconds": 3723
+    },
+    {
+      "text": "1:30",
+      "seconds": 90
+    },
+    {
+      "text": "0:45",
+      "seconds": 45
+    },
+    {
+      "text": "10:00",
+      "seconds": 600
+    },
+    {
+      "text": "1:30:00",
+      "seconds": 5400
+    },
+    {
+      "text": "01:02:03",
+      "seconds": 3723
+    },
+    {
+      "text": "for 10 minutes",
+      "seconds": 600
+    },
+    {
+      "text": "of about 5 min",
+      "seconds": 300
+    },
+    {
+      "text": " 10 ",
+      "seconds": 600
+    },
+    {
+      "text": "10 MIN",
+      "seconds": 600
+    },
+    {
+      "text": "24h",
+      "seconds": 86400
+    },
+    {
+      "text": "",
+      "seconds": null
+    },
+    {
+      "text": "soon",
+      "seconds": null
+    },
+    {
+      "text": "ten",
+      "seconds": null
+    },
+    {
+      "text": "10 bananas",
+      "seconds": null
+    },
+    {
+      "text": "0",
+      "seconds": null
+    },
+    {
+      "text": "0s",
+      "seconds": null
+    },
+    {
+      "text": "25h",
+      "seconds": null
+    },
+    {
+      "text": "1:75:00x",
+      "seconds": null
+    },
+    {
+      "text": "5s 10",
+      "seconds": null
+    }
+  ],
+  "formats": [
+    {
+      "ms": 581000,
+      "text": "9:41"
+    },
+    {
+      "ms": 580001,
+      "text": "9:41"
+    },
+    {
+      "ms": 7000,
+      "text": "0:07"
+    },
+    {
+      "ms": 1,
+      "text": "0:01"
+    },
+    {
+      "ms": 0,
+      "text": "0:00"
+    },
+    {
+      "ms": -50,
+      "text": "0:00"
+    },
+    {
+      "ms": 3723000,
+      "text": "1:02:03"
+    },
+    {
+      "ms": 59999,
+      "text": "1:00"
+    },
+    {
+      "ms": 60000,
+      "text": "1:00"
+    },
+    {
+      "ms": 3600000,
+      "text": "1:00:00"
+    }
+  ],
+  "catalog": [
+    {
+      "name": "youtube",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://www.youtube.com",
+      "profile": "personal",
+      "living": false
+    },
+    {
+      "name": "bat",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://reader.example/manga/absolute-batman/chapter-3",
+      "profile": "personal",
+      "living": true
+    },
+    {
+      "name": "berserk",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://reader.example/manga/berserk/chapter-40?page=2",
+      "profile": "personal",
+      "living": true
+    },
+    {
+      "name": "course",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://learn.example.org/python/lesson/4",
+      "profile": "personal",
+      "living": true
+    },
+    {
+      "name": "bleach",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://www.netflix.com/watch/111",
+      "profile": "personal",
+      "living": true
+    },
+    {
+      "name": "suits",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://www.netflix.com/watch/222",
+      "profile": "personal",
+      "living": true
+    },
+    {
+      "name": "steam",
+      "aliases": [],
+      "kind": "app",
+      "target": "com.valvesoftware.steam",
+      "living": true
+    }
+  ],
+  "bookmarks": [
+    {
+      "url": "https://reader.example/manga/absolute-batman/chapter-14",
+      "result": "update",
+      "names": [
+        "bat"
+      ]
+    },
+    {
+      "url": "https://www.reader.example/manga/berserk/chapter-41#top",
+      "result": "update",
+      "names": [
+        "berserk"
+      ]
+    },
+    {
+      "url": "https://reader.example/manga/one-piece/chapter-1",
+      "result": "ambiguous",
+      "names": [
+        "bat",
+        "berserk"
+      ]
+    },
+    {
+      "url": "https://reader.example/",
+      "result": "ambiguous",
+      "names": [
+        "bat",
+        "berserk"
+      ]
+    },
+    {
+      "url": "http://LEARN.example.org/python/lesson/9?x=1",
+      "result": "update",
+      "names": [
+        "course"
+      ]
+    },
+    {
+      "url": "https://www.netflix.com/watch/98765",
+      "result": "ambiguous",
+      "names": [
+        "bleach",
+        "suits"
+      ]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=abc",
+      "result": "none",
+      "names": []
+    },
+    {
+      "url": "https://somewhere-else.example/page",
+      "result": "none",
+      "names": []
+    },
+    {
+      "url": "",
+      "result": "none",
+      "names": []
+    },
+    {
+      "url": "not a url",
+      "result": "none",
+      "names": []
+    }
+  ]
+}
