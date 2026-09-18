@@ -93,6 +93,7 @@
   .pullbtn { all: unset; margin-top: 10px; padding: 2px 12px; min-height: 36px; display: inline-flex; align-items: center;
     border: 2px solid var(--phosphor); cursor: pointer; }
   .pullbtn:focus-visible { outline: 2px solid #fff; }
+  .timerbar { position: absolute; top: 27px; left: 50%; height: 4px; width: 130px; margin-left: -65px; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); transform-origin: left center; transform: scaleX(0); border-radius: 0 0 3px 3px; pointer-events: none; }
   .log {
     position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 13px; color: rgba(255,255,255,.92);
     background: rgba(0,0,0,.35); padding: 6px 10px; border-radius: 8px; min-height: 32px; display: flex; align-items: center;
@@ -194,6 +195,7 @@
           <button class="pullbtn" id="anotherBtn" type="button">another</button>
         </div>
       </div>
+      <div class="timerbar" id="timerbar"></div>
       <div class="log" aria-live="polite"><span id="logText">Nothing opened yet.</span><span class="ms" id="logMs"></span></div>
     </div>
   </div>
@@ -207,7 +209,7 @@
     <label for="dropUrl" style="position:absolute;left:-9999px">Link to drop on the notch</label>
     <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
   </div>
-  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>, <b>timer 10s</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
 
   <div class="tunerpad">
     <button class="btn" id="btnTune" type="button">Tuner<small>type &ldquo;tune&rdquo;</small></button>
@@ -277,6 +279,7 @@
 
 <script>/*__CORE__*/</script>
 <script>/*__TUNER__*/</script>
+<script>/*__EXTRAS__*/</script>
 <script>
 (function () {
   'use strict';
@@ -495,6 +498,7 @@
     // Action first. The line comes after, and never holds the action up.
     log(actionText(plan, decision), ms);
     cmd.blur();
+    if (plan.type === 'openTool' && plan.tool === 'timer') { startCountdown(plan.argument); return; }
     if (plan.type === 'openTool') { sayLine('open_tool', entry.name); openTuner(); return; }
     var category = plan.type === 'openURL' ? 'open_site' : plan.type === 'openApp' ? 'open_app' : 'open_path';
     showLine(sayLine(category, entry.name));
@@ -626,6 +630,32 @@
   $('btnMic').addEventListener('click', useMic);
   $('tunePrev').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex - 1); });
   $('tuneNext').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex + 1); });
+
+
+  // ---------------------------------------------------------------- timer
+  var extras = self.BrochachoExtras, countdown = null, countdownTick = null;
+  function startCountdown(argument) {
+    var seconds = argument ? extras.parseDuration(argument) : null;
+    if (!seconds) {
+      log(argument ? 'Could not read \u201C' + argument + '\u201D as a time.' : 'Say how long: timer 10, timer 90s, timer 1:30');
+      showLine(argument ? sayLine('unknown', null) : { text: 'timer 10 / 90s / 1:30' }, 2600); return;
+    }
+    clearInterval(countdownTick);
+    countdown = extras.startTimer(seconds, Date.now());
+    log('Timer set for ' + extras.formatRemaining(seconds * 1000));
+    showLine(sayLine('open_tool', 'timer'));
+    var bar = $('timerbar'); bar.style.width = geo.notchW + 'px'; bar.style.marginLeft = (-geo.notchW / 2) + 'px';
+    countdownTick = setInterval(function () {
+      var st = extras.timerStatus(countdown, Date.now());
+      bar.style.transform = 'scaleX(' + st.fraction + ')';
+      $('logMs').textContent = st.done ? '' : st.text + ' left';
+      if (st.done) {
+        clearInterval(countdownTick); countdown = null;
+        log('The timer finished.');
+        var was = muted; var pick = sayLine('timer_done', null, true); muted = was; showLine(pick, 2600);
+      }
+    }, 200);
+  }
 
   // ---------------------------------------------------------------- wiring
   $('btnType').addEventListener('click', startTyping);
