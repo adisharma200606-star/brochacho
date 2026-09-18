@@ -6,12 +6,12 @@ A voice that lives in the MacBook notch. See `SPEC.md` for the full design.
 
 | Folder | What it is | State |
 |---|---|---|
-| `reference-js/` | The brain (matcher, stash, line picker) in plain JavaScript. It is the source of truth for behaviour. | **Tested. 14 tests, 76 matcher cases, all passing.** Run `node --test reference-js/core.test.js`. |
+| `reference-js/` | The brain (matcher, stash, line picker) in plain JavaScript. It is the source of truth for behaviour. | **Tested. 23 tests passing**: 81 matcher cases, the stash, the lines, and the tuner (pitch detection within 0.3 cents on synthetic plucks for every string of all 17 tunings). Run `node --test reference-js/*.test.js`. |
 | `fixtures/` | Golden test files written by the JS tests. The Swift port must reproduce them exactly. | Generated. |
-| `defaults/` | The default list of things to open (`catalog.json`) and the seed line bank. | Done, editable. |
+| `defaults/` | The default list of things to open (`catalog.json`), the tuner's tunings (`tunings.json`) and the seed line bank. | Done, editable. |
 | `prototype/` | A phone-friendly page that simulates the notch with real spring physics, the real matcher, the stash and a browser Italian voice. `python3 prototype/build.py` rebuilds `index.html`. | Works in a browser. Used to tune the feel before the Mac exists. |
 
-| `Sources/BrochachoCore/` + `Tests/` | The brain ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Written, syntax-checked, never compiled.** `swift test` on a Mac, or let CI do it. |
+| `Sources/BrochachoCore/` + `Tests/` | The brain and the tuner maths ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Written, syntax-checked, never compiled.** `swift test` on a Mac, or let CI do it. |
 | `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and (once `App/` exists) builds the app. Logs are also pushed to the `ci-logs` branch. | Ready. Runs as soon as the repo is on GitHub. |
 
 ## What does not exist yet
