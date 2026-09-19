@@ -125,7 +125,72 @@
     });
   }
 
+
+  // ---------------------------------------------------------------- iPhone ----
+  //
+  // The phone and the Mac never write to the same file, so iCloud can never make them clash:
+  //   phone-inbox.txt    only the phone appends.  One save per line:   <ISO date> <link or text>
+  //   phone-opened.txt   only the phone appends.  One open per line:   <ISO date> <link or text>
+  //   for-phone.txt      only the Mac writes.     One unopened item per line, for the phone's "bored" shortcut.
+
+  /** Read a phone file. Tolerant: blank lines are skipped, a missing or unreadable date means "now". */
+  function parsePhoneLines(text, nowMs) {
+    var out = [];
+    String(text || '').split(/\r?\n/).forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) return;
+      var sp = line.indexOf(' ');
+      var first = sp > 0 ? line.slice(0, sp) : '';
+      var ms = /^\d{4}-\d{2}-\d{2}/.test(first) ? Date.parse(first) : NaN;
+      var payload = isNaN(ms) ? line : line.slice(sp + 1).trim();
+      if (!payload) return;
+      out.push({ payload: payload, at: isNaN(ms) ? nowMs : ms, dated: !isNaN(ms) });
+    });
+    return out;
+  }
+
+  function kindOf(payload) { return /^https?:\/\//i.test(payload) ? 'url' : 'text'; }
+
+  /**
+   * Fold the phone's files into the stash. Safe to run again and again on the same files:
+   * nothing is duplicated, and something he already opened is not brought back unless he saved it again later.
+   */
+  function ingestPhone(stash, inboxText, openedText, nowMs) {
+    var counts = { added: 0, refreshed: 0, opened: 0 };
+    parsePhoneLines(inboxText, nowMs).forEach(function (line) {
+      var kind = kindOf(line.payload), existing = null;
+      for (var i = 0; i < stash.items.length; i++) {
+        if (stash.items[i].payload === line.payload && stash.items[i].kind === kind) existing = stash.items[i];
+      }
+      if (!existing) {
+        stash.items.push({ id: 'p' + line.at + '-' + stash.items.length, kind: kind, payload: line.payload, title: null,
+          source: 'phone', savedAt: line.at, servedAt: null, openedAt: null, skippedCount: 0 });
+        counts.added++;
+      } else if (line.dated && line.at > existing.savedAt + 1000) {
+        // Only a line with a real date can count as "saved again". An undated line would look new on every run.
+        existing.savedAt = line.at; existing.openedAt = null; existing.skippedCount = 0;
+        counts.refreshed++;
+      }
+    });
+    parsePhoneLines(openedText, nowMs).forEach(function (line) {
+      stash.items.forEach(function (item) {
+        if (!item.openedAt && item.payload === line.payload && line.dated && line.at >= item.savedAt) { item.openedAt = line.at; counts.opened++; }
+      });
+    });
+    return counts;
+  }
+
+  /** What the Mac writes for the phone: every unopened link or note, oldest first, one per line. */
+  function exportForPhone(stash) {
+    return stash.items
+      .filter(function (it) { return !it.openedAt && (it.kind === 'url' || it.kind === 'text') && it.payload.indexOf('\n') < 0; })
+      .sort(function (a, b) { return a.savedAt !== b.savedAt ? a.savedAt - b.savedAt : (a.id < b.id ? -1 : a.id > b.id ? 1 : 0); })
+      .map(function (it) { return it.payload; })
+      .join('\n');
+  }
+
   var api = {
+    parsePhoneLines: parsePhoneLines, ingestPhone: ingestPhone, exportForPhone: exportForPhone,
     parseDuration: parseDuration, formatRemaining: formatRemaining, startTimer: startTimer, timerStatus: timerStatus,
     urlParts: urlParts, findLivingEntry: findLivingEntry, moveEntry: moveEntry
   };

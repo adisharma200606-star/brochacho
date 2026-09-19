@@ -21,7 +21,36 @@ final class ExtrasTests: XCTestCase {
         let names: [String]
     }
 
+    private struct PhoneLineFixture: Decodable {
+        let payload: String
+        let at: Int
+        let dated: Bool
+    }
+
+    private struct CountsFixture: Decodable {
+        let added: Int
+        let refreshed: Int
+        let opened: Int
+    }
+
+    private struct PhoneFixture: Decodable {
+        let inbox: String
+        let opened: String
+        let now: Int
+        let initial: Stash
+        let counts: CountsFixture
+        let finalStash: Stash
+        let forPhone: String
+        let lines: [PhoneLineFixture]
+
+        private enum CodingKeys: String, CodingKey {
+            case inbox, opened, now, initial, counts, forPhone, lines
+            case finalStash = "final"
+        }
+    }
+
     private struct FileFixture: Decodable {
+        let phone: PhoneFixture
         let durations: [DurationFixture]
         let formats: [FormatFixture]
         let catalog: [CatalogEntry]
@@ -67,6 +96,34 @@ final class ExtrasTests: XCTestCase {
             XCTAssertEqual(result, b.result, b.url)
             XCTAssertEqual(names, b.names, b.url)
         }
+    }
+
+    func testPhoneFilesAgreeWithTheReference() throws {
+        let phone = try Fixtures.load(FileFixture.self, "extras.json").phone
+
+        let lines = PhoneSync.parseLines(phone.inbox, nowMs: phone.now)
+        XCTAssertEqual(lines.map { $0.payload }, phone.lines.map { $0.payload })
+        XCTAssertEqual(lines.map { $0.at }, phone.lines.map { $0.at })
+        XCTAssertEqual(lines.map { $0.dated }, phone.lines.map { $0.dated })
+
+        var stash = phone.initial
+        let counts = stash.ingestPhone(inbox: phone.inbox, opened: phone.opened, nowMs: phone.now)
+        XCTAssertEqual(counts, PhoneSync.Counts(added: phone.counts.added, refreshed: phone.counts.refreshed, opened: phone.counts.opened))
+        XCTAssertEqual(stash, phone.finalStash)
+        XCTAssertEqual(PhoneSync.exportForPhone(stash), phone.forPhone)
+
+        let again = stash.ingestPhone(inbox: phone.inbox, opened: phone.opened, nowMs: phone.now + 60_000)
+        XCTAssertEqual(again, PhoneSync.Counts(), "running it twice changes nothing")
+        XCTAssertEqual(stash, phone.finalStash)
+    }
+
+    func testPhoneDates() {
+        XCTAssertEqual(PhoneSync.parseDate("2026-09-18T08:00:00Z"), 1_789_718_400_000)
+        XCTAssertEqual(PhoneSync.parseDate("2026-09-19T21:40:00+05:30"), 1_789_834_200_000)
+        XCTAssertEqual(PhoneSync.parseDate("2026-09-10"), 1_788_998_400_000)
+        XCTAssertNil(PhoneSync.parseDate("2026"))
+        XCTAssertNil(PhoneSync.parseDate("https://x.example"))
+        XCTAssertEqual(PhoneSync.parseLines("2026 plans for the band", nowMs: 7), [PhoneSync.PhoneLine(payload: "2026 plans for the band", at: 7, dated: false)])
     }
 
     func testMovingAnEntryKeepsEverythingElse() throws {

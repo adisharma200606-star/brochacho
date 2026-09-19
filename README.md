@@ -3,13 +3,14 @@
 A voice that lives in the MacBook notch.
 
 - **`docs/GUIDE.md`** — how every feature works and how to change it. Start here.
+- **`docs/IPHONE.md`** — the two iPhone shortcuts, step by step.
 - `SPEC.md` — the original design brief.
 
 ## What exists right now
 
 | Folder | What it is | State |
 |---|---|---|
-| `reference-js/` | The brain (matcher, stash, line picker) in plain JavaScript. It is the source of truth for behaviour. | **Tested. 28 tests passing**: 88 matcher cases, the stash, the lines, the timer, living bookmarks, and the tuner (pitch detection within 0.3 cents on synthetic plucks for every string of all 17 tunings). Run `node --test reference-js/*.test.js`. |
+| `reference-js/` | The brain (matcher, stash, line picker) in plain JavaScript. It is the source of truth for behaviour. | **Tested. 30 tests passing**: 88 matcher cases, the stash, the lines, the timer, living bookmarks, and the tuner (pitch detection within 0.3 cents on synthetic plucks for every string of all 17 tunings). Run `node --test reference-js/*.test.js`. |
 | `fixtures/` | Golden test files written by the JS tests. The Swift port must reproduce them exactly. | Generated. |
 | `defaults/` | The default list of things to open (`catalog.json`), the tuner's tunings (`tunings.json`) and the seed line bank. | Done, editable. |
 | `prototype/` | A phone-friendly page that simulates the notch with real spring physics, the real matcher, the stash and a browser Italian voice. `python3 prototype/build.py` rebuilds `index.html`. | Works in a browser. Used to tune the feel before the Mac exists. |
@@ -20,7 +21,6 @@ A voice that lives in the MacBook notch.
 ## What does not exist yet
 
 - `App/` — the macOS notch app (SwiftUI + DynamicNotchKit).
-- The full 200-line bank (`defaults/lines.json`). `defaults/lines.seed.json` has the first 57.
 - `DAY_ONE.md`, `BLIND_SPOTS.md`, `REFERENCES.md`.
 
 ## Honest status of the Swift code

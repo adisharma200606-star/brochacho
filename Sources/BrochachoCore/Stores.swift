@@ -34,6 +34,18 @@ public enum BrochachoPaths {
         return configDirectory.appendingPathComponent("stash.json")
     }
 
+    /// The folder the iPhone shortcuts write to. It is the Shortcuts app's own iCloud Drive folder, because that is
+    /// the one place a shortcut can always append to a file. (Path to be confirmed on the Mac: see BLIND_SPOTS.)
+    public static var phoneFolder: URL {
+        return home.appendingPathComponent("Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Brochacho", isDirectory: true)
+    }
+
+    /// Only the phone writes these two.
+    public static var phoneInboxFile: URL { return phoneFolder.appendingPathComponent("phone-inbox.txt") }
+    public static var phoneOpenedFile: URL { return phoneFolder.appendingPathComponent("phone-opened.txt") }
+    /// Only the Mac writes this one.
+    public static var forPhoneFile: URL { return phoneFolder.appendingPathComponent("for-phone.txt") }
+
     /// Turn "~/Downloads" into a real path.
     public static func expandTilde(_ path: String) -> String {
         if path == "~" { return home.path }
@@ -120,6 +132,26 @@ public enum StashStore {
 }
 
 /// How often each thing has been opened. Used to break ties in the matcher.
+public enum PhoneStore {
+    /// Reads whatever the phone has written and folds it into the stash. Missing files simply mean "nothing yet".
+    @discardableResult
+    public static func pull(into stash: inout Stash, nowMs: Int = Clock.nowMs(),
+                            inbox: URL = BrochachoPaths.phoneInboxFile, opened: URL = BrochachoPaths.phoneOpenedFile) -> PhoneSync.Counts {
+        let inboxText = (try? String(contentsOf: inbox, encoding: .utf8)) ?? ""
+        let openedText = (try? String(contentsOf: opened, encoding: .utf8)) ?? ""
+        if inboxText.isEmpty && openedText.isEmpty { return PhoneSync.Counts() }
+        return stash.ingestPhone(inbox: inboxText, opened: openedText, nowMs: nowMs)
+    }
+
+    /// Writes the list the phone's "bored" shortcut reads. Only does so when the phone folder already exists,
+    /// so a Mac that has never seen the shortcuts does not create stray folders in iCloud.
+    public static func push(_ stash: Stash, to url: URL = BrochachoPaths.forPhoneFile) {
+        let folder = url.deletingLastPathComponent()
+        guard FileManager.default.fileExists(atPath: folder.path) else { return }
+        try? Data(PhoneSync.exportForPhone(stash).utf8).write(to: url, options: .atomic)
+    }
+}
+
 public enum UsageStore {
     public static func load(from url: URL = BrochachoPaths.usageFile) -> [String: Int] {
         return (try? JSONFile.read([String: Int].self, from: url)) ?? [:]

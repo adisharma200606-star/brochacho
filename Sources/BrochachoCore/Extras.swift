@@ -261,3 +261,121 @@ public enum LivingBookmarks {
         }
     }
 }
+
+// MARK: - iPhone
+
+/// The phone and the Mac never write to the same file, so iCloud can never make them clash:
+///   phone-inbox.txt    only the phone appends.  One save per line:  <ISO date> <link or text>
+///   phone-opened.txt   only the phone appends.  One open per line:  <ISO date> <link or text>
+///   for-phone.txt      only the Mac writes.     One unopened item per line, for the phone's "bored" shortcut.
+public enum PhoneSync {
+
+    public struct PhoneLine: Equatable {
+        public let payload: String
+        /// Milliseconds since 1970.
+        public let at: Int
+        /// False when the line had no readable date and `at` is simply "now".
+        public let dated: Bool
+    }
+
+    public struct Counts: Equatable {
+        public var added = 0
+        public var refreshed = 0
+        public var opened = 0
+    }
+
+    /// "2026-09-19T21:40:00+05:30", "2026-09-18T08:00:00Z" or "2026-09-10" to milliseconds. Nil otherwise.
+    static func parseDate(_ text: String) -> Int? {
+        let chars = Array(text)
+        guard chars.count >= 10 else { return nil }
+        for (index, c) in chars.prefix(10).enumerated() {
+            let wantsDash = index == 4 || index == 7
+            let ok = wantsDash ? (c == "-") : (c.isASCII && c.isNumber)
+            if !ok { return nil }
+        }
+        let attempts: [ISO8601DateFormatter.Options] = [
+            [.withInternetDateTime],
+            [.withInternetDateTime, .withFractionalSeconds],
+            [.withFullDate]
+        ]
+        for options in attempts {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = options
+            if let date = formatter.date(from: text) {
+                return Int((date.timeIntervalSince1970 * 1000).rounded())
+            }
+        }
+        return nil
+    }
+
+    /// Reads a phone file. Tolerant: blank lines are skipped, and a missing or unreadable date means "now".
+    public static func parseLines(_ text: String, nowMs: Int) -> [PhoneLine] {
+        var out = [PhoneLine]()
+        for raw in text.split(whereSeparator: { $0.isNewline }) {
+            let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            if line.isEmpty { continue }
+            var payload = line
+            var at = nowMs
+            var dated = false
+            if let space = line.firstIndex(of: " "), space != line.startIndex,
+               let ms = parseDate(String(line[line.startIndex..<space])) {
+                payload = String(line[line.index(after: space)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+                at = ms
+                dated = true
+            }
+            if payload.isEmpty { continue }
+            out.append(PhoneLine(payload: payload, at: at, dated: dated))
+        }
+        return out
+    }
+
+    static func kind(of payload: String) -> String {
+        let lower = payload.lowercased()
+        return lower.hasPrefix("http://") || lower.hasPrefix("https://") ? "url" : "text"
+    }
+
+    /// What the Mac writes for the phone: every unopened link or note, oldest first, one per line.
+    public static func exportForPhone(_ stash: Stash) -> String {
+        return stash.items
+            .filter { $0.openedAt == nil && ($0.kind == "url" || $0.kind == "text") && !$0.payload.contains("\n") }
+            .sorted { a, b in a.savedAt != b.savedAt ? a.savedAt < b.savedAt : a.id < b.id }
+            .map { $0.payload }
+            .joined(separator: "\n")
+    }
+}
+
+public extension Stash {
+    /// Folds the phone's files into the stash. Safe to run again and again on the same files: nothing is
+    /// duplicated, and something already opened only comes back if he saved it again later.
+    @discardableResult
+    mutating func ingestPhone(inbox: String, opened: String, nowMs: Int) -> PhoneSync.Counts {
+        var counts = PhoneSync.Counts()
+
+        for line in PhoneSync.parseLines(inbox, nowMs: nowMs) {
+            let kind = PhoneSync.kind(of: line.payload)
+            if let index = items.lastIndex(where: { $0.payload == line.payload && $0.kind == kind }) {
+                // Only a line with a real date can count as "saved again".
+                if line.dated && line.at > items[index].savedAt + 1000 {
+                    items[index].savedAt = line.at
+                    items[index].openedAt = nil
+                    items[index].skippedCount = 0
+                    counts.refreshed += 1
+                }
+            } else {
+                items.append(StashItem(id: "p\(line.at)-\(items.count)", kind: kind, payload: line.payload, title: nil,
+                                       source: "phone", savedAt: line.at))
+                counts.added += 1
+            }
+        }
+
+        for line in PhoneSync.parseLines(opened, nowMs: nowMs) where line.dated {
+            for index in items.indices {
+                if items[index].openedAt == nil && items[index].payload == line.payload && line.at >= items[index].savedAt {
+                    items[index].openedAt = line.at
+                    counts.opened += 1
+                }
+            }
+        }
+        return counts
+    }
+}

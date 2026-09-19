@@ -118,7 +118,7 @@ You find something good and want it later. Three ways to save it, none of which 
 
 1. **Drag it onto the notch.** A link, some text, an image, a file. The notch swallows it.
 2. **Press the save hotkey** while looking at a page in Brave. It saves that tab. No window appears.
-3. **From your phone** (planned, see section 17): share a link to a shortcut that writes to the same stash.
+3. **From your iPhone:** a share-sheet shortcut. See `docs/IPHONE.md` for the build steps. There is a matching **Bored** shortcut for getting things back on the phone, and both work for someone who only has an iPhone.
 
 There are no folders and no tags. The moment a saving tool asks where something goes, people stop using it.
 
@@ -416,7 +416,8 @@ Pick ones you can hit with one hand that do not clash with VS Code.
 | `~/.brochacho/config.json` | every setting and every entry |
 | `~/.brochacho/usage.json` | how often you open each thing, for tie-breaking |
 | `~/.brochacho/line-state.json` | which lines he used recently, so he does not repeat |
-| iCloud Drive `/Brochacho/stash.json` | the stash. In iCloud so your phone can add to it. If iCloud Drive is off, it lives in `~/.brochacho/` instead. |
+| iCloud Drive `/Brochacho/stash.json` | the stash. If iCloud Drive is off, it lives in `~/.brochacho/` instead. |
+| iCloud Drive `/Shortcuts/Brochacho/` | the three small text files the iPhone shortcuts and the Mac pass back and forth (`docs/IPHONE.md`) |
 
 All plain text. You can open, read and back up any of them. If the stash file is ever damaged (a half-finished sync, say), the app moves it aside under a new name and starts a fresh one. **It never deletes it.**
 
@@ -441,15 +442,15 @@ This section will grow once the app has actually run. What can already be predic
 
 | Piece | State |
 |---|---|
-| Matcher, stash, line picker, tuner maths, timer, living bookmarks | **Built and tested in JavaScript** (28 tests) |
+| Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync | **Built and tested in JavaScript** (30 tests) |
 | The same, in Swift | **Written, syntax-checked, never compiled** |
 | Phone prototype (notch feel, typing, stash, tuner, voice preview) | **Working** |
 | Cloud-Mac build and test workflow | **Written**, waiting for the repo to be on GitHub |
 | The Mac app: notch, hotkeys, opening things, drag to save, voice, settings window, tuner screen, timer bar | **Not written** |
 | Hold-to-talk | **Not written** |
 | Explain this | **Not written** |
-| Full line bank (about 200) | **57 written** |
-| Saving from the phone | **Not started.** Depends on whether you use an iPhone or an Android. |
+| Full line bank | **233 lines written**, in `defaults/lines.json`. Edit freely. |
+| Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |
 | The look | **Aurora chosen.** Live in the phone prototype. |
 
 Ideas that are parked, not planned: a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.

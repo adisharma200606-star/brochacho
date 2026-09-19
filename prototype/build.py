@@ -5,7 +5,7 @@ root = pathlib.Path(__file__).resolve().parent.parent
 html = (root / 'prototype' / 'template.html').read_text()
 core = (root / 'reference-js' / 'core.js').read_text()
 catalog = json.loads((root / 'defaults' / 'catalog.json').read_text())
-lines_path = root / 'defaults' / 'lines.json'
+lines_path = root / 'defaults' / 'lines.json'  # built by scripts/build_lines.py
 if not lines_path.exists():
     lines_path = root / 'defaults' / 'lines.seed.json'
 lines = json.loads(lines_path.read_text())

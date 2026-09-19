@@ -326,5 +326,121 @@
       "result": "none",
       "names": []
     }
-  ]
+  ],
+  "phone": {
+    "inbox": "2026-09-19T21:40:00+05:30 https://youtu.be/abc123\n\n2026-09-18T08:00:00Z https://example.com/that-tee?size=m\n2026-09-10 buy new guitar strings\nhttps://no-date.example/page\n   \n2026-09-19T21:41:00+05:30 https://youtu.be/abc123",
+    "opened": "2026-09-19T22:00:00+05:30 https://example.com/that-tee?size=m\r\n2026-09-01T00:00:00Z https://youtu.be/abc123",
+    "now": 1789862400000,
+    "initial": {
+      "items": [
+        {
+          "id": "mac1",
+          "kind": "url",
+          "payload": "https://mac.example/saved-here",
+          "title": null,
+          "source": "hotkey",
+          "savedAt": 1789862395000,
+          "servedAt": null,
+          "openedAt": null,
+          "skippedCount": 0
+        }
+      ],
+      "lastBucket": null,
+      "currentID": null
+    },
+    "counts": {
+      "added": 4,
+      "refreshed": 1,
+      "opened": 1
+    },
+    "final": {
+      "items": [
+        {
+          "id": "mac1",
+          "kind": "url",
+          "payload": "https://mac.example/saved-here",
+          "title": null,
+          "source": "hotkey",
+          "savedAt": 1789862395000,
+          "servedAt": null,
+          "openedAt": null,
+          "skippedCount": 0
+        },
+        {
+          "id": "p1789834200000-1",
+          "kind": "url",
+          "payload": "https://youtu.be/abc123",
+          "title": null,
+          "source": "phone",
+          "savedAt": 1789834260000,
+          "servedAt": null,
+          "openedAt": null,
+          "skippedCount": 0
+        },
+        {
+          "id": "p1789718400000-2",
+          "kind": "url",
+          "payload": "https://example.com/that-tee?size=m",
+          "title": null,
+          "source": "phone",
+          "savedAt": 1789718400000,
+          "servedAt": null,
+          "openedAt": 1789835400000,
+          "skippedCount": 0
+        },
+        {
+          "id": "p1788998400000-3",
+          "kind": "text",
+          "payload": "buy new guitar strings",
+          "title": null,
+          "source": "phone",
+          "savedAt": 1788998400000,
+          "servedAt": null,
+          "openedAt": null,
+          "skippedCount": 0
+        },
+        {
+          "id": "p1789862400000-4",
+          "kind": "url",
+          "payload": "https://no-date.example/page",
+          "title": null,
+          "source": "phone",
+          "savedAt": 1789862400000,
+          "servedAt": null,
+          "openedAt": null,
+          "skippedCount": 0
+        }
+      ],
+      "lastBucket": null,
+      "currentID": null
+    },
+    "forPhone": "buy new guitar strings\nhttps://youtu.be/abc123\nhttps://mac.example/saved-here\nhttps://no-date.example/page",
+    "lines": [
+      {
+        "payload": "https://youtu.be/abc123",
+        "at": 1789834200000,
+        "dated": true
+      },
+      {
+        "payload": "https://example.com/that-tee?size=m",
+        "at": 1789718400000,
+        "dated": true
+      },
+      {
+        "payload": "buy new guitar strings",
+        "at": 1788998400000,
+        "dated": true
+      },
+      {
+        "payload": "https://no-date.example/page",
+        "at": 1789862400000,
+        "dated": false
+      },
+      {
+        "payload": "https://youtu.be/abc123",
+        "at": 1789834260000,
+        "dated": true
+      }
+    ]
+  }
 }

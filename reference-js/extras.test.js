@@ -77,6 +77,46 @@ test('bookmarks: url parts', () => {
   assert.deepStrictEqual(x.urlParts('example.com'), { host: 'example.com', segments: [] });
 });
 
+const INBOX = [
+  '2026-09-19T21:40:00+05:30 https://youtu.be/abc123',
+  '',
+  '2026-09-18T08:00:00Z https://example.com/that-tee?size=m',
+  '2026-09-10 buy new guitar strings',
+  'https://no-date.example/page',
+  '   ',
+  '2026-09-19T21:41:00+05:30 https://youtu.be/abc123'
+].join('\n');
+const OPENED = ['2026-09-19T22:00:00+05:30 https://example.com/that-tee?size=m', '2026-09-01T00:00:00Z https://youtu.be/abc123'].join('\r\n');
+const NOW = Date.UTC(2026, 8, 20, 0, 0, 0);
+
+test('iphone: reading the phone files', () => {
+  const lines = x.parsePhoneLines(INBOX, NOW);
+  assert.deepStrictEqual(lines.map(l => l.payload), ['https://youtu.be/abc123', 'https://example.com/that-tee?size=m',
+    'buy new guitar strings', 'https://no-date.example/page', 'https://youtu.be/abc123']);
+  assert.strictEqual(lines[0].at, Date.UTC(2026, 8, 19, 16, 10, 0));
+  assert.strictEqual(lines[2].at, Date.UTC(2026, 8, 10));
+  assert.strictEqual(lines[3].at, NOW, 'no date means now');
+  assert.deepStrictEqual(x.parsePhoneLines('2026 plans for the band', NOW), [{ payload: '2026 plans for the band', at: NOW, dated: false }]);
+  assert.deepStrictEqual(x.parsePhoneLines('', NOW), []);
+});
+
+test('iphone: folding the phone into the stash, again and again, without duplicates', () => {
+  const stash = { items: [{ id: 'mac1', kind: 'url', payload: 'https://mac.example/saved-here', title: null, source: 'hotkey',
+    savedAt: NOW - 5000, servedAt: null, openedAt: null, skippedCount: 0 }], lastBucket: null, currentID: null };
+  const first = x.ingestPhone(stash, INBOX, OPENED, NOW);
+  assert.deepStrictEqual(first, { added: 4, refreshed: 1, opened: 1 });
+  assert.strictEqual(stash.items.length, 5);
+  const tube = stash.items.find(i => i.payload === 'https://youtu.be/abc123');
+  assert.strictEqual(tube.savedAt, Date.UTC(2026, 8, 19, 16, 11, 0), 'the later save wins');
+  assert.strictEqual(tube.openedAt, null, 'an open from before the save does not count');
+  assert.ok(stash.items.find(i => i.payload.includes('that-tee')).openedAt, 'opened on the phone means opened');
+  assert.strictEqual(stash.items.find(i => i.payload === 'buy new guitar strings').kind, 'text');
+
+  const again = x.ingestPhone(stash, INBOX, OPENED, NOW + 60000);
+  assert.deepStrictEqual(again, { added: 0, refreshed: 0, opened: 0 }, 'running it twice changes nothing');
+  assert.strictEqual(x.exportForPhone(stash), ['buy new guitar strings', 'https://youtu.be/abc123', 'https://mac.example/saved-here', 'https://no-date.example/page'].join('\n'));
+});
+
 test('write extras fixtures', () => {
   const dir = path.join(__dirname, '..', 'fixtures');
   const formats = [581000, 580001, 7000, 1, 0, -50, 3723000, 59999, 60000, 3600000].map(ms => ({ ms, text: x.formatRemaining(ms) }));
@@ -84,7 +124,13 @@ test('write extras fixtures', () => {
     const r = x.findLivingEntry(url, CATALOG);
     return { url, result: r.result, names: r.result === 'update' ? [r.entry.name] : r.result === 'ambiguous' ? r.entries.map(e => e.name) : [] };
   });
+  const pstash = { items: [{ id: 'mac1', kind: 'url', payload: 'https://mac.example/saved-here', title: null, source: 'hotkey',
+    savedAt: NOW - 5000, servedAt: null, openedAt: null, skippedCount: 0 }], lastBucket: null, currentID: null };
+  const initial = JSON.parse(JSON.stringify(pstash));
+  const counts = x.ingestPhone(pstash, INBOX, OPENED, NOW);
+  const phone = { inbox: INBOX, opened: OPENED, now: NOW, initial, counts, final: pstash, forPhone: x.exportForPhone(pstash),
+    lines: x.parsePhoneLines(INBOX, NOW) };
   fs.writeFileSync(path.join(dir, 'extras.json'), JSON.stringify({
-    durations: DURATIONS.map(([text, seconds]) => ({ text, seconds })), formats, catalog: CATALOG, bookmarks
+    durations: DURATIONS.map(([text, seconds]) => ({ text, seconds })), formats, catalog: CATALOG, bookmarks, phone
   }, null, 2));
 });
