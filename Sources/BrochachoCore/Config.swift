@@ -83,44 +83,57 @@ public struct MotionTheme: Codable, Equatable {
     }
 }
 
+/// The "Aurora" look: a black notch, Helvetica Neue, and a soft three-colour glow while it is open.
 public struct LookTheme: Codable, Equatable {
-    /// Text colour as "#RRGGBB".
-    public var phosphor: String
-    /// Glow radius in points. 0 turns it off.
-    public var glow: Double
-    /// Font family name. Falls back to the system monospaced font when it is not installed.
-    public var font: String
+    /// The name of the palette chosen in the prototype ("aurora", "sunset", "mint", "mono"). Informational.
+    public var palette: String
+    /// The three glow colours as "#RRGGBB": inner, middle, outer.
+    public var glowColors: [String]
+    /// 0 turns the glow off, 1 is full strength.
+    public var glowStrength: Double
+    /// Base text size in points. The typed text and the tuner note scale from it.
     public var textSize: Double
-    /// How long the cursor stays on (and then off), in milliseconds.
-    public var cursorBlinkMs: Double
+    /// How long one pulse of the cursor takes, in milliseconds.
+    public var caretBlinkMs: Double
 
-    public init(phosphor: String = "#FFB000", glow: Double = 6, font: String = "VT323", textSize: Double = 22,
-                cursorBlinkMs: Double = 530) {
-        self.phosphor = phosphor
-        self.glow = glow
-        self.font = font
+    public static let auroraColors = ["#FF375F", "#0A84FF", "#BF5AF2"]
+
+    public init(palette: String = "aurora", glowColors: [String] = LookTheme.auroraColors, glowStrength: Double = 0.8,
+                textSize: Double = 19, caretBlinkMs: Double = 600) {
+        self.palette = palette
+        self.glowColors = glowColors
+        self.glowStrength = glowStrength
         self.textSize = textSize
-        self.cursorBlinkMs = cursorBlinkMs
+        self.caretBlinkMs = caretBlinkMs
     }
 
-    private enum CodingKeys: String, CodingKey { case phosphor, glow, font, textSize, cursorBlinkMs }
+    private enum CodingKeys: String, CodingKey { case palette, glowColors, glowStrength, textSize, caretBlinkMs }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = LookTheme()
-        phosphor = try c.decodeIfPresent(String.self, forKey: .phosphor) ?? d.phosphor
-        glow = try c.decodeIfPresent(Double.self, forKey: .glow) ?? d.glow
-        font = try c.decodeIfPresent(String.self, forKey: .font) ?? d.font
+        palette = try c.decodeIfPresent(String.self, forKey: .palette) ?? d.palette
+        glowColors = try c.decodeIfPresent([String].self, forKey: .glowColors) ?? d.glowColors
+        glowStrength = try c.decodeIfPresent(Double.self, forKey: .glowStrength) ?? d.glowStrength
         textSize = try c.decodeIfPresent(Double.self, forKey: .textSize) ?? d.textSize
-        cursorBlinkMs = try c.decodeIfPresent(Double.self, forKey: .cursorBlinkMs) ?? d.cursorBlinkMs
+        caretBlinkMs = try c.decodeIfPresent(Double.self, forKey: .caretBlinkMs) ?? d.caretBlinkMs
     }
 
-    /// The phosphor colour as red, green, blue in 0...1. Falls back to amber when the string is not "#RRGGBB".
-    public var phosphorRGB: (red: Double, green: Double, blue: Double) {
-        let amber = (red: 1.0, green: 176.0 / 255.0, blue: 0.0)
-        var hex = phosphor.trimmingCharacters(in: .whitespacesAndNewlines)
+    /// The three glow colours as red, green, blue in 0...1. Always returns exactly three, falling back to
+    /// the Aurora colours for anything missing or unreadable.
+    public var glowRGB: [(red: Double, green: Double, blue: Double)] {
+        return (0..<3).map { index in
+            let fallback = LookTheme.auroraColors[index]
+            let hex = index < glowColors.count ? glowColors[index] : fallback
+            return LookTheme.rgb(hex: hex) ?? LookTheme.rgb(hex: fallback) ?? (red: 1, green: 1, blue: 1)
+        }
+    }
+
+    /// "#RRGGBB" or "RRGGBB" to red, green, blue in 0...1. Nil when it cannot be read.
+    public static func rgb(hex raw: String) -> (red: Double, green: Double, blue: Double)? {
+        var hex = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if hex.hasPrefix("#") { hex.removeFirst() }
-        guard hex.utf8.count == 6, let value = UInt32(hex, radix: 16) else { return amber }
+        guard hex.utf8.count == 6, let value = UInt32(hex, radix: 16) else { return nil }
         return (red: Double((value >> 16) & 0xFF) / 255.0,
                 green: Double((value >> 8) & 0xFF) / 255.0,
                 blue: Double(value & 0xFF) / 255.0)

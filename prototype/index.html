@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Brochacho notch — feel test</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@500&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
     --mat: #F2C21A;
@@ -14,11 +14,11 @@
     --paper: #FFF6D6;
     --rule: #17140C;
     --muted: #4A4020;
-    --phosphor: #FFB000;
-    --glow: 6px;
-    --notch-font: 'VT323', 'Courier New', monospace;
-    --notch-size: 22px;
-    --blink: 530ms;
+    --glow-a: #FF375F; --glow-b: #0A84FF; --glow-c: #BF5AF2; --tint: #E6DEFF;
+    --off: #FF9F0A; --ok: #30D158;
+    --notch-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --notch-size: 19px;
+    --blink: 600ms;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -42,61 +42,58 @@
   /* ---- the simulated Mac screen ---- */
   .stage-holder { position: sticky; top: 0; z-index: 5; padding: 8px 0 10px; background: var(--mat); }
   .stage {
-    position: relative; height: 270px; border-radius: 14px; overflow: hidden;
+    position: relative; height: 300px; border-radius: 14px; overflow: hidden;
     border: 3px solid var(--rule); box-shadow: 6px 6px 0 var(--rule);
-    background: linear-gradient(168deg, #3A5560 0%, #24353D 55%, #1A262C 100%);
+    background: linear-gradient(165deg, #2B2340 0%, #181524 60%, #100E18 100%);
     touch-action: manipulation;
   }
   .menubar {
     position: absolute; inset: 0 0 auto 0; height: 26px; display: flex; justify-content: space-between; align-items: center;
-    padding: 0 12px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.86); background: rgba(0,0,0,.22);
+    padding: 0 12px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.86); background: rgba(0,0,0,.25);
+    font-family: var(--notch-font);
   }
   .menubar span + span { margin-left: 12px; }
+
+  /* The notch. Black like the hardware, Helvetica inside, a soft colour glow while it is open. */
   .notch {
     position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    background: #000; overflow: hidden; border-radius: 0 0 9px 9px;
-    width: 130px; height: 26px; will-change: width, height; cursor: pointer;
+    background: #000; overflow: hidden; border-radius: 0 0 10px 10px;
+    width: 130px; height: 26px; will-change: width, height, box-shadow; cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
-  .notch:focus-visible { outline: 3px solid var(--phosphor); outline-offset: 2px; }
+  .notch:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
   .content {
-    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    padding: 34px 16px 14px; color: var(--phosphor);
-    font-family: var(--notch-font); font-size: var(--notch-size); line-height: 1.15;
-    text-shadow: 0 0 var(--glow) var(--phosphor);
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%); box-sizing: border-box;
+    padding: 36px 14px 14px; color: #fff;
+    font-family: var(--notch-font); font-size: var(--notch-size); line-height: 1.25; letter-spacing: -0.01em;
   }
   .content[hidden] { display: none; }
-  .inputrow { display: flex; align-items: center; gap: 8px; position: relative; min-height: 1.3em; }
-  .typed { white-space: pre; overflow: hidden; }
-  .cursor { display: inline-block; width: .55em; height: 1em; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor);
-    animation: blink var(--blink) steps(1) infinite; vertical-align: -0.12em; }
-  @keyframes blink { 50% { opacity: 0; } }
-  #cmd {
-    position: absolute; inset: 0; width: 100%; opacity: 0; font-size: 16px; border: 0; background: transparent; color: transparent;
-    caret-color: transparent;
-  }
-  .go {
-    margin-left: auto; position: relative; z-index: 2; font: inherit; color: #000; background: var(--phosphor); border: 0;
-    padding: 0 10px; min-height: 30px; min-width: 44px; text-shadow: none; cursor: pointer;
-  }
-  .rows { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
-  .rows button {
-    all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; gap: 10px;
-    padding: 3px 8px; min-height: 32px; align-items: center; cursor: pointer; opacity: .72;
-  }
-  .rows button:focus-visible { outline: 2px solid var(--phosphor); }
-  .rows li:first-child button { background: var(--phosphor); color: #000; text-shadow: none; opacity: 1; }
-  .rows .where { font-size: .82em; white-space: nowrap; }
-  .line { min-height: 1.3em; }
-  .pulltitle { margin-bottom: 4px; }
-  .pullmeta { font-size: .8em; opacity: .75; overflow-wrap: anywhere; }
-  .pullbtn { all: unset; margin-top: 10px; padding: 2px 12px; min-height: 36px; display: inline-flex; align-items: center;
-    border: 2px solid var(--phosphor); cursor: pointer; }
+  .inputrow { display: flex; align-items: center; gap: 6px; position: relative; min-height: 2.6em; padding: 0 8px; }
+  .typed { white-space: pre; overflow: hidden; font-size: 2.1em; font-weight: 500; letter-spacing: -0.03em; line-height: 1.1; }
+  .cursor { display: inline-block; width: 3px; height: 2em; border-radius: 2px; background: #fff; animation: blink var(--blink) ease-in-out infinite alternate; }
+  @keyframes blink { from { opacity: 1; } to { opacity: .12; } }
+  #cmd { position: absolute; inset: 0; width: 100%; opacity: 0; font-size: 16px; border: 0; background: transparent; color: transparent; caret-color: transparent; }
+  .go { margin-left: auto; position: relative; z-index: 2; font: inherit; font-weight: 500; color: #fff; background: rgba(255,255,255,.16); border: 0;
+    border-radius: 12px; padding: 0 12px; min-height: 40px; min-width: 48px; cursor: pointer; }
+  .go:focus-visible { outline: 2px solid #fff; }
+  .rows { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; }
+  .rows button { all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 0 14px; min-height: 44px; border-radius: 13px; cursor: pointer; color: #C7C7CC; }
+  .rows button:focus-visible { outline: 2px solid #fff; }
+  .rows li:first-child button { background: rgba(255,255,255,.14); color: #fff; font-weight: 500; }
+  .rows .where { font-size: 13px; white-space: nowrap; color: #98989D; letter-spacing: 0; }
+  .line { min-height: 1.3em; padding: 4px 8px 2px; font-size: 1.1em; font-weight: 500; color: var(--tint); }
+  .pulltitle { margin: 0 8px 4px; font-weight: 500; }
+  .pullmeta { margin: 0 8px; font-size: 13px; color: #98989D; overflow-wrap: anywhere; letter-spacing: 0; }
+  .pullbtn { all: unset; margin: 12px 8px 0; padding: 0 16px; min-height: 40px; display: inline-flex; align-items: center; border-radius: 999px;
+    background: rgba(255,255,255,.16); font-weight: 500; cursor: pointer; }
   .pullbtn:focus-visible { outline: 2px solid #fff; }
-  .timerbar { position: absolute; top: 27px; left: 50%; height: 4px; width: 130px; margin-left: -65px; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); transform-origin: left center; transform: scaleX(0); border-radius: 0 0 3px 3px; pointer-events: none; }
+  .timerbar { position: absolute; top: 27px; left: 50%; height: 4px; width: 130px; margin-left: -65px;
+    background: linear-gradient(90deg, var(--glow-a), var(--glow-b), var(--glow-c)); transform-origin: left center; transform: scaleX(0);
+    border-radius: 0 0 4px 4px; pointer-events: none; }
   .log {
     position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 13px; color: rgba(255,255,255,.92);
-    background: rgba(0,0,0,.35); padding: 6px 10px; border-radius: 8px; min-height: 32px; display: flex; align-items: center;
+    background: rgba(0,0,0,.4); padding: 6px 10px; border-radius: 8px; min-height: 32px; display: flex; align-items: center;
     justify-content: space-between; gap: 10px;
   }
   .log .ms { font-variant-numeric: tabular-nums; white-space: nowrap; opacity: .8; }
@@ -106,21 +103,27 @@
   }
 
   /* ---- tuner ---- */
-  .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .8em; }
-  .tunehead button { all: unset; min-width: 40px; min-height: 36px; text-align: center; cursor: pointer; border: 2px solid var(--phosphor); box-sizing: border-box; }
+  .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 13px; color: #98989D; letter-spacing: 0; padding: 0 4px; }
+  .tunehead button { all: unset; width: 40px; height: 40px; border-radius: 20px; text-align: center; cursor: pointer; background: rgba(255,255,255,.12); color: #fff; font-size: 20px; line-height: 40px; }
   .tunehead button:focus-visible { outline: 2px solid #fff; }
-  .strings { display: flex; justify-content: space-between; gap: 4px; margin: 8px 0 6px; }
-  .strings span { flex: 1; text-align: center; padding: 1px 0; opacity: .55; border-bottom: 2px solid transparent; }
-  .strings span.active { opacity: 1; background: var(--phosphor); color: #000; text-shadow: none; }
-  .strings span.locked { border-bottom-color: var(--phosphor); opacity: .9; }
-  .scale { position: relative; height: 26px; border: 2px solid var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); }
-  .scale::before { content: ''; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--phosphor); opacity: .7; }
-  .scale.intune { background: var(--phosphor); }
-  .scale.intune .needle { background: #000; box-shadow: none; }
-  .needle { position: absolute; top: 3px; bottom: 3px; width: 12px; margin-left: -6px; left: 50%; background: var(--phosphor); box-shadow: 0 0 var(--glow) var(--phosphor); transition: left .09s linear; }
-  .readout { display: flex; justify-content: space-between; margin-top: 6px; font-size: .85em; min-height: 1.2em; }
+  .tunebig { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding: 2px 8px 8px; min-height: 84px; }
+  .tunebig .note { font-size: 84px; font-weight: 200; letter-spacing: -0.04em; line-height: .86; }
+  .tunebig .note small { font-size: .34em; font-weight: 300; color: #98989D; margin-left: 2px; letter-spacing: 0; }
+  .tunebig .cents { text-align: right; font-size: 13px; color: #98989D; letter-spacing: 0; line-height: 1.3; }
+  .tunebig .cents b { display: block; font-size: 30px; font-weight: 300; color: var(--off); letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .tunebig.intune .cents b { color: var(--ok); }
+  .scale { position: relative; height: 24px; margin: 0 8px; }
+  .scale::before { content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.18); }
+  .scale::after { content: ''; position: absolute; left: 50%; top: 3px; width: 2px; height: 18px; margin-left: -1px; border-radius: 1px; background: rgba(255,255,255,.6); }
+  .needle { position: absolute; top: 3px; width: 18px; height: 18px; margin-left: -9px; left: 50%; border-radius: 9px; background: var(--off);
+    box-shadow: 0 0 16px var(--off); transition: left .09s linear, background .2s, box-shadow .2s; z-index: 1; }
+  .scale.intune .needle { background: var(--ok); box-shadow: 0 0 18px var(--ok); }
+  .strings { display: flex; justify-content: space-between; gap: 4px; margin: 10px 4px 0; font-size: 15px; font-weight: 500; letter-spacing: 0; }
+  .strings span { flex: 1; text-align: center; padding: 5px 0; border-radius: 10px; color: #98989D; }
+  .strings span.active { background: rgba(255,255,255,.16); color: #fff; }
+  .strings span.locked { color: var(--ok); }
   .tunerpad { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 18px; }
-  @media (prefers-reduced-motion: reduce) { .needle { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .needle { transition: none; } .cursor { animation: none; } }
 
   /* ---- gesture buttons ---- */
   .gestures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 6px 0 8px; }
@@ -129,7 +132,7 @@
     box-shadow: 4px 4px 0 var(--rule); padding: 10px 8px; min-height: 52px; cursor: pointer; border-radius: 0;
   }
   .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--rule); }
-  .btn:focus-visible { outline: 3px solid var(--phosphor); outline-offset: 2px; }
+  .btn:focus-visible { outline: 3px solid var(--glow-b); outline-offset: 2px; }
   .btn small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
   .droprow { display: flex; gap: 8px; margin: 0 0 18px; }
   .droprow input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 8px 10px; border: 3px solid var(--rule);
@@ -143,7 +146,7 @@
   summary::-webkit-details-marker { display: none; }
   summary::after { content: '+'; font-weight: 400; }
   details[open] summary::after { content: '–'; }
-  summary:focus-visible { outline: 3px solid var(--phosphor); }
+  summary:focus-visible { outline: 3px solid var(--glow-b); }
   .field { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline; margin: 10px 0 14px; }
   .field label { font-weight: 600; }
   .field output { font-variant-numeric: tabular-nums; color: var(--muted); }
@@ -151,7 +154,7 @@
   .field select, .field input[type=color] { grid-column: 1 / -1; font: inherit; font-size: 16px; min-height: 44px; border: 3px solid var(--rule);
     background: var(--paper); color: var(--ink); border-radius: 0; padding: 4px 8px; width: 100%; }
   .swatches { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
-  .swatches button { width: 44px; height: 44px; border: 3px solid var(--rule); border-radius: 0; cursor: pointer; padding: 0; }
+  .swatches button { width: 64px; height: 44px; border: 3px solid var(--rule); border-radius: 0; cursor: pointer; padding: 0; }
   .swatches button[aria-pressed=true] { box-shadow: 0 0 0 3px var(--mat), 0 0 0 6px var(--rule); }
   .hint { font-size: 14px; color: var(--muted); margin: -6px 0 12px; }
   .rowbtns { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 12px; }
@@ -171,7 +174,7 @@
       <div class="notch" id="notch" role="button" tabindex="0" aria-label="The notch. Tap to get something back from your stash.">
         <div class="content" id="viewInput" hidden>
           <div class="inputrow">
-            <span aria-hidden="true">&gt;</span><span class="typed" id="typed"></span><span class="cursor" aria-hidden="true"></span>
+            <span class="typed" id="typed"></span><span class="cursor" aria-hidden="true"></span>
             <label for="cmd" style="position:absolute;left:-9999px">Name of the thing to open</label>
             <input id="cmd" type="text" inputmode="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
             <button class="go" id="go" type="button" aria-label="Open the top match">&crarr;</button>
@@ -185,9 +188,9 @@
             <span id="tuneName"></span>
             <button id="tuneNext" type="button" aria-label="Next tuning">&rsaquo;</button>
           </div>
-          <div class="strings" id="tuneStrings"></div>
+          <div class="tunebig" id="tuneBig"><span class="note" id="tuneNote"></span><span class="cents" id="tuneCents"></span></div>
           <div class="scale" id="tuneScale"><div class="needle" id="tuneNeedle"></div></div>
-          <div class="readout"><span id="tuneNote"></span><span id="tuneCents"></span></div>
+          <div class="strings" id="tuneStrings"></div>
         </div>
         <div class="content" id="viewPull" hidden>
           <div class="pulltitle" id="pullTitle"></div>
@@ -230,22 +233,15 @@
 
   <details>
     <summary>Look</summary>
-    <div class="field"><label>Phosphor</label><span></span>
+    <div class="field"><label>Glow colours</label><span></span>
       <div class="swatches" id="swatches"></div></div>
-    <div class="field"><label for="custom">Your own colour</label><span></span>
-      <input id="custom" type="color" data-key="look.phosphor"></div>
-    <div class="field"><label for="glow">Glow</label><output id="o-glow"></output>
-      <input id="glow" type="range" min="0" max="16" step="1" data-key="look.glow"></div>
-    <div class="field"><label for="font">Typeface</label><span></span>
-      <select id="font" data-key="look.font">
-        <option value="VT323">VT323 (old terminal)</option>
-        <option value="Share Tech Mono">Share Tech Mono (sharper)</option>
-        <option value="IBM Plex Mono">IBM Plex Mono (cleanest)</option>
-      </select></div>
+    <div class="field"><label for="glowStrength">Glow strength</label><output id="o-glowStrength"></output>
+      <input id="glowStrength" type="range" min="0" max="1" step="0.05" data-key="look.glowStrength"></div>
     <div class="field"><label for="textSize">Text size</label><output id="o-textSize"></output>
-      <input id="textSize" type="range" min="16" max="30" step="1" data-key="look.textSize"></div>
-    <div class="field"><label for="blink">Cursor blink</label><output id="o-blink"></output>
-      <input id="blink" type="range" min="250" max="1000" step="10" data-key="look.cursorBlinkMs"></div>
+      <input id="textSize" type="range" min="15" max="24" step="1" data-key="look.textSize"></div>
+    <div class="field"><label for="blink">Cursor pulse</label><output id="o-blink"></output>
+      <input id="blink" type="range" min="250" max="1200" step="10" data-key="look.caretBlinkMs"></div>
+    <p class="hint">Type is Helvetica Neue on the Mac. A phone without it shows the closest match it has.</p>
   </details>
 
   <details>
@@ -1154,12 +1150,20 @@
 
   var DEFAULTS = {
     motion: { stiffness: 260, damping: 24 },
-    look: { phosphor: '#FFB000', glow: 6, font: 'VT323', textSize: 22, cursorBlinkMs: 530 },
+    look: { palette: 'aurora', glowStrength: 0.8, textSize: 19, caretBlinkMs: 600 },
     voice: { voiceName: '', rate: 0.95, pitch: 0.9, frequency: 0.6 }
   };
-  var SWATCHES = ['#FFB000', '#7CFF6B', '#CFE8FF', '#FF5A4E', '#F2C21A'];
-  var FONT_SCALE = { 'VT323': 1.22, 'Share Tech Mono': 1, 'IBM Plex Mono': 0.95 };
-  var STORE = 'brochacho.feel.v1';
+  var PALETTES = {
+    aurora: { colors: ['#FF375F', '#0A84FF', '#BF5AF2'], tint: '#E6DEFF' },
+    sunset: { colors: ['#FF9F0A', '#FF375F', '#FFD60A'], tint: '#FFE8C7' },
+    mint:   { colors: ['#30D158', '#64D2FF', '#0A84FF'], tint: '#D4F7E6' },
+    mono:   { colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF'], tint: '#FFFFFF' }
+  };
+  var STORE = 'brochacho.feel.v2';
+  function rgba(hex, alpha) {
+    var v = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((v >> 16) & 255) + ',' + ((v >> 8) & 255) + ',' + (v & 255) + ',' + alpha.toFixed(3) + ')';
+  }
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function $(id) { return document.getElementById(id); }
@@ -1211,8 +1215,12 @@
     var h = geo.notchH + (tall.x - geo.notchH) * Math.max(0, p) + gulp.x * 0.35;
     notch.style.width = Math.max(40, w) + 'px';
     notch.style.height = Math.max(geo.notchH, h) + 'px';
-    var r = 9 + 11 * Math.max(0, Math.min(1, p));
+    var r = 10 + 18 * Math.max(0, Math.min(1, p));
     notch.style.borderRadius = '0 0 ' + r + 'px ' + r + 'px';
+    // The glow breathes in with the spring, so an overshoot makes it flare for a moment.
+    var pal = (PALETTES[settings.look.palette] || PALETTES.aurora).colors, g = Math.max(0, p) * settings.look.glowStrength;
+    notch.style.boxShadow = g < 0.01 ? 'none'
+      : '0 0 28px ' + rgba(pal[0], 0.45 * g) + ', 0 10px 60px ' + rgba(pal[1], 0.5 * g) + ', 0 0 90px ' + rgba(pal[2], 0.45 * g);
     var vis = Math.max(0, Math.min(1, (p - 0.35) / 0.5));
     Object.keys(views).forEach(function (k) { views[k].style.opacity = vis; });
   }
@@ -1422,12 +1430,19 @@
     }
     var c = Math.max(-50, Math.min(50, d.cents || 0));
     $('tuneNeedle').style.left = (50 + c) + '%';
-    $('tuneNeedle').style.opacity = d.state === 'idle' ? .25 : 1;
+    $('tuneNeedle').style.opacity = d.state === 'idle' ? .3 : 1;
     $('tuneScale').classList.toggle('intune', !!d.inTune);
-    if (d.state === 'idle') { $('tuneNote').textContent = 'pluck a string'; $('tuneCents').textContent = ''; return; }
-    $('tuneNote').textContent = d.label + (d.octave == null ? '' : d.octave);
-    var r = Math.round(d.cents);
-    $('tuneCents').textContent = d.inTune ? 'in tune' : (r > 0 ? '+' : '') + r + ' cents, ' + (r < 0 ? 'tune up' : 'tune down');
+    $('tuneBig').classList.toggle('intune', !!d.inTune);
+    var note = $('tuneNote'), cents = $('tuneCents');
+    note.textContent = ''; cents.textContent = '';
+    if (d.state === 'idle') { note.textContent = '\u2013'; cents.textContent = 'pluck a string'; return; }
+    var m = /^([A-G][#b]?)(-?\d+)?$/.exec(d.label + (d.octave == null ? '' : d.octave)) || [null, d.label, ''];
+    note.appendChild(document.createTextNode(m[1]));
+    if (m[2]) { var sm = document.createElement('small'); sm.textContent = m[2]; note.appendChild(sm); }
+    var r = Math.round(d.cents), big = document.createElement('b');
+    big.textContent = d.inTune ? 'in tune' : (r > 0 ? '+' : r < 0 ? '\u2212' : '') + Math.abs(r);
+    cents.appendChild(big);
+    cents.appendChild(document.createTextNode(d.inTune ? '' : r < 0 ? 'cents, tune up' : 'cents, tune down'));
   }
   function heard(reading) {
     var d = tunerCore.feed(tuneSession, reading, Date.now(), resolvedTuning, 440);
@@ -1569,23 +1584,26 @@
     return 'Feel: ' + w + '. On the Mac this is interpolatingSpring(stiffness: ' + settings.motion.stiffness + ', damping: ' + settings.motion.damping + ').';
   }
   function apply() {
-    var r = document.documentElement.style, L = settings.look;
-    r.setProperty('--phosphor', L.phosphor);
-    r.setProperty('--glow', L.glow + 'px');
-    r.setProperty('--notch-font', "'" + L.font + "', 'Courier New', monospace");
-    r.setProperty('--notch-size', Math.round(L.textSize * (FONT_SCALE[L.font] || 1)) + 'px');
-    r.setProperty('--blink', (L.cursorBlinkMs * 2) + 'ms');
+    var r = document.documentElement.style, L = settings.look, pal = PALETTES[L.palette] || PALETTES.aurora;
+    r.setProperty('--glow-a', pal.colors[0]); r.setProperty('--glow-b', pal.colors[1]); r.setProperty('--glow-c', pal.colors[2]);
+    r.setProperty('--tint', pal.tint);
+    r.setProperty('--notch-size', L.textSize + 'px');
+    r.setProperty('--blink', L.caretBlinkMs + 'ms');
     $('bounce').textContent = bounceWord();
-    Array.prototype.forEach.call($('swatches').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.c.toLowerCase() === L.phosphor.toLowerCase())); });
-    renderExport(); refit();
+    Array.prototype.forEach.call($('swatches').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.c === L.palette)); });
+    renderExport(); refit(); paint();
   }
-  function renderExport() { $('export').value = JSON.stringify({ theme: settings }, null, 2); }
+  function renderExport() {
+    var out = clone(settings);
+    out.look.glowColors = (PALETTES[settings.look.palette] || PALETTES.aurora).colors;
+    $('export').value = JSON.stringify({ theme: out }, null, 2);
+  }
   function syncControls() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
       var v = get(settings, el.dataset.key);
       if (el.tagName === 'SELECT' && el.id === 'voice') return;
       el.value = v;
-      var out = $('o-' + el.id); if (out) out.textContent = el.id === 'frequency' ? Math.round(v * 100) + '%' : el.id === 'blink' ? v + ' ms' : v;
+      var out = $('o-' + el.id); if (out) out.textContent = (el.id === 'frequency' || el.id === 'glowStrength') ? Math.round(v * 100) + '%' : el.id === 'blink' ? v + ' ms' : v;
     });
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
@@ -1594,9 +1612,11 @@
       set(settings, el.dataset.key, v); persist(); syncControls(); apply();
     });
   });
-  SWATCHES.forEach(function (c) {
-    var b = document.createElement('button'); b.type = 'button'; b.dataset.c = c; b.style.background = c; b.setAttribute('aria-label', 'Phosphor ' + c);
-    b.addEventListener('click', function () { settings.look.phosphor = c; persist(); syncControls(); apply(); });
+  Object.keys(PALETTES).forEach(function (name) {
+    var c = PALETTES[name].colors, b = document.createElement('button');
+    b.type = 'button'; b.dataset.c = name; b.setAttribute('aria-label', 'Glow colours: ' + name);
+    b.style.background = 'linear-gradient(90deg, ' + c[0] + ', ' + c[1] + ', ' + c[2] + ')';
+    b.addEventListener('click', function () { settings.look.palette = name; persist(); syncControls(); apply(); if (mode === 'closed') $('replay').click(); });
     $('swatches').appendChild(b);
   });
 

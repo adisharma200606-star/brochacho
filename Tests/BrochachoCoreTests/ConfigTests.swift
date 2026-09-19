@@ -18,7 +18,7 @@ final class ConfigTests: XCTestCase {
         let json = """
         {
           "hotkeys": { "open": "ctrl+space" },
-          "theme": { "motion": { "stiffness": 400 }, "look": { "phosphor": "#7CFF6B" } },
+          "theme": { "motion": { "stiffness": 400 }, "look": { "glowStrength": 0.3 } },
           "catalog": [ { "name": "reddit", "kind": "site", "target": "https://www.reddit.com" } ]
         }
         """
@@ -29,7 +29,8 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config.hotkeys.talk, Hotkeys().talk)
         XCTAssertEqual(config.theme.motion.stiffness, 400)
         XCTAssertEqual(config.theme.motion.damping, MotionTheme().damping)
-        XCTAssertEqual(config.theme.look.phosphor, "#7CFF6B")
+        XCTAssertEqual(config.theme.look.glowStrength, 0.3)
+        XCTAssertEqual(config.theme.look.glowColors, LookTheme.auroraColors)
         XCTAssertEqual(config.theme.voice, VoiceTheme())
         XCTAssertEqual(config.brave, BraveConfig())
         XCTAssertEqual(config.catalog.count, 1)
@@ -47,12 +48,18 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: url), broken, "a typo in the config must never wipe it")
     }
 
-    func testPhosphorColourParsing() {
-        XCTAssertEqual(LookTheme(phosphor: "#FF0000").phosphorRGB.red, 1)
-        XCTAssertEqual(LookTheme(phosphor: "#FF0000").phosphorRGB.green, 0)
-        XCTAssertEqual(LookTheme(phosphor: "00ff00").phosphorRGB.green, 1)
-        XCTAssertEqual(LookTheme(phosphor: "nonsense").phosphorRGB.red, 1)
-        XCTAssertEqual(LookTheme(phosphor: "nonsense").phosphorRGB.blue, 0)
+    func testColourParsing() {
+        XCTAssertEqual(LookTheme.rgb(hex: "#FF0000")?.red, 1)
+        XCTAssertEqual(LookTheme.rgb(hex: "#FF0000")?.green, 0)
+        XCTAssertEqual(LookTheme.rgb(hex: "00ff00")?.green, 1)
+        XCTAssertNil(LookTheme.rgb(hex: "nonsense"))
+
+        let broken = LookTheme(glowColors: ["#00FF00", "nonsense"])
+        let rgb = broken.glowRGB
+        XCTAssertEqual(rgb.count, 3, "always three colours, whatever the config says")
+        XCTAssertEqual(rgb[0].green, 1)
+        XCTAssertEqual(rgb[1].blue, 1, accuracy: 0.001, "an unreadable colour falls back to Aurora's")
+        XCTAssertEqual(rgb[2].red, 191.0 / 255.0, accuracy: 0.001, "a missing colour falls back to Aurora's")
     }
 
     func testProfilesAndTilde() {

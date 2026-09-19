@@ -290,7 +290,7 @@ Later, if you want: pre-made audio clips from a voice service. If a clip exists 
 
 ### How often
 
-The amber text line **always** shows. Whether it is also *spoken* is a dial:
+The text line **always** shows. Whether it is also *spoken* is a dial:
 
 - `theme.voice.frequency` — 0 is never, 1 is every time. Default 0.6. The variety and this dial are what keep him funny after the hundredth time.
 - `speak` — the master switch.
@@ -324,14 +324,20 @@ If a new name is exactly the same as one you already have, it warns you.
 
 ## 12. Look and feel
 
-**Status:** being chosen
+**Status:** look chosen (Aurora) · working in the phone prototype · Mac screens not built
 
-The first look was amber terminal text. That is being replaced by a Helvetica-based look. Three directions are on the design canvas (D Swiss Poster, E Colour Block, F Aurora). Once you pick, the phone prototype and this section get rewritten to match.
+The look is **Aurora**: a black notch that matches the hardware, Helvetica Neue inside it, soft translucent rows, and a three-colour glow around the edge while it is open. A professional-looking piece of software that happens to talk like an Italian uncle. The contrast is the joke.
 
-What stays true whichever you pick:
+- **Type:** Helvetica Neue, which ships on every Mac. The name you type is large and medium weight. The tuner's note is very large and very thin.
+- **Rows:** the top match sits on a soft translucent pill. The others are grey.
+- **Glow:** three colours. It fades in as the notch opens, and because it follows the same spring as the notch, a bouncy spring makes it flare for a moment. Palettes: Aurora (pink, blue, purple), Sunset, Mint, and Mono (white only).
+- **Tuner colours:** orange while a string is off, green the moment it locks.
+- **Timer:** a thin bar in the glow colours draining along the bottom of the closed notch.
+
+What you can change without touching code:
 
 - The notch opens and closes on a **spring**, tuned by you on the phone prototype. The two numbers, `stiffness` and `damping`, mean exactly the same thing on the Mac, so what you feel on the phone is what you get.
-- Colours, type size, glow and cursor blink are all settings, not code.
+- Glow colours and strength, text size, and how fast the cursor pulses.
 - On a screen with no notch (an external monitor), it appears as a small floating pill at the top centre.
 
 To apply settings from the prototype: open **Settings to copy**, copy, and paste it over the `theme` block in the config.
@@ -369,7 +375,7 @@ Pick ones you can hit with one hand that do not clash with VS Code.
   "speak": true,
   "theme": {
     "motion": { "stiffness": 260, "damping": 24 },
-    "look":   { "phosphor": "#FFB000", "glow": 6, "font": "VT323", "textSize": 22, "cursorBlinkMs": 530 },
+    "look":   { "palette": "aurora", "glowColors": ["#FF375F", "#0A84FF", "#BF5AF2"], "glowStrength": 0.8, "textSize": 19, "caretBlinkMs": 600 },
     "voice":  { "voiceName": "", "rate": 0.95, "pitch": 0.9, "frequency": 0.6 }
   },
   "tuner": { "a4": 440, "toleranceCents": 5, "lastTuningID": "guitar-standard", "customTunings": [] },
@@ -385,7 +391,9 @@ Pick ones you can hit with one hand that do not clash with VS Code.
 | `speak` | master switch for the voice |
 | `theme.motion.stiffness` | how hard the notch snaps open. Higher is snappier. |
 | `theme.motion.damping` | how quickly it settles. Lower is bouncier. |
-| `theme.look.*` | colour (`#RRGGBB`), glow size, typeface, text size, cursor blink. These will change with the new look. |
+| `theme.look.glowColors` | the three glow colours, `#RRGGBB`, inner to outer. An unreadable one falls back to Aurora's. |
+| `theme.look.glowStrength` | 0 is no glow, 1 is full |
+| `theme.look.textSize`, `caretBlinkMs` | base text size in points; how long one cursor pulse takes |
 | `theme.voice.voiceName` | which system voice. Empty means the best Italian one installed. |
 | `theme.voice.rate`, `pitch` | 1.0 is the voice's normal speed and pitch |
 | `theme.voice.frequency` | 0 to 1, how often lines are spoken as well as shown |
@@ -442,6 +450,6 @@ This section will grow once the app has actually run. What can already be predic
 | Explain this | **Not written** |
 | Full line bank (about 200) | **57 written** |
 | Saving from the phone | **Not started.** Depends on whether you use an iPhone or an Android. |
-| The new Helvetica look | **Three directions drawn**, waiting for your pick |
+| The look | **Aurora chosen.** Live in the phone prototype. |
 
 Ideas that are parked, not planned: a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.
