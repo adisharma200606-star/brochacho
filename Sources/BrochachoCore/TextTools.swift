@@ -2,7 +2,7 @@ import Foundation
 
 /// Small text helpers. Ported line for line from `reference-js/core.js`.
 /// Everything works on ASCII bytes after normalising, which keeps indexing simple and fast.
-public enum Text {
+public enum TextTools {
 
     /// Lowercase and strip everything except a-z and 0-9. "You Tube!" becomes "youtube".
     public static func normalize(_ s: String) -> String {

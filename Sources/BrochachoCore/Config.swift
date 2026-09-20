@@ -4,23 +4,29 @@ import Foundation
 // Every field has a default, so a config that leaves things out (or an older config) still loads.
 
 public struct Hotkeys: Codable, Equatable {
-    /// Opens the box in the notch. Written as "opt+space" in config.json under the key "open".
+    /// Opens the box in the notch. Config key "open".
     public var openBox: String
     /// Held down to talk, released to run. Config key "talk".
+    /// It must include a normal key: macOS cannot register a modifier on its own as a global hotkey.
     public var talk: String
     /// Saves the front browser tab to the stash. No window appears. Config key "save".
     public var saveTab: String
+    /// Moves a living bookmark to the page in front. Config key "mark".
+    public var markPlace: String
 
-    public init(openBox: String = "opt+space", talk: String = "right_opt", saveTab: String = "opt+s") {
+    public init(openBox: String = "opt+space", talk: String = "ctrl+opt+space", saveTab: String = "ctrl+opt+s",
+                markPlace: String = "ctrl+opt+m") {
         self.openBox = openBox
         self.talk = talk
         self.saveTab = saveTab
+        self.markPlace = markPlace
     }
 
     private enum CodingKeys: String, CodingKey {
         case openBox = "open"
         case talk
         case saveTab = "save"
+        case markPlace = "mark"
     }
 
     public init(from decoder: Decoder) throws {
@@ -29,6 +35,7 @@ public struct Hotkeys: Codable, Equatable {
         openBox = try c.decodeIfPresent(String.self, forKey: .openBox) ?? d.openBox
         talk = try c.decodeIfPresent(String.self, forKey: .talk) ?? d.talk
         saveTab = try c.decodeIfPresent(String.self, forKey: .saveTab) ?? d.saveTab
+        markPlace = try c.decodeIfPresent(String.self, forKey: .markPlace) ?? d.markPlace
     }
 }
 
@@ -232,14 +239,28 @@ public struct AskConfig: Codable, Equatable {
     public var maxTokens: Int
     /// A spending ceiling per calendar month, in US dollars. When it is reached he says so and stops asking.
     public var monthlyBudgetUSD: Double
+    /// What the chosen model costs, in US dollars per million tokens. Only used to keep count against the
+    /// budget. Change these if you change `model`.
+    public var inputUSDPerMillionTokens: Double
+    public var outputUSDPerMillionTokens: Double
 
-    public init(model: String = "claude-haiku-4-5", maxTokens: Int = 300, monthlyBudgetUSD: Double = 2) {
+    public init(model: String = "claude-haiku-4-5", maxTokens: Int = 300, monthlyBudgetUSD: Double = 2,
+                inputUSDPerMillionTokens: Double = 1, outputUSDPerMillionTokens: Double = 5) {
         self.model = model
         self.maxTokens = maxTokens
         self.monthlyBudgetUSD = monthlyBudgetUSD
+        self.inputUSDPerMillionTokens = inputUSDPerMillionTokens
+        self.outputUSDPerMillionTokens = outputUSDPerMillionTokens
     }
 
-    private enum CodingKeys: String, CodingKey { case model, maxTokens, monthlyBudgetUSD }
+    private enum CodingKeys: String, CodingKey {
+        case model, maxTokens, monthlyBudgetUSD, inputUSDPerMillionTokens, outputUSDPerMillionTokens
+    }
+
+    /// What one reply cost, from the token counts the API reports.
+    public func cost(inputTokens: Int, outputTokens: Int) -> Double {
+        return Double(inputTokens) / 1_000_000 * inputUSDPerMillionTokens + Double(outputTokens) / 1_000_000 * outputUSDPerMillionTokens
+    }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -247,26 +268,31 @@ public struct AskConfig: Codable, Equatable {
         model = try c.decodeIfPresent(String.self, forKey: .model) ?? d.model
         maxTokens = try c.decodeIfPresent(Int.self, forKey: .maxTokens) ?? d.maxTokens
         monthlyBudgetUSD = try c.decodeIfPresent(Double.self, forKey: .monthlyBudgetUSD) ?? d.monthlyBudgetUSD
+        inputUSDPerMillionTokens = try c.decodeIfPresent(Double.self, forKey: .inputUSDPerMillionTokens) ?? d.inputUSDPerMillionTokens
+        outputUSDPerMillionTokens = try c.decodeIfPresent(Double.self, forKey: .outputUSDPerMillionTokens) ?? d.outputUSDPerMillionTokens
     }
 }
 
 public struct Config: Codable, Equatable {
     public var hotkeys: Hotkeys
     public var brave: BraveConfig
-    /// Master switch for the voice. The amber line shows either way.
+    /// Master switch for the voice. The text line shows either way.
     public var speak: Bool
+    /// The accent the Mac should expect when you talk to it. "en-IN" is English as spoken in India.
+    public var speechLocale: String
     public var theme: Theme
     public var tuner: TunerConfig
     public var ask: AskConfig
     public var feedback: FeedbackConfig
     public var catalog: [CatalogEntry]
 
-    public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true,
+    public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true, speechLocale: String = "en-IN",
                 theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), ask: AskConfig = AskConfig(),
                 feedback: FeedbackConfig = FeedbackConfig(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
         self.speak = speak
+        self.speechLocale = speechLocale
         self.theme = theme
         self.tuner = tuner
         self.ask = ask
@@ -274,13 +300,14 @@ public struct Config: Codable, Equatable {
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, ask, feedback, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, speechLocale, theme, tuner, ask, feedback, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         hotkeys = try c.decodeIfPresent(Hotkeys.self, forKey: .hotkeys) ?? Hotkeys()
         brave = try c.decodeIfPresent(BraveConfig.self, forKey: .brave) ?? BraveConfig()
         speak = try c.decodeIfPresent(Bool.self, forKey: .speak) ?? true
+        speechLocale = try c.decodeIfPresent(String.self, forKey: .speechLocale) ?? "en-IN"
         theme = try c.decodeIfPresent(Theme.self, forKey: .theme) ?? Theme()
         tuner = try c.decodeIfPresent(TunerConfig.self, forKey: .tuner) ?? TunerConfig()
         ask = try c.decodeIfPresent(AskConfig.self, forKey: .ask) ?? AskConfig()

@@ -52,7 +52,7 @@ public enum ActionPlan: Equatable {
 
         if decision.mode == .search {
             guard let template = entry.searchTemplate else { return nil }
-            let encoded = Text.encodeQuery(decision.query ?? "")
+            let encoded = TextTools.encodeQuery(decision.query ?? "")
             var url = template
             if let range = template.range(of: "{q}") {
                 url = template.replacingCharacters(in: range, with: encoded)

@@ -31,7 +31,7 @@ public enum Ask {
 
     /// Does the question point at something he copied? "what does this mean", "explain this".
     public static func wantsClipboard(_ question: String) -> Bool {
-        return Text.words(question).contains { $0 == "this" || $0 == "these" }
+        return TextTools.words(question).contains { $0 == "this" || $0 == "these" }
     }
 
     /// The two texts sent to the model. `clip` is whatever he last copied; it is only included when the

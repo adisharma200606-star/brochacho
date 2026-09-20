@@ -321,6 +321,11 @@ public struct TunerSession {
         self.options = options
     }
 
+    /// The strings that have been in tune at least once this session, for the screen to mark.
+    public var lockedStringIndexes: [Int] {
+        return lockedStrings
+    }
+
     static func median(_ values: [Double]) -> Double {
         if values.isEmpty { return 0 }
         let sorted = values.sorted()

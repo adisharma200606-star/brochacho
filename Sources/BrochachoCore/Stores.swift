@@ -111,7 +111,7 @@ public enum ConfigStore {
 public enum StashStore {
     /// Loads the stash. A missing file means an empty stash. A broken or half-synced file is moved aside,
     /// never deleted, and an empty stash is started.
-    public static func load(from url: URL = BrochachoPaths.stashFile, nowMs: Int = Clock.nowMs()) -> (stash: Stash, problem: LoadProblem?) {
+    public static func load(from url: URL = BrochachoPaths.stashFile, nowMs: Int = SystemClock.nowMs()) -> (stash: Stash, problem: LoadProblem?) {
         if !JSONFile.exists(url) { return (Stash(), nil) }
         do {
             return (try JSONFile.read(Stash.self, from: url), nil)
@@ -135,7 +135,7 @@ public enum StashStore {
 public enum PhoneStore {
     /// Reads whatever the phone has written and folds it into the stash. Missing files simply mean "nothing yet".
     @discardableResult
-    public static func pull(into stash: inout Stash, nowMs: Int = Clock.nowMs(),
+    public static func pull(into stash: inout Stash, nowMs: Int = SystemClock.nowMs(),
                             inbox: URL = BrochachoPaths.phoneInboxFile, opened: URL = BrochachoPaths.phoneOpenedFile) -> PhoneSync.Counts {
         let inboxText = (try? String(contentsOf: inbox, encoding: .utf8)) ?? ""
         let openedText = (try? String(contentsOf: opened, encoding: .utf8)) ?? ""
@@ -182,7 +182,7 @@ public enum LineBankStore {
     }
 }
 
-public enum Clock {
+public enum SystemClock {
     /// Milliseconds since 1970.
     public static func nowMs() -> Int {
         return Int((Date().timeIntervalSince1970 * 1000).rounded())

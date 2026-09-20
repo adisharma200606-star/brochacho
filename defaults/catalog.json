@@ -15,5 +15,7 @@
   {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"},
   {"name": "timer", "display": "Timer", "aliases": ["countdown"], "kind": "tool", "target": "timer", "takesWords": true},
   {"name": "note", "display": "New note", "aliases": ["notes", "new note"], "kind": "tool", "target": "note", "takesWords": true},
-  {"name": "reminder", "display": "Reminder", "aliases": ["remind", "remind me", "reminders", "todo", "task"], "kind": "tool", "target": "reminder", "takesWords": true}
+  {"name": "reminder", "display": "Reminder", "aliases": ["remind", "remind me", "reminders", "todo", "task"], "kind": "tool", "target": "reminder", "takesWords": true},
+  {"name": "settings", "display": "Settings", "aliases": ["preferences", "brochacho"], "kind": "tool", "target": "settings"},
+  {"name": "bored", "display": "Something I saved", "aliases": ["im bored", "i am bored", "surprise me"], "kind": "tool", "target": "pull"}
 ]

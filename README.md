@@ -18,13 +18,18 @@ A voice that lives in the MacBook notch.
 | `Sources/BrochachoCore/` + `Tests/` | The brain and the tuner maths ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Written, syntax-checked, never compiled.** `swift test` on a Mac, or let CI do it. |
 | `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and (once `App/` exists) builds the app. Logs are also pushed to the `ci-logs` branch. | Ready. Runs as soon as the repo is on GitHub. |
 
-## What does not exist yet
+| `App/` | **The Mac app**: the notch, hotkeys, opening things in Brave, drag to save, the voice, sounds, the tuner, the timer, notes and reminders, hold-to-talk, Ask, and the settings window. About 2,500 lines of SwiftUI and AppKit on top of a lightly patched copy of DynamicNotchKit. | **Written. Never compiled, never run.** |
 
-- `App/` — the macOS notch app (SwiftUI + DynamicNotchKit).
-- `DAY_ONE.md`, `BLIND_SPOTS.md`, `REFERENCES.md`.
+## Start here
+
+- On a new Mac: **`DAY_ONE.md`**.
+- A Claude session picking this up: **`CLAUDE.md`**.
+- How the code fits together: `docs/ARCHITECTURE.md`.
+- Every guess that could not be checked without a Mac: `BLIND_SPOTS.md`.
+- Third-party code and licences: `REFERENCES.md`.
 
 ## Honest status of the Swift code
 
-No Swift toolchain could be installed where this was written (swift.org is blocked there), so the Swift
-has passed a syntax check (tree-sitter) and a careful read, and nothing more. The CI workflow exists to
-fix that: the first push compiles it on a real Mac.
+No Swift toolchain could be installed where this was written (swift.org is blocked there), and there was no Mac.
+Every Swift file passes a syntax check (tree-sitter) and was written against the real source of the two libraries
+it uses. None of it has met a compiler. The first build will have errors; that is what day one is for.

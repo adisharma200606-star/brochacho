@@ -141,13 +141,13 @@ final class MatcherTests: XCTestCase {
     }
 
     func testTextHelpers() {
-        XCTAssertEqual(Text.normalize("You-Tube! 2"), "youtube2")
-        XCTAssertEqual(Text.words("VS Code, the editor"), ["vs", "code", "the", "editor"])
-        XCTAssertEqual(Text.editDistance("kitten", "sitting"), 3)
-        XCTAssertEqual(Text.editDistance("", "abc"), 3)
-        XCTAssertEqual(Text.subsequenceSpan("ytb", in: "youtube"), 6)
-        XCTAssertNil(Text.subsequenceSpan("xyz", in: "youtube"))
-        XCTAssertEqual(Text.encodeQuery("café ☕ & co"), "caf%C3%A9%20%E2%98%95%20%26%20co")
+        XCTAssertEqual(TextTools.normalize("You-Tube! 2"), "youtube2")
+        XCTAssertEqual(TextTools.words("VS Code, the editor"), ["vs", "code", "the", "editor"])
+        XCTAssertEqual(TextTools.editDistance("kitten", "sitting"), 3)
+        XCTAssertEqual(TextTools.editDistance("", "abc"), 3)
+        XCTAssertEqual(TextTools.subsequenceSpan("ytb", in: "youtube"), 6)
+        XCTAssertNil(TextTools.subsequenceSpan("xyz", in: "youtube"))
+        XCTAssertEqual(TextTools.encodeQuery("café ☕ & co"), "caf%C3%A9%20%E2%98%95%20%26%20co")
     }
 
     func testSearchURLs() {
@@ -160,7 +160,7 @@ final class MatcherTests: XCTestCase {
     func testTappingARowOpensThatRow() {
         let catalog = DefaultCatalog.entries
         let decision = Matcher.match("", catalog: catalog, usage: ["steam": 9, "gmail": 4])
-        XCTAssertEqual(decision.results.map { $0.entry.name }, ["steam", "gmail", "claude", "desktop"])
+        XCTAssertEqual(decision.results.map { $0.entry.name }, ["steam", "gmail", "youtube", "youtube music"])
         XCTAssertNil(ActionPlan.make(from: decision), "nothing typed and nothing chosen opens nothing")
         XCTAssertEqual(ActionPlan.make(from: decision, choosing: 1),
                        .openURL(url: "https://mail.google.com", profile: "personal", entry: "gmail"))

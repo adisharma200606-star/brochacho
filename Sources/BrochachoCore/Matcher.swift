@@ -110,7 +110,7 @@ public enum Matcher {
 
     /// Score one normalised query against one raw key (a name or an alias).
     private static func scoreKey(_ q: String, _ rawKey: String) -> Score? {
-        let key = Text.normalize(rawKey)
+        let key = TextTools.normalize(rawKey)
         if q.isEmpty || key.isEmpty { return nil }
         let qLen = q.utf8.count
         let keyLen = key.utf8.count
@@ -118,7 +118,7 @@ public enum Matcher {
         if q == key { return Score(band: .exact, quality: 1) }
         if key.hasPrefix(q) { return Score(band: .prefix, quality: Double(qLen) / Double(keyLen)) }
 
-        let ws = Text.words(rawKey)
+        let ws = TextTools.words(rawKey)
         if qLen >= 2 && ws.count >= 2 {
             for w in ws.dropFirst() where w.hasPrefix(q) {
                 return Score(band: .wordPrefix, quality: Double(qLen) / Double(w.utf8.count))
@@ -130,19 +130,19 @@ public enum Matcher {
         }
 
         if qLen >= 2, let qFirst = q.utf8.first, let keyFirst = key.utf8.first, qFirst == keyFirst {
-            if let span = Text.subsequenceSpan(q, in: key), span > 0 {
+            if let span = TextTools.subsequenceSpan(q, in: key), span > 0 {
                 return Score(band: .subsequence, quality: Double(qLen) / Double(span))
             }
         }
 
         if qLen >= 4 {
             let head = String(decoding: Array(key.utf8.prefix(qLen)), as: UTF8.self)
-            let prefixDistance = Text.editDistance(q, head)
+            let prefixDistance = TextTools.editDistance(q, head)
             let prefixMax = qLen >= 6 ? 2 : 1
             if prefixDistance <= prefixMax {
                 return Score(band: .prefixEdit, quality: -Double(prefixDistance))
             }
-            let distance = Text.editDistance(q, key)
+            let distance = TextTools.editDistance(q, key)
             let distanceMax = keyLen <= 5 ? 1 : 2
             if distance <= distanceMax {
                 return Score(band: .edit, quality: -Double(distance))
@@ -184,14 +184,14 @@ public enum Matcher {
         return hits
     }
 
-    /// Every entry, most used first, then by name.
+    /// Every entry, most used first. Things never used keep the order they have in the catalog.
     public static func mostUsed(catalog: [CatalogEntry], usage: [String: Int]) -> [Hit] {
-        var hits = catalog.map { Hit(entry: $0, band: .unranked, quality: 0, usage: usage[$0.name] ?? 0) }
-        hits.sort { a, b in
-            if a.usage != b.usage { return a.usage > b.usage }
-            return a.entry.name < b.entry.name
+        let indexed = catalog.enumerated().map { (index: $0.offset, hit: Hit(entry: $0.element, band: .unranked, quality: 0, usage: usage[$0.element.name] ?? 0)) }
+        let sorted = indexed.sorted { a, b in
+            if a.hit.usage != b.hit.usage { return a.hit.usage > b.hit.usage }
+            return a.index < b.index
         }
-        return hits
+        return sorted.map { $0.hit }
     }
 
     /// Entries that accept more words around their name: searchable sites ("yt berserk amv") and tools that
@@ -200,7 +200,7 @@ public enum Matcher {
         for entry in catalog {
             let takes = toolsOnly ? (entry.kind == .tool && entry.takesWords) : (entry.searchTemplate != nil || entry.takesWords)
             if !takes { continue }
-            for key in entry.keys where Text.normalize(key) == head {
+            for key in entry.keys where TextTools.normalize(key) == head {
                 return entry
             }
         }
@@ -209,7 +209,7 @@ public enum Matcher {
 
     private static func stripLeadingFiller(_ tokens: [String]) -> [String] {
         var i = 0
-        while i < tokens.count && filler.contains(Text.normalize(tokens[i])) {
+        while i < tokens.count && filler.contains(TextTools.normalize(tokens[i])) {
             i += 1
         }
         return i == tokens.count ? tokens : Array(tokens[i...])
@@ -229,7 +229,7 @@ public enum Matcher {
     ///  8. otherwise: nothing
     /// Before all of that: a question mark at either end means ask, and after step 3b so does a leading question word.
     public static func match(_ input: String, catalog: [CatalogEntry], usage: [String: Int] = [:], limit: Int = 4) -> Decision {
-        if Text.normalize(input).isEmpty {
+        if TextTools.normalize(input).isEmpty {
             let top = Array(mostUsed(catalog: catalog, usage: usage).prefix(limit))
             return Decision(mode: .empty, results: top, query: nil, confident: false)
         }
@@ -242,7 +242,7 @@ public enum Matcher {
 
         let rawTokens = input.split(whereSeparator: { $0.isWhitespace }).map(String.init)
         let tokens = stripLeadingFiller(rawTokens)
-        let whole = Text.normalize(tokens.joined())
+        let whole = TextTools.normalize(tokens.joined())
 
         let ranked = rank(whole, catalog: catalog, usage: usage)
         if let first = ranked.first, first.band == .exact {
@@ -253,7 +253,7 @@ public enum Matcher {
             let maxHead = Swift.min(2, tokens.count - 1)
             var k = maxHead
             while k >= 1 {
-                let head = Text.normalize(tokens[0..<k].joined())
+                let head = TextTools.normalize(tokens[0..<k].joined())
                 if let entry = exactEntryWithSearch(head, catalog: catalog) {
                     let hit = Hit(entry: entry, band: .exact, quality: 1, usage: usage[entry.name] ?? 0)
                     let query = tokens[k...].joined(separator: " ")
@@ -267,7 +267,7 @@ public enum Matcher {
         if tokens.count >= 2 {
             var t = Swift.min(2, tokens.count - 1)
             while t >= 1 {
-                let tail = Text.normalize(tokens[(tokens.count - t)...].joined())
+                let tail = TextTools.normalize(tokens[(tokens.count - t)...].joined())
                 if let tool = exactEntryWithSearch(tail, catalog: catalog, toolsOnly: true) {
                     let hit = Hit(entry: tool, band: .exact, quality: 1, usage: usage[tool.name] ?? 0)
                     let query = tokens[0..<(tokens.count - t)].joined(separator: " ")
@@ -278,7 +278,7 @@ public enum Matcher {
         }
 
         // It starts like a question and is more than one word: ask.
-        if tokens.count >= 2 && questionWords.contains(Text.normalize(tokens[0])) {
+        if tokens.count >= 2 && questionWords.contains(TextTools.normalize(tokens[0])) {
             return askDecision(tokens.joined(separator: " "), confident: true)
         }
 
@@ -289,7 +289,7 @@ public enum Matcher {
         if tokens.count >= 2 {
             var n = tokens.count - 1
             while n >= 1 {
-                let partial = rank(Text.normalize(tokens[0..<n].joined()), catalog: catalog, usage: usage)
+                let partial = rank(TextTools.normalize(tokens[0..<n].joined()), catalog: catalog, usage: usage)
                 if let first = partial.first, first.band >= Band.strongFrom {
                     return Decision(mode: .open, results: Array(partial.prefix(limit)), query: nil, confident: true)
                 }

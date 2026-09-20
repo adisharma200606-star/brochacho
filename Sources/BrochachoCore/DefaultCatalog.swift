@@ -19,6 +19,8 @@ public enum DefaultCatalog {
         CatalogEntry(name: "tuner", display: "Tuner", aliases: ["tune", "guitar tuner", "ukulele tuner", "uke"], kind: .tool, target: "tuner", profile: nil, searchTemplate: nil, takesWords: false, living: false),
         CatalogEntry(name: "timer", display: "Timer", aliases: ["countdown"], kind: .tool, target: "timer", profile: nil, searchTemplate: nil, takesWords: true, living: false),
         CatalogEntry(name: "note", display: "New note", aliases: ["notes", "new note"], kind: .tool, target: "note", profile: nil, searchTemplate: nil, takesWords: true, living: false),
-        CatalogEntry(name: "reminder", display: "Reminder", aliases: ["remind", "remind me", "reminders", "todo", "task"], kind: .tool, target: "reminder", profile: nil, searchTemplate: nil, takesWords: true, living: false)
+        CatalogEntry(name: "reminder", display: "Reminder", aliases: ["remind", "remind me", "reminders", "todo", "task"], kind: .tool, target: "reminder", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "settings", display: "Settings", aliases: ["preferences", "brochacho"], kind: .tool, target: "settings", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "bored", display: "Something I saved", aliases: ["im bored", "i am bored", "surprise me"], kind: .tool, target: "pull", profile: nil, searchTemplate: nil, takesWords: false, living: false)
     ]
 }

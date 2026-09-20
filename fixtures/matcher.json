@@ -166,6 +166,27 @@
       "kind": "tool",
       "target": "reminder",
       "takesWords": true
+    },
+    {
+      "name": "settings",
+      "display": "Settings",
+      "aliases": [
+        "preferences",
+        "brochacho"
+      ],
+      "kind": "tool",
+      "target": "settings"
+    },
+    {
+      "name": "bored",
+      "display": "Something I saved",
+      "aliases": [
+        "im bored",
+        "i am bored",
+        "surprise me"
+      ],
+      "kind": "tool",
+      "target": "pull"
     }
   ],
   "cases": [
@@ -959,6 +980,14 @@
         {
           "name": "spotify",
           "band": "prefix"
+        },
+        {
+          "name": "settings",
+          "band": "prefix"
+        },
+        {
+          "name": "bored",
+          "band": "prefix"
         }
       ],
       "plan": {
@@ -982,6 +1011,14 @@
         },
         {
           "name": "steam",
+          "band": "prefix"
+        },
+        {
+          "name": "settings",
+          "band": "prefix"
+        },
+        {
+          "name": "bored",
           "band": "prefix"
         }
       ],
@@ -1300,6 +1337,78 @@
       }
     },
     {
+      "input": "bored",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "bored",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "pull",
+        "entry": "bored"
+      }
+    },
+    {
+      "input": "i'm bored",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "bored",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "pull",
+        "entry": "bored"
+      }
+    },
+    {
+      "input": "settings",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "settings",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "settings",
+        "entry": "settings"
+      }
+    },
+    {
+      "input": "preferences",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "settings",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "settings",
+        "entry": "settings"
+      }
+    },
+    {
       "input": "note",
       "usage": {},
       "mode": "open",
@@ -1575,19 +1684,19 @@
       "query": null,
       "results": [
         {
-          "name": "claude",
+          "name": "youtube",
           "band": "none"
         },
         {
-          "name": "desktop",
+          "name": "youtube music",
           "band": "none"
         },
         {
-          "name": "downloads",
+          "name": "gmail",
           "band": "none"
         },
         {
-          "name": "github",
+          "name": "google",
           "band": "none"
         }
       ],
@@ -1601,19 +1710,19 @@
       "query": null,
       "results": [
         {
-          "name": "claude",
+          "name": "youtube",
           "band": "none"
         },
         {
-          "name": "desktop",
+          "name": "youtube music",
           "band": "none"
         },
         {
-          "name": "downloads",
+          "name": "gmail",
           "band": "none"
         },
         {
-          "name": "github",
+          "name": "google",
           "band": "none"
         }
       ],
@@ -1627,19 +1736,19 @@
       "query": null,
       "results": [
         {
-          "name": "claude",
+          "name": "youtube",
           "band": "none"
         },
         {
-          "name": "desktop",
+          "name": "youtube music",
           "band": "none"
         },
         {
-          "name": "downloads",
+          "name": "gmail",
           "band": "none"
         },
         {
-          "name": "github",
+          "name": "google",
           "band": "none"
         }
       ],

@@ -168,14 +168,13 @@
     return hits;
   }
 
+  /** Every entry, most used first. Things never used keep the order they have in the catalog. */
   function mostUsed(catalog, usage) {
     usage = usage || {};
     return catalog
-      .map(function (e) { return { entry: e, band: 0, quality: 0, usage: usage[e.name] || 0 }; })
-      .sort(function (a, b) {
-        if (a.usage !== b.usage) return b.usage - a.usage;
-        return a.entry.name < b.entry.name ? -1 : a.entry.name > b.entry.name ? 1 : 0;
-      });
+      .map(function (e, index) { return { entry: e, band: 0, quality: 0, usage: usage[e.name] || 0, index: index }; })
+      .sort(function (a, b) { return a.usage !== b.usage ? b.usage - a.usage : a.index - b.index; })
+      .map(function (h) { return { entry: h.entry, band: h.band, quality: h.quality, usage: h.usage }; });
   }
 
   // Entries that accept more words after their name: searchable sites ("yt berserk amv")

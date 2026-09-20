@@ -1,0 +1,57 @@
+# The Xcode project is generated from this file, so the project itself is never edited or committed.
+#   brew install xcodegen
+#   cd App && xcodegen generate && open Brochacho.xcodeproj
+name: Brochacho
+
+options:
+  bundleIdPrefix: com.adi
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+
+packages:
+  # The brain: matching, stash, lines, tuner maths, timer, reminders, asking. Lives at the repo root.
+  BrochachoCore:
+    path: ..
+  # The notch window. A copy of DynamicNotchKit 1.1.0 with two small edits: see Vendor/DynamicNotchKit/PATCHES.md.
+  DynamicNotchKit:
+    path: Vendor/DynamicNotchKit
+  # Global hotkeys, including key-down and key-up for hold-to-talk. MIT.
+  HotKey:
+    url: https://github.com/soffes/HotKey
+    exactVersion: 0.2.1
+
+targets:
+  Brochacho:
+    type: application
+    platform: macOS
+    sources:
+      - path: Brochacho
+    dependencies:
+      - package: BrochachoCore
+      - package: DynamicNotchKit
+      - package: HotKey
+    info:
+      path: Brochacho/Info.plist
+      properties:
+        CFBundleDisplayName: Brochacho
+        CFBundleShortVersionString: "0.1"
+        CFBundleVersion: "1"
+        # No Dock icon and no menu bar of its own. It lives in the notch.
+        LSUIElement: true
+        NSMicrophoneUsageDescription: "Brochacho listens while you hold the talk key, and while the tuner is open."
+        NSSpeechRecognitionUsageDescription: "Brochacho turns what you say into the name of the thing to open. It happens on this Mac."
+        NSAppleEventsUsageDescription: "Brochacho asks your browser which page is in front so it can save it, and asks Notes to make a note."
+        NSRemindersUsageDescription: "Brochacho adds the reminders you type into the notch."
+        NSRemindersFullAccessUsageDescription: "Brochacho adds the reminders you type into the notch."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.adi.brochacho
+        SWIFT_VERSION: "5.0"
+        MACOSX_DEPLOYMENT_TARGET: "13.0"
+        # Signed "to run locally". It launches processes and sends AppleScript, so it is not sandboxed.
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: NO
+        ENABLE_APP_SANDBOX: NO
+        GENERATE_INFOPLIST_FILE: NO

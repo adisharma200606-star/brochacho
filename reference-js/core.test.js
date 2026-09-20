@@ -87,6 +87,11 @@ const MATCH_CASES = [
   ['ti', 'open', 'timer', null, {}, true],
   ['tu', 'open', 'tuner', null, {}, true],
 
+  ['bored', 'open', 'bored', null, {}, true],
+  ["i'm bored", 'open', 'bored', null, {}, true],
+  ['settings', 'open', 'settings', null, {}, true],
+  ['preferences', 'open', 'settings', null, {}, true],
+
   // capturing: a note or a reminder is a tool that takes words
   ['note', 'open', 'note', null, {}, true],
   ['new note', 'open', 'note', null, {}, true],
@@ -165,7 +170,7 @@ test('matcher: every hand-written case', () => {
 
 test('matcher: empty input lists the most used things', () => {
   const m = core.match('', catalog, { steam: 9, gmail: 4 });
-  assert.deepStrictEqual(m.results.map(r => r.entry.name), ['steam', 'gmail', 'claude', 'desktop']);
+  assert.deepStrictEqual(m.results.map(r => r.entry.name), ['steam', 'gmail', 'youtube', 'youtube music']);
 });
 
 test('plan: sites, apps, paths and searches', () => {
