@@ -13,7 +13,8 @@ final class MatcherTests: XCTestCase {
         let path: String?
         let tool: String?
         let argument: String?
-        let entry: String
+        let question: String?
+        let entry: String?
     }
 
     private struct ResultFixture: Decodable {
@@ -31,9 +32,32 @@ final class MatcherTests: XCTestCase {
         let plan: PlanFixture?
     }
 
+    private struct AskBuildFixture: Decodable {
+        let question: String
+        let clip: String
+        let user: String
+    }
+
+    private struct ShapedFixture: Decodable {
+        let text: String
+        let command: String?
+    }
+
+    private struct AskAnswerFixture: Decodable {
+        let text: String
+        let shaped: ShapedFixture
+    }
+
+    private struct AskFixture: Decodable {
+        let rules: String
+        let builds: [AskBuildFixture]
+        let answers: [AskAnswerFixture]
+    }
+
     private struct FileFixture: Decodable {
         let catalog: [CatalogEntry]
         let cases: [CaseFixture]
+        let ask: AskFixture
     }
 
     func testEveryGoldenCase() throws {
@@ -72,10 +96,43 @@ final class MatcherTests: XCTestCase {
                 XCTAssertEqual(tool, expected.tool, "plan tool for \(label)")
                 XCTAssertEqual(argument, expected.argument, "plan argument for \(label)")
                 XCTAssertEqual(entry, expected.entry, "plan entry for \(label)")
+            case (.some(.ask(let question)), .some(let expected)):
+                XCTAssertEqual(expected.type, "ask", "plan type for \(label)")
+                XCTAssertEqual(question, expected.question, "plan question for \(label)")
             default:
                 XCTFail("one side has a plan and the other does not, for \(label)")
             }
         }
+    }
+
+    func testAskAgreesWithTheReference() throws {
+        let ask = try Fixtures.load(FileFixture.self, "matcher.json").ask
+        XCTAssertEqual(Ask.rules, ask.rules)
+        for b in ask.builds {
+            XCTAssertEqual(Ask.build(question: b.question, clip: b.clip).user, b.user, b.question)
+        }
+        for a in ask.answers {
+            let shaped = Ask.shape(a.text)
+            XCTAssertEqual(shaped.text, a.shaped.text, a.text)
+            XCTAssertEqual(shaped.command, a.shaped.command, a.text)
+        }
+    }
+
+    func testAskNeverLeaksTheClipboardAndBuildsAValidBody() throws {
+        XCTAssertFalse(Ask.wantsClipboard("what is a thistle"))
+        XCTAssertTrue(Ask.wantsClipboard("what does this mean"))
+        XCTAssertEqual(Ask.build(question: "capital of italy", clip: "my secret notes").user, "capital of italy")
+
+        let prompt = Ask.build(question: "explain this", clip: "TypeError: x is not a function")
+        let data = try Ask.requestBody(prompt: prompt, model: "claude-haiku-4-5", maxTokens: 300)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(json["model"] as? String, "claude-haiku-4-5")
+        XCTAssertEqual(json["max_tokens"] as? Int, 300)
+        XCTAssertEqual(json["system"] as? String, Ask.rules)
+        let messages = try XCTUnwrap(json["messages"] as? [[String: Any]])
+        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages[0]["role"] as? String, "user")
+        XCTAssertEqual(messages[0]["content"] as? String, prompt.user)
     }
 
     func testDefaultCatalogMatchesTheSharedJSON() throws {

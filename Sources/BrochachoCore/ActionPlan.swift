@@ -11,6 +11,8 @@ public enum ActionPlan: Equatable {
     /// Show something built into Brochacho in the notch: "tuner" or "timer".
     /// `argument` holds any words typed with the name, so "timer 10" arrives as tool "timer", argument "10".
     case openTool(tool: String, argument: String?, entry: String)
+    /// Ask the question and show a short answer in the notch. The only plan that needs the internet.
+    case ask(question: String)
 
     /// The catalog entry name this plan came from. Used to count usage and to pick a line.
     public var entryName: String {
@@ -19,6 +21,7 @@ public enum ActionPlan: Equatable {
         case .openApp(_, let entry): return entry
         case .openPath(_, let entry): return entry
         case .openTool(_, _, let entry): return entry
+        case .ask: return ""
         }
     }
 
@@ -29,11 +32,16 @@ public enum ActionPlan: Equatable {
         case .openApp: return "open_app"
         case .openPath: return "open_path"
         case .openTool: return "open_tool"
+        case .ask: return "explained"
         }
     }
 
     /// Turn a decision into a plan. Returns nil when there is nothing to do.
     public static func make(from decision: Decision) -> ActionPlan? {
+        if decision.mode == .ask {
+            guard let question = decision.query, !question.isEmpty else { return nil }
+            return .ask(question: question)
+        }
         guard let first = decision.results.first else { return nil }
         if decision.mode == .empty || decision.mode == .nothing { return nil }
         let entry = first.entry

@@ -54,8 +54,10 @@ public enum MatchMode: String, Equatable {
     case empty
     /// Results are ranked. The first one is what Enter opens.
     case open
-    /// The first word or two named a searchable site. `query` holds the rest.
+    /// The first word or two named a searchable site (or a tool that takes words). `query` holds the rest.
     case search
+    /// It reads like a question. `query` holds the question and there are no results.
+    case ask
     /// Nothing matched.
     case nothing = "none"
 }
@@ -84,6 +86,22 @@ public enum Matcher {
         "open", "launch", "start", "run", "go", "goto", "to", "play", "me", "some", "the",
         "my", "show", "please", "hey", "yo", "brochacho", "up", "a", "set"
     ]
+
+    /// The box works like a browser's address bar: a name opens the thing, anything that reads like a
+    /// question gets asked. These are the words a question starts with.
+    public static let questionWords: [String] = [
+        "how", "what", "whats", "why", "who", "whos", "when", "where", "which", "is", "are", "can", "could",
+        "does", "do", "did", "should", "would", "explain", "define", "meaning", "tell"
+    ]
+
+    private static func askDecision(_ text: String, confident: Bool) -> Decision {
+        var question = Substring(text)
+        while let first = question.first, first == "?" || first.isWhitespace {
+            question = question.dropFirst()
+        }
+        let cleaned = String(question).trimmingCharacters(in: .whitespacesAndNewlines)
+        return Decision(mode: .ask, results: [], query: cleaned, confident: confident)
+    }
 
     private struct Score {
         let band: Band
@@ -207,11 +225,19 @@ public enum Matcher {
     ///  4. the whole input ranks strongly: open
     ///  5. a shorter run of leading words ranks strongly: open ("gmail inbox")
     ///  6. the whole input ranks weakly: open, not confident
-    ///  7. otherwise: nothing
+    ///  7. several words that match nothing: ask, not confident
+    ///  8. otherwise: nothing
+    /// Before all of that: a question mark at either end means ask, and after step 3b so does a leading question word.
     public static func match(_ input: String, catalog: [CatalogEntry], usage: [String: Int] = [:], limit: Int = 4) -> Decision {
         if Text.normalize(input).isEmpty {
             let top = Array(mostUsed(catalog: catalog, usage: usage).prefix(limit))
             return Decision(mode: .empty, results: top, query: nil, confident: false)
+        }
+
+        // A question mark always means "ask".
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasSuffix("?") || trimmed.hasPrefix("?") {
+            return askDecision(trimmed, confident: true)
         }
 
         let rawTokens = input.split(whereSeparator: { $0.isWhitespace }).map(String.init)
@@ -251,6 +277,11 @@ public enum Matcher {
             }
         }
 
+        // It starts like a question and is more than one word: ask.
+        if tokens.count >= 2 && questionWords.contains(Text.normalize(tokens[0])) {
+            return askDecision(tokens.joined(separator: " "), confident: true)
+        }
+
         if let first = ranked.first, first.band >= Band.strongFrom {
             return Decision(mode: .open, results: Array(ranked.prefix(limit)), query: nil, confident: true)
         }
@@ -268,6 +299,10 @@ public enum Matcher {
 
         if !ranked.isEmpty {
             return Decision(mode: .open, results: Array(ranked.prefix(limit)), query: nil, confident: false)
+        }
+        // Several words that match nothing are a question, not an error.
+        if tokens.count >= 2 {
+            return askDecision(tokens.joined(separator: " "), confident: false)
         }
         return Decision(mode: .nothing, results: [], query: nil, confident: false)
     }

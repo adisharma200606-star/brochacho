@@ -87,6 +87,20 @@ const MATCH_CASES = [
   ['ti', 'open', 'timer', null, {}, true],
   ['tu', 'open', 'tuner', null, {}, true],
 
+  // asking: a question mark, a question word, or several words that match nothing
+  ['how do i undo a git commit?', 'ask', null, 'how do i undo a git commit?', {}, true],
+  ['what is a closure', 'ask', null, 'what is a closure', {}, true],
+  ['how to tune a guitar', 'ask', null, 'how to tune a guitar', {}, true],
+  ['explain this', 'ask', null, 'explain this', {}, true],
+  ["what's a pull request", 'ask', null, "what's a pull request", {}, true],
+  ['why is my build failing', 'ask', null, 'why is my build failing', {}, true],
+  ['hey tell me who won the 2022 world cup', 'ask', null, 'tell me who won the 2022 world cup', {}, true],
+  ['youtube?', 'ask', null, 'youtube?', {}, true],
+  ['? capital of italy', 'ask', null, 'capital of italy', {}, true],
+  ['capital of italy', 'ask', null, 'capital of italy', {}, false],
+  ['g how to tune a guitar', 'search', 'google', 'how to tune a guitar', {}, true], // naming a site still wins
+  ["what's app", 'open', 'whatsapp', null, {}, true],                               // an exact name still wins
+
   // nothing
   ['', 'empty', null, null, {}, false],
   ['    ', 'empty', null, null, {}, false],
@@ -99,7 +113,6 @@ const MATCH_CASES = [
   ['yt berserk amv', 'search', 'youtube', 'berserk amv', {}, true],
   ['youtube lofi', 'search', 'youtube', 'lofi', {}, true],
   ['you tube lofi beats', 'search', 'youtube', 'lofi beats', {}, true],
-  ['g how to tune a guitar', 'search', 'google', 'how to tune a guitar', {}, true],
   ['google weather bengaluru', 'search', 'google', 'weather bengaluru', {}, true],
   ['gh dynamicnotchkit', 'search', 'github', 'dynamicnotchkit', {}, true],
   ['open yt arctic monkeys 505', 'search', 'youtube', 'arctic monkeys 505', {}, true],
@@ -116,7 +129,6 @@ const MATCH_CASES = [
 
   // speech mishearings
   ['g mail', 'open', 'gmail', null, {}, true],
-  ["what's app", 'open', 'whatsapp', null, {}, true],
   ['linked in', 'open', 'linkedin', null, {}, true],
   ['you to', 'open', 'youtube', null, {}, true],
   ['youto', 'open', 'youtube', null, {}, false],
@@ -135,7 +147,8 @@ test('matcher: every hand-written case', () => {
     assert.strictEqual(m.mode, mode, 'mode for ' + label);
     if (mode === 'open' || mode === 'search') assert.strictEqual(m.results[0].entry.name, top, 'top for ' + label);
     if (mode === 'none') assert.strictEqual(m.results.length, 0, 'no results for ' + label);
-    if (mode === 'search') assert.strictEqual(m.query, query, 'query for ' + label);
+    if (mode === 'search' || mode === 'ask') assert.strictEqual(m.query, query, 'query for ' + label);
+    if (mode === 'ask') assert.strictEqual(m.results.length, 0, 'ask has no rows for ' + label);
     assert.strictEqual(m.confident, confident, 'confident for ' + label);
     assert.ok(m.results.length <= 4, 'at most 4 results for ' + label);
   }
@@ -162,6 +175,25 @@ test('plan: sites, apps, paths and searches', () => {
   assert.deepStrictEqual(core.plan(core.match('timer 10', catalog)), { type: 'openTool', tool: 'timer', argument: '10', entry: 'timer' });
   assert.strictEqual(core.plan(core.match('zzz', catalog)), null);
   assert.strictEqual(core.plan(core.match('', catalog)), null);
+});
+
+
+test('ask: what gets sent, and how the answer is split', () => {
+  assert.deepStrictEqual(core.plan(core.match('what is a closure', catalog)), { type: 'ask', question: 'what is a closure' });
+  assert.strictEqual(core.plan(core.match('?', catalog)), null, 'a lone question mark asks nothing');
+  assert.strictEqual(core.wantsClipboard('what does this mean'), true);
+  assert.strictEqual(core.wantsClipboard('what is a thistle'), false);
+  assert.strictEqual(core.buildAsk('what is a closure', 'IGNORED').user, 'what is a closure');
+  const withClip = core.buildAsk('explain this', 'TypeError: x is not a function');
+  assert.strictEqual(withClip.user, 'explain this\n\nHere is what I copied:\nTypeError: x is not a function');
+  assert.ok(withClip.system.includes('three short sentences'));
+  const long = core.buildAsk('explain this', 'a'.repeat(7000));
+  assert.ok(long.user.includes('(cut short)'));
+  assert.strictEqual(long.user.length, 'explain this\n\nHere is what I copied (cut short):\n'.length + 6000);
+  assert.deepStrictEqual(core.shapeAnswer('It moves your last commit back to your working files.\n\n$ git reset --soft HEAD~1\n'),
+    { text: 'It moves your last commit back to your working files.', command: 'git reset --soft HEAD~1' });
+  assert.deepStrictEqual(core.shapeAnswer('Rome.'), { text: 'Rome.', command: null });
+  assert.deepStrictEqual(core.shapeAnswer(''), { text: '', command: null });
 });
 
 // -------------------------------------------------------------------- stash
@@ -294,7 +326,14 @@ test('write golden fixtures', () => {
       plan: core.plan(m)
     };
   });
-  fs.writeFileSync(path.join(dir, 'matcher.json'), JSON.stringify({ catalog, cases: matcher }, null, 2));
+  const ask = {
+    rules: core.ASK_RULES,
+    builds: [['what is a closure', 'IGNORED'], ['explain this', 'TypeError: x is not a function'], ['what are these', ''], ['explain this', 'a'.repeat(6500)]]
+      .map(([question, clip]) => ({ question, clip, user: core.buildAsk(question, clip).user })),
+    answers: ['It moves your last commit back.\n\n$ git reset --soft HEAD~1\n', 'Rome.', '', 'Line one.\r\nLine two.', '$ ls -la']
+      .map(text => ({ text, shaped: core.shapeAnswer(text) }))
+  };
+  fs.writeFileSync(path.join(dir, 'matcher.json'), JSON.stringify({ catalog, cases: matcher, ask }, null, 2));
 
   // A long scripted session against the stash.
   const s = seededStash();

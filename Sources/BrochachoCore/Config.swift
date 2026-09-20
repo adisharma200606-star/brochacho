@@ -224,6 +224,32 @@ public struct TunerConfig: Codable, Equatable {
     }
 }
 
+/// Settings for "Ask". The key itself is never stored here: it lives in the Mac's Keychain.
+public struct AskConfig: Codable, Equatable {
+    /// Which Claude model answers. The small fast one is the right default.
+    public var model: String
+    /// The longest reply allowed, in tokens. Three sentences fit comfortably.
+    public var maxTokens: Int
+    /// A spending ceiling per calendar month, in US dollars. When it is reached he says so and stops asking.
+    public var monthlyBudgetUSD: Double
+
+    public init(model: String = "claude-haiku-4-5", maxTokens: Int = 300, monthlyBudgetUSD: Double = 2) {
+        self.model = model
+        self.maxTokens = maxTokens
+        self.monthlyBudgetUSD = monthlyBudgetUSD
+    }
+
+    private enum CodingKeys: String, CodingKey { case model, maxTokens, monthlyBudgetUSD }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = AskConfig()
+        model = try c.decodeIfPresent(String.self, forKey: .model) ?? d.model
+        maxTokens = try c.decodeIfPresent(Int.self, forKey: .maxTokens) ?? d.maxTokens
+        monthlyBudgetUSD = try c.decodeIfPresent(Double.self, forKey: .monthlyBudgetUSD) ?? d.monthlyBudgetUSD
+    }
+}
+
 public struct Config: Codable, Equatable {
     public var hotkeys: Hotkeys
     public var brave: BraveConfig
@@ -231,19 +257,22 @@ public struct Config: Codable, Equatable {
     public var speak: Bool
     public var theme: Theme
     public var tuner: TunerConfig
+    public var ask: AskConfig
     public var catalog: [CatalogEntry]
 
     public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true,
-                theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
+                theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), ask: AskConfig = AskConfig(),
+                catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
         self.speak = speak
         self.theme = theme
         self.tuner = tuner
+        self.ask = ask
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, ask, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -252,6 +281,7 @@ public struct Config: Codable, Equatable {
         speak = try c.decodeIfPresent(Bool.self, forKey: .speak) ?? true
         theme = try c.decodeIfPresent(Theme.self, forKey: .theme) ?? Theme()
         tuner = try c.decodeIfPresent(TunerConfig.self, forKey: .tuner) ?? TunerConfig()
+        ask = try c.decodeIfPresent(AskConfig.self, forKey: .ask) ?? AskConfig()
         catalog = try c.decodeIfPresent([CatalogEntry].self, forKey: .catalog) ?? DefaultCatalog.entries
     }
 }

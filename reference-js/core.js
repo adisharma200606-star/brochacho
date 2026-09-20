@@ -198,6 +198,15 @@
   var FILLER = ['open', 'launch', 'start', 'run', 'go', 'goto', 'to', 'play', 'me', 'some', 'the',
     'my', 'show', 'please', 'hey', 'yo', 'brochacho', 'up', 'a', 'set'];
 
+  // Asking. The box works like a browser's address bar: a name opens the thing, anything that reads
+  // like a question gets asked. There is still no command to learn.
+  var QUESTION_WORDS = ['how', 'what', 'whats', 'why', 'who', 'whos', 'when', 'where', 'which', 'is', 'are', 'can', 'could',
+    'does', 'do', 'did', 'should', 'would', 'explain', 'define', 'meaning', 'tell'];
+
+  function askDecision(text, confident) {
+    return { mode: 'ask', query: String(text).replace(/^[\s?]+/, '').trim(), results: [], confident: confident };
+  }
+
   function stripLeadingFiller(tokens) {
     var i = 0;
     while (i < tokens.length && FILLER.indexOf(normalize(tokens[i])) >= 0) i++;
@@ -209,6 +218,7 @@
    *   mode "empty"  -> nothing typed; results = most used
    *   mode "open"   -> results ranked; results[0] is what Enter opens
    *   mode "search" -> first word(s) named a searchable site; query = the rest
+   *   mode "ask"    -> it reads like a question; query = the question, results = []
    *   mode "none"   -> nothing matched
    * `confident` is true when it is safe to act without a confirming Enter/tap
    * (used for speech, where a wrong guess must never open the wrong thing).
@@ -228,6 +238,9 @@
     usage = usage || {};
     var rawTokens = String(input || '').trim().split(/\s+/).filter(Boolean);
     if (!normalize(input)) return { mode: 'empty', results: mostUsed(catalog, usage).slice(0, limit), confident: false };
+
+    var trimmed = String(input).trim();
+    if (trimmed.charAt(trimmed.length - 1) === '?' || trimmed.charAt(0) === '?') return askDecision(trimmed, true);
 
     var tokens = stripLeadingFiller(rawTokens);
     var whole = normalize(tokens.join(''));
@@ -270,6 +283,11 @@
       }
     }
 
+    // It starts like a question and is more than one word: ask.
+    if (tokens.length >= 2 && QUESTION_WORDS.indexOf(normalize(tokens[0])) >= 0) {
+      return askDecision(tokens.join(' '), true);
+    }
+
     if (ranked.length && ranked[0].band >= STRONG_FROM) {
       return { mode: 'open', results: ranked.slice(0, limit), confident: true };
     }
@@ -282,6 +300,7 @@
     }
 
     if (ranked.length) return { mode: 'open', results: ranked.slice(0, limit), confident: false };
+    if (tokens.length >= 2) return askDecision(tokens.join(' '), false);
     return { mode: 'none', results: [], confident: false };
   }
 
@@ -289,6 +308,7 @@
 
   /** Turn a match decision into a plain description of what the shell should do. */
   function plan(decision) {
+    if (decision && decision.mode === 'ask') return decision.query ? { type: 'ask', question: decision.query } : null;
     if (!decision || !decision.results.length || decision.mode === 'empty' || decision.mode === 'none') return null;
     var e = decision.results[0].entry;
     if (decision.mode === 'search' && e.kind === 'tool') {
@@ -441,15 +461,52 @@
     return { id: line.id, text: line.text, speak: speak };
   }
 
+  // ----------------------------------------------------------------- ask ----
+
+  var ASK_RULES = [
+    'You are answering inside a tiny panel at the top of a Mac screen.',
+    'Reply in at most three short sentences of plain English. No preamble, no markdown, no lists.',
+    'The reader is a self-taught builder who is new to coding, so avoid jargon or explain it in passing.',
+    'If the best answer is a command or a line of code, give one sentence first, then put the command alone on the last line, starting with "$ ".',
+    'If you are not sure, say so in one sentence. If it needs information from today and you cannot look it up, say that plainly instead of guessing.'
+  ].join(' ');
+  var MAX_CLIP = 6000;
+
+  /** Does the question point at something he copied? "what does this mean", "explain this". */
+  function wantsClipboard(question) {
+    return words(question).some(function (w) { return w === 'this' || w === 'these'; });
+  }
+
+  /** The two texts sent to the model. `clip` is whatever he copied, used only when the question points at it. */
+  function buildAsk(question, clip) {
+    var q = String(question || '').trim();
+    var user = q;
+    if (clip && wantsClipboard(q)) {
+      var c = String(clip);
+      var cut = c.length > MAX_CLIP;
+      user = q + '\n\nHere is what I copied' + (cut ? ' (cut short)' : '') + ':\n' + c.slice(0, MAX_CLIP);
+    }
+    return { system: ASK_RULES, user: user };
+  }
+
+  /** Split an answer into the part to read and, when the last line starts with "$ ", a command to copy. */
+  function shapeAnswer(text) {
+    var lines = String(text || '').replace(/\r/g, '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+    var command = null;
+    if (lines.length && lines[lines.length - 1].indexOf('$ ') === 0) command = lines.pop().slice(2).trim();
+    return { text: lines.join(' '), command: command || null };
+  }
+
   // -------------------------------------------------------------- export ----
 
   var api = {
     normalize: normalize, words: words, editDistance: editDistance, subsequenceSpan: subsequenceSpan,
     encodeQuery: encodeQuery, BAND: BAND, bandName: bandName, scoreKey: scoreKey, rank: rank,
-    match: match, plan: plan, FILLER: FILLER,
+    match: match, plan: plan, FILLER: FILLER, QUESTION_WORDS: QUESTION_WORDS,
     newStash: newStash, addItem: addItem, serve: serve, another: another, remaining: remaining,
     FRESH_DAYS: FRESH_DAYS, SKIP_LIMIT: SKIP_LIMIT, DAY_MS: DAY_MS,
-    pickLine: pickLine
+    pickLine: pickLine,
+    ASK_RULES: ASK_RULES, wantsClipboard: wantsClipboard, buildAsk: buildAsk, shapeAnswer: shapeAnswer
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BrochachoCore = api;

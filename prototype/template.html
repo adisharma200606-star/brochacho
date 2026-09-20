@@ -42,7 +42,7 @@
   /* ---- the simulated Mac screen ---- */
   .stage-holder { position: sticky; top: 0; z-index: 5; padding: 8px 0 10px; background: var(--mat); }
   .stage {
-    position: relative; height: 300px; border-radius: 14px; overflow: hidden;
+    position: relative; height: 330px; border-radius: 14px; overflow: hidden;
     border: 3px solid var(--rule); box-shadow: 6px 6px 0 var(--rule);
     background: linear-gradient(165deg, #2B2340 0%, #181524 60%, #100E18 100%);
     touch-action: manipulation;
@@ -101,6 +101,18 @@
     position: fixed; z-index: 20; padding: 4px 10px; background: var(--ink); color: var(--mat); font-size: 12px; font-weight: 600;
     border-radius: 999px; pointer-events: none; transition: transform .42s cubic-bezier(.5,-0.2,.7,.4), opacity .42s;
   }
+
+  /* ---- ask ---- */
+  .asked { font-size: 13px; color: #98989D; letter-spacing: 0; padding: 0 8px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .answer { padding: 0 8px; max-height: 150px; overflow-y: auto; line-height: 1.35; -webkit-overflow-scrolling: touch; }
+  .answer.thinking { color: #98989D; animation: think 1.1s ease-in-out infinite alternate; }
+  @keyframes think { from { opacity: .45; } to { opacity: 1; } }
+  .cmd { display: flex; align-items: center; gap: 8px; margin: 10px 8px 0; padding: 8px 8px 8px 12px; border-radius: 12px; background: rgba(255,255,255,.12); }
+  .cmd[hidden] { display: none; }
+  .cmd code { flex: 1; min-width: 0; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 14px; letter-spacing: 0; overflow-x: auto; white-space: nowrap; }
+  .cmd button { all: unset; padding: 0 14px; min-height: 36px; border-radius: 10px; background: rgba(255,255,255,.18); font-size: 14px; font-weight: 500; cursor: pointer; }
+  .cmd button:focus-visible { outline: 2px solid #fff; }
+  @media (prefers-reduced-motion: reduce) { .answer.thinking { animation: none; } }
 
   /* ---- tuner ---- */
   .tunehead { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 13px; color: #98989D; letter-spacing: 0; padding: 0 4px; }
@@ -192,6 +204,11 @@
           <div class="scale" id="tuneScale"><div class="needle" id="tuneNeedle"></div></div>
           <div class="strings" id="tuneStrings"></div>
         </div>
+        <div class="content" id="viewAnswer" hidden>
+          <div class="asked" id="askedText"></div>
+          <div class="answer" id="answerText" aria-live="polite"></div>
+          <div class="cmd" id="answerCmd" hidden><code id="answerCode"></code><button id="answerCopy" type="button">Copy</button></div>
+        </div>
         <div class="content" id="viewPull" hidden>
           <div class="pulltitle" id="pullTitle"></div>
           <div class="pullmeta" id="pullMeta"></div>
@@ -212,7 +229,7 @@
     <label for="dropUrl" style="position:absolute;left:-9999px">Link to drop on the notch</label>
     <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
   </div>
-  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>, <b>timer 10s</b>. Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>, <b>timer 10s</b>. Or just ask something: <b>what is a closure</b>, <b>how do i undo a git commit?</b> Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
 
   <div class="tunerpad">
     <button class="btn" id="btnTune" type="button">Tuner<small>type &ldquo;tune&rdquo;</small></button>
@@ -326,7 +343,7 @@
   var closeTimer = null;
 
   var stage = $('stage'), notch = $('notch'), cmd = $('cmd');
-  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull'), tuner: $('viewTuner') };
+  var views = { input: $('viewInput'), line: $('viewLine'), pull: $('viewPull'), tuner: $('viewTuner'), answer: $('viewAnswer') };
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ------------------------------------------------------- spring physics
@@ -392,6 +409,7 @@
   function close() {
     clearTimeout(closeTimer);
     if (typeof stopSources === 'function') stopSources();
+    if (askCtl) { try { askCtl.abort(); } catch (e) {} askCtl = null; }
     mode = 'closed'; open.target = 0; cmd.blur();
     notch.setAttribute('aria-expanded', 'false');
     kick();
@@ -465,6 +483,14 @@
       b.addEventListener('click', function (ev) { ev.stopPropagation(); run(i); });
       li.appendChild(b); ul.appendChild(li);
     });
+    if (decision.mode === 'ask') {
+      var liA = document.createElement('li'), bA = document.createElement('button'); bA.type = 'button';
+      var qa = document.createElement('span'); qa.textContent = 'Ask: ' + decision.query;
+      qa.style.overflow = 'hidden'; qa.style.textOverflow = 'ellipsis'; qa.style.whiteSpace = 'nowrap';
+      var wa = document.createElement('span'); wa.className = 'where'; wa.textContent = 'Claude';
+      bA.appendChild(qa); bA.appendChild(wa); bA.addEventListener('click', function (ev) { ev.stopPropagation(); run(); });
+      liA.appendChild(bA); ul.appendChild(liA);
+    }
     if (decision.mode === 'none') {
       var li2 = document.createElement('li'); li2.style.opacity = .7; li2.style.padding = '3px 8px'; li2.textContent = '?'; ul.appendChild(li2);
     }
@@ -493,6 +519,7 @@
     var decision = core.match(cmd.value, CATALOG, usage);
     var ms = performance.now() - t0;
     if (decision.mode === 'empty' && index == null) return;
+    if (decision.mode === 'ask') { cmd.blur(); ask(decision.query, ms); return; }
     if (decision.mode === 'none') {
       log('Nothing called \u201C' + cmd.value.trim() + '\u201D. You would add it to the config.', ms);
       showLine(sayLine('unknown', null)); return;
@@ -646,6 +673,61 @@
   $('tunePrev').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex - 1); });
   $('tuneNext').addEventListener('click', function (e) { e.stopPropagation(); stopSources(); setTuning(tuningIndex + 1); });
 
+
+
+  // ------------------------------------------------------------------ ask
+  // On the Mac this is one call to the Claude API with your own key. Here, the page asks Claude through the
+  // viewer instead, on the quick tier, so you can feel the feature today. It cannot browse in either place.
+  var sampleFn = null, askCtl = null;
+  try {
+    if (window.claude && typeof window.claude.use === 'function') {
+      window.claude.use('sample').then(function (fn) { sampleFn = fn; }, function () {});
+    }
+  } catch (e) {}
+
+  function showAnswer(shaped, thinking) {
+    $('answerText').classList.toggle('thinking', !!thinking);
+    $('answerText').textContent = shaped.text;
+    $('answerCmd').hidden = !shaped.command;
+    $('answerCode').textContent = shaped.command || '';
+    refit();
+  }
+  function ask(question, matchMs) {
+    unlockVoice(); clearTimeout(closeTimer);
+    if (askCtl) { try { askCtl.abort(); } catch (e) {} }
+    $('askedText').textContent = question;
+    showAnswer({ text: 'Thinking\u2026', command: null }, true);
+    show('answer');
+    log('Asked: ' + question, matchMs);
+    if (!sampleFn) {
+      showAnswer({ text: 'Asking needs Claude. It works when this page is open inside Claude, and on the Mac with your own API key.', command: null }, false);
+      return;
+    }
+    var built = core.buildAsk(question, '');
+    var started = performance.now();
+    askCtl = new AbortController();
+    sampleFn(built.system + '\n\nQuestion: ' + built.user, {
+      modelTier: 'quick', signal: askCtl.signal,
+      onText: function (p) { showAnswer(core.shapeAnswer(p.text), false); }
+    }).then(function (res) {
+      showAnswer(core.shapeAnswer(res.text), false);
+      $('logMs').textContent = 'answered in ' + ((performance.now() - started) / 1000).toFixed(1) + ' s';
+      sayLine('explained', null);
+    }, function (err) {
+      var code = err && err.code;
+      if (code === 'cancelled') return;
+      var kept = err && err.text ? core.shapeAnswer(err.text).text + ' ' : '';
+      showAnswer({ text: kept + (code === 'not_granted' ? 'You said no to asking Claude from this page. Reload it to be asked again.'
+        : code === 'rate_limited' ? 'Too many questions at once. Give it a moment.'
+        : 'That did not work' + (code ? ' (' + code + ').' : '.')), command: null }, false);
+    });
+  }
+  $('answerCopy').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var text = $('answerCode').textContent, btn = this;
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
+  });
 
   // ---------------------------------------------------------------- timer
   var extras = self.BrochachoExtras, countdown = null, countdownTick = null;

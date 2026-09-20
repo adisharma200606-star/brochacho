@@ -22,7 +22,7 @@ When the app runs on your Mac, every Status line gets updated and anything that 
 6. [Bookmarks that remember where you stopped](#6-bookmarks-that-remember-where-you-stopped)
 7. [The tuner](#7-the-tuner)
 8. [The timer](#8-the-timer)
-9. [Explain this](#9-explain-this)
+9. [Ask](#9-ask)
 10. [The voice](#10-the-voice)
 11. [Adding your own things](#11-adding-your-own-things)
 12. [Look and feel](#12-look-and-feel)
@@ -91,7 +91,7 @@ Every site entry says which Brave profile it belongs to, `personal` or `work`. B
 
 ### If he does not know it
 
-He shows `?`, says something like "Never heard of it", and nothing opens. Add it (section 11).
+If it is a single word he does not know, he shows `?`, says something like "Never heard of it", and nothing opens. Add it (section 11). If it is several words, he treats it as a question (section 9).
 
 ---
 
@@ -252,19 +252,41 @@ There is one timer at a time. There are no streaks, no history, and no "you focu
 
 ---
 
-## 9. Explain this
+## 9. Ask
 
-**Status:** designed · nothing written yet · needs a Claude API key
+**Status:** brain tested (recognising a question, what gets sent, splitting the answer) · Swift written · working in the phone prototype through Claude itself · the Mac's network call and screen are not written · needs a Claude API key on the Mac
 
-You are looking at an error message or a line of code you do not understand.
+The box works like a browser's address bar. Type a name and it opens the thing. Type a question and it gets asked. There is nothing to switch and no command to learn.
 
-1. Select it and copy it (⌘C).
-2. Press the **explain** hotkey.
-3. A short explanation in plain English appears in the notch: what it means, the most likely cause, the first thing to try.
+**What counts as a question**
 
-This is the only feature that uses the internet and the only one that costs money: roughly a cent per use, paid from a Claude Console API key that you add once. The key is kept in the Mac's Keychain, never in the config file.
+| You type | What happens |
+|---|---|
+| `how do i undo a git commit?` | asked. A question mark at the start or the end always means ask. |
+| `what is a closure` · `why is my build failing` · `explain this` | asked. It starts with a question word. |
+| `capital of italy` | asked. Several words that match nothing you have are treated as a question, but because he is less sure, he shows **Ask: capital of italy** and waits for Enter even when you spoke it. |
+| `g how to tune a guitar` | **not** asked. Naming a site first still searches that site. |
+| `what's app` | **not** asked. An exact name always wins. |
 
-It reads the clipboard and nothing else. It never looks at your screen, and it only runs when you press the hotkey.
+Before you press Enter, the row under the box says **Ask: …**, so you always know what Enter will do.
+
+**The answer** appears in the notch as it is written: at most three short sentences, plain English. If the best answer is a command, it sits on its own line with a **Copy** button. The notch stays open until you dismiss it.
+
+**"This" means what you copied.** Ask `explain this` or `what does this mean` and whatever you last copied (an error message, a line of code) is sent along. If your question does not say *this* or *these*, your clipboard is never sent.
+
+**What it knows and does not know.** It answers from what the model already knows. It is very good at "how do I", "what is", "what does this error mean". It **cannot look things up**, so it does not know today's score, this week's news or current prices, and it is told to say so rather than guess. It can also simply be wrong, and a three-sentence answer has no sources. For anything that matters, check.
+
+Looking things up live is possible later (Claude's API has a web search tool). It costs more per question and takes several seconds, so it is not in the first version.
+
+**Cost and limits.** Each question is a fraction of a cent on the small fast model. Settings, under `ask` in the config:
+
+- `model` — which Claude model answers.
+- `maxTokens` — the longest reply allowed.
+- `monthlyBudgetUSD` — a ceiling per month, default 2. When it is reached he says so and stops asking until next month.
+
+The API key is stored in the Mac's Keychain, never in the config file. Questions are sent to Anthropic and nowhere else. Nothing is ever sent unless you press Enter on an **Ask** row.
+
+**In the phone prototype** the same feature runs through your Claude account instead of an API key, so the first question asks your permission, and it may be a little slower than the Mac will be.
 
 ---
 
@@ -354,7 +376,6 @@ To apply settings from the prototype: open **Settings to copy**, copy, and paste
 | Talk | hold to talk, release to run | `right_opt` |
 | Save | saves the front Brave tab to the stash | `opt+s` |
 | Mark my place | moves a living bookmark to this page | not chosen |
-| Explain | explains whatever you just copied | not chosen |
 
 Pick ones you can hit with one hand that do not clash with VS Code.
 
@@ -379,6 +400,7 @@ Pick ones you can hit with one hand that do not clash with VS Code.
     "voice":  { "voiceName": "", "rate": 0.95, "pitch": 0.9, "frequency": 0.6 }
   },
   "tuner": { "a4": 440, "toleranceCents": 5, "lastTuningID": "guitar-standard", "customTunings": [] },
+  "ask":   { "model": "claude-haiku-4-5", "maxTokens": 300, "monthlyBudgetUSD": 2 },
   "catalog": [ ]
 }
 ```
@@ -398,6 +420,7 @@ Pick ones you can hit with one hand that do not clash with VS Code.
 | `theme.voice.rate`, `pitch` | 1.0 is the voice's normal speed and pitch |
 | `theme.voice.frequency` | 0 to 1, how often lines are spoken as well as shown |
 | `tuner.*` | see section 7 |
+| `ask.*` | see section 9 |
 | `catalog` | your entries (section 11). One entry looks like this: |
 
 ```json
@@ -442,13 +465,13 @@ This section will grow once the app has actually run. What can already be predic
 
 | Piece | State |
 |---|---|
-| Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync | **Built and tested in JavaScript** (30 tests) |
+| Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync | **Built and tested in JavaScript** (31 tests) |
 | The same, in Swift | **Written, syntax-checked, never compiled** |
 | Phone prototype (notch feel, typing, stash, tuner, voice preview) | **Working** |
 | Cloud-Mac build and test workflow | **Written**, waiting for the repo to be on GitHub |
 | The Mac app: notch, hotkeys, opening things, drag to save, voice, settings window, tuner screen, timer bar | **Not written** |
 | Hold-to-talk | **Not written** |
-| Explain this | **Not written** |
+| Ask | **Brain built and tested; works in the phone prototype.** The Mac's network call, Keychain storage and spending cap are not written. |
 | Full line bank | **233 lines written**, in `defaults/lines.json`. Edit freely. |
 | Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |
 | The look | **Aurora chosen.** Live in the phone prototype. |
