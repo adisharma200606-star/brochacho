@@ -15,6 +15,10 @@ tuner = (root / 'reference-js' / 'tuner.js').read_text()
 assert '</script' not in tuner
 html = html.replace('/*__TUNER__*/', tuner)
 html = html.replace('/*__EXTRAS__*/', (root / 'reference-js' / 'extras.js').read_text())
+html = html.replace('/*__CAPTURE__*/', (root / 'reference-js' / 'capture.js').read_text())
+import base64
+sounds = {f.stem: base64.b64encode(f.read_bytes()).decode() for f in sorted((root / 'App' / 'Brochacho' / 'Resources' / 'sounds').glob('*.wav'))}
+html = html.replace('/*__SOUNDS__*/{}', json.dumps(sounds))
 html = html.replace('/*__TUNINGS__*/[]', json.dumps(json.loads((root / 'defaults' / 'tunings.json').read_text())))
 html = html.replace('/*__CATALOG__*/[]', json.dumps(catalog))
 html = html.replace('/*__LINES__*/{}', json.dumps(lines))

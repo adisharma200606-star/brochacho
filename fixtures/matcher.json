@@ -141,6 +141,31 @@
       "kind": "tool",
       "target": "timer",
       "takesWords": true
+    },
+    {
+      "name": "note",
+      "display": "New note",
+      "aliases": [
+        "notes",
+        "new note"
+      ],
+      "kind": "tool",
+      "target": "note",
+      "takesWords": true
+    },
+    {
+      "name": "reminder",
+      "display": "Reminder",
+      "aliases": [
+        "remind",
+        "remind me",
+        "reminders",
+        "todo",
+        "task"
+      ],
+      "kind": "tool",
+      "target": "reminder",
+      "takesWords": true
     }
   ],
   "cases": [
@@ -1272,6 +1297,117 @@
         "type": "openTool",
         "tool": "tuner",
         "entry": "tuner"
+      }
+    },
+    {
+      "input": "note",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "note",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "note",
+        "entry": "note"
+      }
+    },
+    {
+      "input": "new note",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "note",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "note",
+        "entry": "note"
+      }
+    },
+    {
+      "input": "note buy new strings",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "buy new strings",
+      "results": [
+        {
+          "name": "note",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "note",
+        "argument": "buy new strings",
+        "entry": "note"
+      }
+    },
+    {
+      "input": "remind me to call mom tomorrow at 5",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "to call mom tomorrow at 5",
+      "results": [
+        {
+          "name": "reminder",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "reminder",
+        "argument": "to call mom tomorrow at 5",
+        "entry": "reminder"
+      }
+    },
+    {
+      "input": "todo finish the report",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "finish the report",
+      "results": [
+        {
+          "name": "reminder",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "reminder",
+        "argument": "finish the report",
+        "entry": "reminder"
+      }
+    },
+    {
+      "input": "reminder",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "reminder",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "reminder",
+        "entry": "reminder"
       }
     },
     {

@@ -116,6 +116,13 @@ BANK = {
     "Let's hear her sing.", "Strings, eh. We fix them.", "Pluck. I listen.", "My ears are all yours.",
     "Bring her here. We make her sing.", "The tuning fork is out.",
   ]),
+  "target:note": ("nt", [
+    "Noted.", "Written down. In ink.", "I remember, so you can forget.", "It's in the little black book.", "On paper. Safe.",
+  ]),
+  "target:reminder": ("rm", [
+    "I'll tap your shoulder.", "Consider yourself reminded.", "It's in the book.", "I won't let you forget.",
+    "Marked. I'm watching the clock.",
+  ]),
   "target:timer": ("tm", [
     "The clock, she's running.", "I watch the time. You work.", "Timer set. I'm counting.",
     "Go. I'll tell you when.", "Tick tock, I'm on it.",

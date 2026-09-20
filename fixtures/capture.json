@@ -1,0 +1,263 @@
+{
+  "cases": [
+    {
+      "typed": "buy new strings",
+      "now": 1790001000000,
+      "title": "buy new strings",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "me to call mom tomorrow at 5",
+      "now": 1790001000000,
+      "title": "call mom",
+      "dueWall": 1790096400000,
+      "said": "Tomorrow 17:00"
+    },
+    {
+      "typed": "to call mom tomorrow at 5pm",
+      "now": 1790001000000,
+      "title": "call mom",
+      "dueWall": 1790096400000,
+      "said": "Tomorrow 17:00"
+    },
+    {
+      "typed": "call mom tomorrow",
+      "now": 1790001000000,
+      "title": "call mom",
+      "dueWall": 1790067600000,
+      "said": "Tomorrow 09:00"
+    },
+    {
+      "typed": "call mom at 5",
+      "now": 1790001000000,
+      "title": "call mom",
+      "dueWall": 1790010000000,
+      "said": "Today 17:00"
+    },
+    {
+      "typed": "call mom at 2",
+      "now": 1790001000000,
+      "title": "call mom",
+      "dueWall": 1790085600000,
+      "said": "Tomorrow 14:00"
+    },
+    {
+      "typed": "standup at 9",
+      "now": 1790001000000,
+      "title": "standup",
+      "dueWall": 1790024400000,
+      "said": "Today 21:00"
+    },
+    {
+      "typed": "standup at 9am",
+      "now": 1790001000000,
+      "title": "standup",
+      "dueWall": 1790067600000,
+      "said": "Tomorrow 09:00"
+    },
+    {
+      "typed": "standup tomorrow at 9",
+      "now": 1790001000000,
+      "title": "standup",
+      "dueWall": 1790067600000,
+      "said": "Tomorrow 09:00"
+    },
+    {
+      "typed": "gym 6:30 pm",
+      "now": 1790001000000,
+      "title": "gym",
+      "dueWall": 1790015400000,
+      "said": "Today 18:30"
+    },
+    {
+      "typed": "gym 18:30",
+      "now": 1790001000000,
+      "title": "gym",
+      "dueWall": 1790015400000,
+      "said": "Today 18:30"
+    },
+    {
+      "typed": "gym at 06:15",
+      "now": 1790001000000,
+      "title": "gym",
+      "dueWall": 1790057700000,
+      "said": "Tomorrow 06:15"
+    },
+    {
+      "typed": "take the pizza out in 20 minutes",
+      "now": 1790001000000,
+      "title": "take the pizza out",
+      "dueWall": 1790002200000,
+      "said": "Today 14:50"
+    },
+    {
+      "typed": "take the pizza out in 20min",
+      "now": 1790001000000,
+      "title": "take the pizza out",
+      "dueWall": 1790002200000,
+      "said": "Today 14:50"
+    },
+    {
+      "typed": "check the build in an hour",
+      "now": 1790001000000,
+      "title": "check the build",
+      "dueWall": 1790004600000,
+      "said": "Today 15:30"
+    },
+    {
+      "typed": "stretch in half an hour",
+      "now": 1790001000000,
+      "title": "stretch",
+      "dueWall": 1790002800000,
+      "said": "Today 15:00"
+    },
+    {
+      "typed": "renew the domain in 2 weeks",
+      "now": 1790001000000,
+      "title": "renew the domain",
+      "dueWall": 1791210600000,
+      "said": "Mon 5 Oct 14:30"
+    },
+    {
+      "typed": "submit the report friday",
+      "now": 1790001000000,
+      "title": "submit the report",
+      "dueWall": 1790326800000,
+      "said": "Fri 25 Sep 09:00"
+    },
+    {
+      "typed": "submit the report on friday at 4pm",
+      "now": 1790001000000,
+      "title": "submit the report",
+      "dueWall": 1790352000000,
+      "said": "Fri 25 Sep 16:00"
+    },
+    {
+      "typed": "submit the report next fri",
+      "now": 1790001000000,
+      "title": "submit the report",
+      "dueWall": 1790326800000,
+      "said": "Fri 25 Sep 09:00"
+    },
+    {
+      "typed": "team lunch monday",
+      "now": 1790001000000,
+      "title": "team lunch",
+      "dueWall": 1790586000000,
+      "said": "Mon 28 Sep 09:00"
+    },
+    {
+      "typed": "watch the match tonight",
+      "now": 1790001000000,
+      "title": "watch the match",
+      "dueWall": 1790020800000,
+      "said": "Today 20:00"
+    },
+    {
+      "typed": "watch the match tonight at 11pm",
+      "now": 1790001000000,
+      "title": "watch the match",
+      "dueWall": 1790031600000,
+      "said": "Today 23:00"
+    },
+    {
+      "typed": "water the plants in the morning",
+      "now": 1790001000000,
+      "title": "water the plants",
+      "dueWall": 1790067600000,
+      "said": "Tomorrow 09:00"
+    },
+    {
+      "typed": "call the bank this afternoon",
+      "now": 1790001000000,
+      "title": "call the bank",
+      "dueWall": 1790002800000,
+      "said": "Today 15:00"
+    },
+    {
+      "typed": "lunch at noon",
+      "now": 1790001000000,
+      "title": "lunch",
+      "dueWall": 1790078400000,
+      "said": "Tomorrow 12:00"
+    },
+    {
+      "typed": "pay rent day after tomorrow",
+      "now": 1790001000000,
+      "title": "pay rent",
+      "dueWall": 1790154000000,
+      "said": "Wed 23 Sep 09:00"
+    },
+    {
+      "typed": "email Priya about the deck today",
+      "now": 1790001000000,
+      "title": "email Priya about the deck",
+      "dueWall": 1790006400000,
+      "said": "Today 16:00"
+    },
+    {
+      "typed": "watch 12 angry men",
+      "now": 1790001000000,
+      "title": "watch 12 angry men",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "buy 2 sets of strings",
+      "now": 1790001000000,
+      "title": "buy 2 sets of strings",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "in two minds about the tee",
+      "now": 1790001000000,
+      "title": "in two minds about the tee",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "read chapter 5",
+      "now": 1790001000000,
+      "title": "read chapter 5",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "tomorrow",
+      "now": 1790001000000,
+      "title": "tomorrow",
+      "dueWall": 1790067600000,
+      "said": "Tomorrow 09:00"
+    },
+    {
+      "typed": "",
+      "now": 1790001000000,
+      "title": "",
+      "dueWall": null,
+      "said": "no time set"
+    },
+    {
+      "typed": "log hours today at 9am",
+      "now": 1790001000000,
+      "title": "log hours",
+      "dueWall": 1789981200000,
+      "said": "Today 09:00"
+    },
+    {
+      "typed": "call mom at 5",
+      "now": 1790031600000,
+      "title": "call mom",
+      "dueWall": 1790096400000,
+      "said": "Tomorrow 17:00"
+    },
+    {
+      "typed": "party tomorrow at 8pm",
+      "now": 1798711200000,
+      "title": "party",
+      "dueWall": 1798833600000,
+      "said": "Tomorrow 20:00"
+    }
+  ]
+}

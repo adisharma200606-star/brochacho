@@ -22,15 +22,17 @@ When the app runs on your Mac, every Status line gets updated and anything that 
 6. [Bookmarks that remember where you stopped](#6-bookmarks-that-remember-where-you-stopped)
 7. [The tuner](#7-the-tuner)
 8. [The timer](#8-the-timer)
-9. [Ask](#9-ask)
-10. [The voice](#10-the-voice)
-11. [Adding your own things](#11-adding-your-own-things)
-12. [Look and feel](#12-look-and-feel)
-13. [Hotkeys](#13-hotkeys)
-14. [The config file, key by key](#14-the-config-file-key-by-key)
-15. [Where your files live](#15-where-your-files-live)
-16. [When something goes wrong](#16-when-something-goes-wrong)
-17. [What is built and what is not](#17-what-is-built-and-what-is-not)
+9. [Notes and reminders](#9-notes-and-reminders)
+10. [Ask](#10-ask)
+11. [The voice](#11-the-voice)
+12. [Sounds and touch](#12-sounds-and-touch)
+13. [Adding your own things](#13-adding-your-own-things)
+14. [Look and feel](#14-look-and-feel)
+15. [Hotkeys](#15-hotkeys)
+16. [The config file, key by key](#16-the-config-file-key-by-key)
+17. [Where your files live](#17-where-your-files-live)
+18. [When something goes wrong](#18-when-something-goes-wrong)
+19. [What is built and what is not](#19-what-is-built-and-what-is-not)
 
 ---
 
@@ -91,7 +93,7 @@ Every site entry says which Brave profile it belongs to, `personal` or `work`. B
 
 ### If he does not know it
 
-If it is a single word he does not know, he shows `?`, says something like "Never heard of it", and nothing opens. Add it (section 11). If it is several words, he treats it as a question (section 9).
+If it is a single word he does not know, he shows `?`, says something like "Never heard of it", and nothing opens. Add it (section 13). If it is several words, he treats it as a question (section 10).
 
 ---
 
@@ -211,7 +213,7 @@ Arrows flip through them.
 
 ### Your own tunings
 
-Add them under `tuner.customTunings` in the config (section 14). Notes are written as letter, optional `#` or `b`, and octave number: `E2`, `F#3`, `Bb3`. Middle C is `C4`.
+Add them under `tuner.customTunings` in the config (section 16). Notes are written as letter, optional `#` or `b`, and octave number: `E2`, `F#3`, `Bb3`. Middle C is `C4`.
 
 ### Settings
 
@@ -252,7 +254,46 @@ There is one timer at a time. There are no streaks, no history, and no "you focu
 
 ---
 
-## 9. Ask
+## 9. Notes and reminders
+
+**Status:** brain tested (reading the time out of what you typed) · Swift written · working in the phone prototype · the part that actually creates the note or reminder on the Mac is not written
+
+A thought arrives while you are in the middle of something. Type it into the notch and carry on. You never leave what you were doing.
+
+| You type | What happens |
+|---|---|
+| `note buy new strings` | a new note in **Apple Notes** with that text |
+| `remind me to call mom tomorrow at 5` | a reminder in **Apple Reminders**: "call mom", tomorrow 17:00 |
+| `todo finish the report` | a reminder with no time, which is what a to-do is |
+| `note` or `reminder` on its own | opens that app, on a fresh note or the list, ready to type |
+
+Because these are Apple's own apps, everything syncs to your iPhone by itself. A reminder typed on the Mac buzzes your phone at the right time.
+
+Before it closes, the notch shows what it understood (**call mom · Tomorrow 17:00**), so a misread never goes unnoticed.
+
+**Times it understands**
+
+| You say | It means |
+|---|---|
+| `in 20 minutes` · `in an hour` · `in half an hour` · `in 2 days` | that long from now |
+| `today` · `tonight` · `tomorrow` · `day after tomorrow` | that day |
+| `friday` · `on friday` · `next fri` | the coming Friday. If today is Friday, next week's. |
+| `at 5pm` · `5:30 pm` · `18:30` · `at 06:15` | that time |
+| `at 5` | 17:00. A bare hour from 1 to 6 means the afternoon. |
+| `at 9` | 9:00 if that is still ahead today, otherwise 21:00 |
+| `noon` · `midnight` · `in the morning` · `this afternoon` · `evening` | 12:00 · 0:00 · 9:00 · 15:00 · 19:00 |
+
+- A day with no time means 9:00. `today` with no time, when 9:00 has already gone, means an hour or two from now.
+- A time that has already passed today means tomorrow.
+- Numbers that are not times are left alone: `watch 12 angry men`, `read chapter 5` and `buy 2 sets of strings` stay exactly as typed.
+
+**Not yet:** calendar dates like "25 September" or "the 3rd". Say `in 4 days`, or open Reminders and set it there.
+
+The first time, macOS will ask whether Brochacho may add to your Reminders and control Notes. Say yes once.
+
+---
+
+## 10. Ask
 
 **Status:** brain tested (recognising a question, what gets sent, splitting the answer) · Swift written · working in the phone prototype through Claude itself · the Mac's network call and screen are not written · needs a Claude API key on the Mac
 
@@ -290,7 +331,7 @@ The API key is stored in the Mac's Keychain, never in the config file. Questions
 
 ---
 
-## 10. The voice
+## 11. The voice
 
 **Status:** brain tested (which line, how often, no repeats) · Swift written · sound not written
 
@@ -320,7 +361,32 @@ The text line **always** shows. Whether it is also *spoken* is a dial:
 
 ---
 
-## 11. Adding your own things
+## 12. Sounds and touch
+
+**Status:** sounds made and playing in the phone prototype · the map of which sound goes with what is tested · playing them on the Mac, and the trackpad taps, are not written
+
+Eight small sounds, all soft and glassy, none longer than a second. They are generated, not downloaded: the script that makes them is `scripts/make_sounds.py`, so any of them can be reshaped.
+
+| Sound | When |
+|---|---|
+| open | the notch opens for typing |
+| close | you dismiss it yourself. When it closes by itself after a line, it stays silent. |
+| save | something goes into the stash, a note or reminder is made, a bookmark moves |
+| pull | he hands something back, or you ask for another |
+| nope | he does not know what you typed |
+| answer | an answer has finished arriving |
+| lock | a string comes into tune |
+| done | the timer ends, or every string is in tune |
+
+Opening a site or an app makes no sound. The thing appearing is the feedback.
+
+**Touch:** the Mac's trackpad gives a small tap on open, on save, when a string locks and when the timer ends. You only feel it while a finger is resting on the trackpad, and it cannot be previewed on a phone.
+
+Settings, under `feedback` in the config: `sounds` (on or off), `volume` (0 to 1), `haptics` (on or off). Muting the voice does not mute these, and the other way round.
+
+---
+
+## 13. Adding your own things
 
 **Status:** brain tested · Swift written · settings window not built
 
@@ -344,7 +410,7 @@ If a new name is exactly the same as one you already have, it warns you.
 
 ---
 
-## 12. Look and feel
+## 14. Look and feel
 
 **Status:** look chosen (Aurora) · working in the phone prototype · Mac screens not built
 
@@ -366,7 +432,7 @@ To apply settings from the prototype: open **Settings to copy**, copy, and paste
 
 ---
 
-## 13. Hotkeys
+## 15. Hotkeys
 
 **Status:** placeholders. You choose the real ones on the Mac.
 
@@ -381,7 +447,7 @@ Pick ones you can hit with one hand that do not clash with VS Code.
 
 ---
 
-## 14. The config file, key by key
+## 16. The config file, key by key
 
 `~/.brochacho/config.json`. It is created with sensible defaults the first time the app runs. **Every key is optional**: leave one out and the default is used. If you make a typo that breaks the file, the app uses defaults for that run and **leaves your file alone**, so a mistake never wipes your settings.
 
@@ -401,13 +467,14 @@ Pick ones you can hit with one hand that do not clash with VS Code.
   },
   "tuner": { "a4": 440, "toleranceCents": 5, "lastTuningID": "guitar-standard", "customTunings": [] },
   "ask":   { "model": "claude-haiku-4-5", "maxTokens": 300, "monthlyBudgetUSD": 2 },
+  "feedback": { "sounds": true, "volume": 0.5, "haptics": true },
   "catalog": [ ]
 }
 ```
 
 | Key | Meaning |
 |---|---|
-| `hotkeys.*` | see section 13 |
+| `hotkeys.*` | see section 15 |
 | `brave.binaryPath` | where Brave lives. Only change it if you installed Brave somewhere unusual. |
 | `brave.personalProfileDir`, `brave.workProfileDir` | the folder names Brave uses for your two profiles. Found on day one. |
 | `speak` | master switch for the voice |
@@ -420,19 +487,20 @@ Pick ones you can hit with one hand that do not clash with VS Code.
 | `theme.voice.rate`, `pitch` | 1.0 is the voice's normal speed and pitch |
 | `theme.voice.frequency` | 0 to 1, how often lines are spoken as well as shown |
 | `tuner.*` | see section 7 |
-| `ask.*` | see section 9 |
-| `catalog` | your entries (section 11). One entry looks like this: |
+| `ask.*` | see section 10 |
+| `feedback.*` | see section 12 |
+| `catalog` | your entries (section 13). One entry looks like this: |
 
 ```json
 { "name": "bat", "display": "Absolute Batman", "aliases": ["batman"], "kind": "site",
   "target": "https://…", "profile": "personal", "living": true }
 ```
 
-`kind` is `site`, `app`, `path` or `tool`. For an app, `target` is its bundle identifier (for example `com.valvesoftware.steam`). For a folder, it is the path (`~/Downloads`). `tool` is for built-in things: `tuner` and `timer`.
+`kind` is `site`, `app`, `path` or `tool`. For an app, `target` is its bundle identifier (for example `com.valvesoftware.steam`). For a folder, it is the path (`~/Downloads`). `tool` is for built-in things: `tuner`, `timer`, `note` and `reminder`.
 
 ---
 
-## 15. Where your files live
+## 17. Where your files live
 
 | File | What it holds |
 |---|---|
@@ -446,7 +514,7 @@ All plain text. You can open, read and back up any of them. If the stash file is
 
 ---
 
-## 16. When something goes wrong
+## 18. When something goes wrong
 
 This section will grow once the app has actually run. What can already be predicted:
 
@@ -461,19 +529,21 @@ This section will grow once the app has actually run. What can already be predic
 
 ---
 
-## 17. What is built and what is not
+## 19. What is built and what is not
 
 | Piece | State |
 |---|---|
-| Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync | **Built and tested in JavaScript** (31 tests) |
+| Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync, reading reminders, asking | **Built and tested in JavaScript** (36 tests) |
 | The same, in Swift | **Written, syntax-checked, never compiled** |
 | Phone prototype (notch feel, typing, stash, tuner, voice preview) | **Working** |
 | Cloud-Mac build and test workflow | **Written**, waiting for the repo to be on GitHub |
 | The Mac app: notch, hotkeys, opening things, drag to save, voice, settings window, tuner screen, timer bar | **Not written** |
 | Hold-to-talk | **Not written** |
 | Ask | **Brain built and tested; works in the phone prototype.** The Mac's network call, Keychain storage and spending cap are not written. |
-| Full line bank | **233 lines written**, in `defaults/lines.json`. Edit freely. |
+| Full line bank | **243 lines written**, in `defaults/lines.json`. Edit freely. |
 | Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |
 | The look | **Aurora chosen.** Live in the phone prototype. |
+| Interface sounds | **Made** (eight WAV files, generated by a script). Playing in the phone prototype. |
+| **Version 1 is frozen here.** | Nothing new gets added until the Mac app runs. New ideas go on the parked list below. |
 
-Ideas that are parked, not planned: a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.
+Ideas that are parked, not planned: a calculator in the box (so sums never go to the AI), Look (drag a box on the screen and ask about it), finding saved things by meaning, a hook so your own scripts can make him announce things, cheat codes, a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.

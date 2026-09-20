@@ -1,0 +1,54 @@
+{
+  "open": {
+    "sound": "open",
+    "haptic": "alignment"
+  },
+  "close": {
+    "sound": "close",
+    "haptic": null
+  },
+  "opened": {
+    "sound": null,
+    "haptic": null
+  },
+  "saved": {
+    "sound": "save",
+    "haptic": "levelChange"
+  },
+  "captured": {
+    "sound": "save",
+    "haptic": "levelChange"
+  },
+  "bookmarkMoved": {
+    "sound": "save",
+    "haptic": "levelChange"
+  },
+  "pulled": {
+    "sound": "pull",
+    "haptic": null
+  },
+  "another": {
+    "sound": "pull",
+    "haptic": null
+  },
+  "unknown": {
+    "sound": "nope",
+    "haptic": "generic"
+  },
+  "answer": {
+    "sound": "answer",
+    "haptic": null
+  },
+  "tunerLock": {
+    "sound": "lock",
+    "haptic": "alignment"
+  },
+  "allInTune": {
+    "sound": "done",
+    "haptic": "generic"
+  },
+  "timerDone": {
+    "sound": "done",
+    "haptic": "generic"
+  }
+}

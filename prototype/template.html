@@ -229,7 +229,7 @@
     <label for="dropUrl" style="position:absolute;left:-9999px">Link to drop on the notch</label>
     <input id="dropUrl" type="url" inputmode="url" placeholder="Paste a link to drop" value="">
   </div>
-  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>, <b>timer 10s</b>. Or just ask something: <b>what is a closure</b>, <b>how do i undo a git commit?</b> Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
+  <p class="note">Typing here runs the real matcher that ships in the app. Try <b>yt</b>, <b>you</b>, <b>yt berserk amv</b>, <b>play me some youtube</b>, <b>steem</b>, <b>timer 10s</b>. Capture a thought: <b>remind me to call mom tomorrow at 5</b>, <b>note buy new strings</b>. Or just ask something: <b>what is a closure</b>, <b>how do i undo a git commit?</b> Holding a key to talk needs the Mac's microphone, but spoken words go through this same matcher.</p>
 
   <div class="tunerpad">
     <button class="btn" id="btnTune" type="button">Tuner<small>type &ldquo;tune&rdquo;</small></button>
@@ -280,8 +280,18 @@
   </details>
 
   <details>
+    <summary>Sound and touch</summary>
+    <div class="field"><label for="soundsOn">Interface sounds</label><span></span>
+      <select id="soundsOn" data-key="feedback.sounds" data-bool="1"><option value="true">On</option><option value="false">Off</option></select></div>
+    <div class="field"><label for="volume">Volume</label><output id="o-volume"></output>
+      <input id="volume" type="range" min="0" max="1" step="0.05" data-key="feedback.volume"></div>
+    <div class="rowbtns" id="auditions"></div>
+    <p class="hint">These are the actual files the Mac app ships with. The trackpad taps (on open, save and when a string locks) cannot be felt on a phone, so those wait for the Mac.</p>
+  </details>
+
+  <details>
     <summary>Settings to copy</summary>
-    <p class="hint">Copy this and keep it. It becomes the theme block in the Mac app's config file.</p>
+    <p class="hint">Copy this and keep it. These two blocks go straight into the Mac app's config file.</p>
     <textarea id="export" readonly aria-label="Settings as JSON"></textarea>
     <div class="rowbtns">
       <button class="btn" id="copy" type="button">Copy settings</button>
@@ -293,19 +303,23 @@
 <script>/*__CORE__*/</script>
 <script>/*__TUNER__*/</script>
 <script>/*__EXTRAS__*/</script>
+<script>/*__CAPTURE__*/</script>
 <script>
 (function () {
   'use strict';
   var core = self.BrochachoCore;
   var CATALOG = /*__CATALOG__*/[];
   var BANK = /*__LINES__*/{};
+  var SOUNDS = /*__SOUNDS__*/{};
+  var capture = self.BrochachoCapture;
   var tunerCore = self.BrochachoTuner;
   var TUNINGS = /*__TUNINGS__*/[];
 
   var DEFAULTS = {
     motion: { stiffness: 260, damping: 24 },
     look: { palette: 'aurora', glowStrength: 0.8, textSize: 19, caretBlinkMs: 600 },
-    voice: { voiceName: '', rate: 0.95, pitch: 0.9, frequency: 0.6 }
+    voice: { voiceName: '', rate: 0.95, pitch: 0.9, frequency: 0.6 },
+    feedback: { sounds: true, volume: 0.5, haptics: true }
   };
   var PALETTES = {
     aurora: { colors: ['#FF375F', '#0A84FF', '#BF5AF2'], tint: '#E6DEFF' },
@@ -327,7 +341,7 @@
   var settings = clone(DEFAULTS);
   try {
     var saved = JSON.parse(localStorage.getItem(STORE) || 'null');
-    if (saved) ['motion', 'look', 'voice'].forEach(function (g) { for (var k in DEFAULTS[g]) if (saved[g] && saved[g][k] !== undefined) settings[g][k] = saved[g][k]; });
+    if (saved) ['motion', 'look', 'voice', 'feedback'].forEach(function (g) { for (var k in DEFAULTS[g]) if (saved[g] && saved[g][k] !== undefined) settings[g][k] = saved[g][k]; });
   } catch (e) { /* storage can be unavailable; defaults are fine */ }
   function persist() { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }
 
@@ -442,6 +456,7 @@
     renderExport();
   }
   function unlockVoice() {
+    loadSounds();
     if (!canSpeak || unlocked) return; unlocked = true;
     try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
   }
@@ -464,10 +479,10 @@
 
   // -------------------------------------------------------------- gestures
   function whereText(entry, decision) {
-    if (decision && decision.mode === 'search') return 'search';
+    if (decision && decision.mode === 'search' && entry.kind !== 'tool') return 'search';
     if (entry.kind === 'site') return 'Brave / ' + (entry.profile || 'personal');
     if (entry.kind === 'app') return 'app';
-    if (entry.kind === 'tool') return 'in the notch';
+    if (entry.kind === 'tool') return entry.target === 'note' ? 'Apple Notes' : entry.target === 'reminder' ? 'Apple Reminders' : 'in the notch';
     return 'Finder';
   }
   function renderRows() {
@@ -498,7 +513,7 @@
   }
   function startTyping() {
     unlockVoice(); clearTimeout(closeTimer);
-    cmd.value = ''; renderRows(); show('input');
+    cmd.value = ''; renderRows(); show('input'); feedback('open');
     cmd.focus({ preventScroll: true });
   }
   function actionText(plan, decision) {
@@ -522,7 +537,7 @@
     if (decision.mode === 'ask') { cmd.blur(); ask(decision.query, ms); return; }
     if (decision.mode === 'none') {
       log('Nothing called \u201C' + cmd.value.trim() + '\u201D. You would add it to the config.', ms);
-      showLine(sayLine('unknown', null)); return;
+      feedback('unknown'); showLine(sayLine('unknown', null)); return;
     }
     // Tapping a row opens that row; Enter opens the top one.
     decision = { mode: decision.mode === 'empty' ? 'open' : decision.mode, query: decision.query,
@@ -534,6 +549,7 @@
     log(actionText(plan, decision), ms);
     cmd.blur();
     if (plan.type === 'openTool' && plan.tool === 'timer') { startCountdown(plan.argument); return; }
+    if (plan.type === 'openTool' && (plan.tool === 'note' || plan.tool === 'reminder')) { captureThought(plan.tool, plan.argument, entry.name); return; }
     if (plan.type === 'openTool') { sayLine('open_tool', entry.name); openTuner(); return; }
     var category = plan.type === 'openURL' ? 'open_site' : plan.type === 'openApp' ? 'open_app' : 'open_path';
     showLine(sayLine(category, entry.name));
@@ -546,7 +562,7 @@
     var days = Math.round((Date.now() - item.savedAt) / core.DAY_MS);
     $('pullMeta').textContent = (days <= 0 ? 'saved today' : 'saved ' + days + (days === 1 ? ' day ago' : ' days ago')) + '  ' + item.payload.replace(/^https?:\/\//, '');
     log('Opened from your stash: ' + (item.title || item.payload));
-    sayLine(isAnother ? 'another' : 'pulled', null);
+    feedback(isAnother ? 'another' : 'pulled'); sayLine(isAnother ? 'another' : 'pulled', null);
     show('pull'); closeAfter(6000);
   }
   function drop() {
@@ -562,7 +578,7 @@
     setTimeout(function () {
       chip.remove();
       core.addItem(stash, { payload: url, source: 'drop' }, Date.now());
-      gulp.v += 600; kick();
+      gulp.v += 600; kick(); feedback('saved');
       log('Saved to your stash: ' + url.replace(/^https?:\/\//, ''));
       $('dropUrl').value = '';
       showLine(sayLine('saved', null), 1500);
@@ -611,7 +627,9 @@
   function heard(reading) {
     var d = tunerCore.feed(tuneSession, reading, Date.now(), resolvedTuning, 440);
     paintTuner(d);
-    if (d.allInTuneNow) { var pick = sayLine('all_in_tune', null, true); if (pick) log('Every string locked. He says: ' + pick.text); }
+    if (d.inTune && !lastLocked && !d.allInTuneNow) feedback('tunerLock');
+    lastLocked = !!d.inTune;
+    if (d.allInTuneNow) { feedback('allInTune'); var pick = sayLine('all_in_tune', null, true); if (pick) log('Every string locked. He says: ' + pick.text); }
   }
   function openTuner() {
     unlockVoice(); clearTimeout(closeTimer);
@@ -675,6 +693,32 @@
 
 
 
+
+  // --------------------------------------------------------------- sounds
+  // The same WAV files that ship in the Mac app, so this is exactly what you will hear there.
+  var soundBuffers = {}, soundsLoading = false, lastLocked = false;
+  function loadSounds() {
+    if (soundsLoading || !ensureAudio()) return;
+    soundsLoading = true;
+    Object.keys(SOUNDS).forEach(function (name) {
+      try {
+        var bin = atob(SOUNDS[name]), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        audioCtx.decodeAudioData(bytes.buffer, function (buf) { soundBuffers[name] = buf; }, function () {});
+      } catch (e) {}
+    });
+  }
+  function feedback(event) {
+    var spec = core.FEEDBACK[event];
+    if (!spec || !spec.sound || !settings.feedback.sounds || !audioCtx) return;
+    var buf = soundBuffers[spec.sound]; if (!buf) return;
+    try {
+      var src = audioCtx.createBufferSource(), gain = audioCtx.createGain();
+      src.buffer = buf; gain.gain.value = settings.feedback.volume * 1.6;
+      src.connect(gain); gain.connect(audioCtx.destination); src.start();
+    } catch (e) {}
+  }
+
   // ------------------------------------------------------------------ ask
   // On the Mac this is one call to the Claude API with your own key. Here, the page asks Claude through the
   // viewer instead, on the quick tier, so you can feel the feature today. It cannot browse in either place.
@@ -712,7 +756,7 @@
     }).then(function (res) {
       showAnswer(core.shapeAnswer(res.text), false);
       $('logMs').textContent = 'answered in ' + ((performance.now() - started) / 1000).toFixed(1) + ' s';
-      sayLine('explained', null);
+      feedback('answer'); sayLine('explained', null);
     }, function (err) {
       var code = err && err.code;
       if (code === 'cancelled') return;
@@ -728,6 +772,29 @@
     function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1400); }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
   });
+
+
+  // -------------------------------------------------------------- capture
+  // On the Mac these land in Apple Notes and Apple Reminders, which sync to the iPhone by themselves.
+  function wallNow() { var d = new Date(); return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()); }
+  function captureThought(tool, argument, entryName) {
+    var text = (argument || '').trim();
+    if (!text) {
+      log(tool === 'note' ? 'Opened Notes on a fresh, empty note' : 'Opened Reminders');
+      showLine(sayLine('open_app', entryName)); return;
+    }
+    feedback('captured');
+    var shown;
+    if (tool === 'note') {
+      shown = 'Note: ' + text; log('New note in Apple Notes: \u201C' + text + '\u201D');
+    } else {
+      var r = capture.parseReminder(text, wallNow());
+      shown = r.title + '  \u00B7  ' + capture.describeDue(r.dueWall, wallNow());
+      log('New reminder in Apple Reminders: \u201C' + r.title + '\u201D, ' + capture.describeDue(r.dueWall, wallNow()));
+    }
+    sayLine('open_tool', entryName);
+    showLine({ text: shown }, 3200);
+  }
 
   // ---------------------------------------------------------------- timer
   var extras = self.BrochachoExtras, countdown = null, countdownTick = null;
@@ -749,7 +816,7 @@
       if (st.done) {
         clearInterval(countdownTick); countdown = null;
         log('The timer finished.');
-        var was = muted; var pick = sayLine('timer_done', null, true); muted = was; showLine(pick, 2600);
+        feedback('timerDone'); var was = muted; var pick = sayLine('timer_done', null, true); muted = was; showLine(pick, 2600);
       }
     }, 200);
   }
@@ -768,11 +835,11 @@
   notch.addEventListener('keydown', function (e) {
     if (e.target === notch && (e.key === 'Enter' || e.key === ' ') && mode === 'closed') { e.preventDefault(); pull(false); }
   });
-  stage.addEventListener('click', function () { if (mode !== 'closed') close(); });
+  stage.addEventListener('click', function () { if (mode !== 'closed') { feedback('close'); close(); } });
   cmd.addEventListener('input', renderRows);
   cmd.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); run(); }
-    else if (e.key === 'Escape') { close(); }
+    else if (e.key === 'Escape') { feedback('close'); close(); }
   });
   $('replay').addEventListener('click', function () {
     cmd.value = 'yt'; renderRows(); show('input'); closeAfter(1400);
@@ -813,21 +880,22 @@
     renderExport(); refit(); paint();
   }
   function renderExport() {
-    var out = clone(settings);
+    var out = clone(settings), feedback = out.feedback;
+    delete out.feedback;
     out.look.glowColors = (PALETTES[settings.look.palette] || PALETTES.aurora).colors;
-    $('export').value = JSON.stringify({ theme: out }, null, 2);
+    $('export').value = JSON.stringify({ theme: out, feedback: feedback }, null, 2);
   }
   function syncControls() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
       var v = get(settings, el.dataset.key);
       if (el.tagName === 'SELECT' && el.id === 'voice') return;
-      el.value = v;
-      var out = $('o-' + el.id); if (out) out.textContent = (el.id === 'frequency' || el.id === 'glowStrength') ? Math.round(v * 100) + '%' : el.id === 'blink' ? v + ' ms' : v;
+      el.value = el.dataset.bool ? String(v) : v;
+      var out = $('o-' + el.id); if (out) out.textContent = (el.id === 'frequency' || el.id === 'glowStrength' || el.id === 'volume') ? Math.round(v * 100) + '%' : el.id === 'blink' ? v + ' ms' : v;
     });
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-key]'), function (el) {
     el.addEventListener('input', function () {
-      var v = el.type === 'range' ? parseFloat(el.value) : el.value;
+      var v = el.type === 'range' ? parseFloat(el.value) : el.dataset.bool ? el.value === 'true' : el.value;
       set(settings, el.dataset.key, v); persist(); syncControls(); apply();
     });
   });
@@ -837,6 +905,12 @@
     b.style.background = 'linear-gradient(90deg, ' + c[0] + ', ' + c[1] + ', ' + c[2] + ')';
     b.addEventListener('click', function () { settings.look.palette = name; persist(); syncControls(); apply(); if (mode === 'closed') $('replay').click(); });
     $('swatches').appendChild(b);
+  });
+
+  [['open', 'Open'], ['close', 'Close'], ['saved', 'Save'], ['pulled', 'Pull'], ['unknown', 'Nope'], ['answer', 'Answer'], ['tunerLock', 'In tune'], ['timerDone', 'Done']].forEach(function (pair) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = pair[1]; b.style.minHeight = '44px'; b.style.padding = '6px 12px';
+    b.addEventListener('click', function () { loadSounds(); setTimeout(function () { feedback(pair[0]); }, soundBuffers[core.FEEDBACK[pair[0]].sound] ? 0 : 350); });
+    $('auditions').appendChild(b);
   });
 
   function tick() { var d = new Date(); $('clock').textContent = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) + '  ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); }

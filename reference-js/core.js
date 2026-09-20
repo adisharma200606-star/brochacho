@@ -497,6 +497,26 @@
     return { text: lines.join(' '), command: command || null };
   }
 
+  // ------------------------------------------------------------ feedback ----
+
+  // What he hears and feels for each thing that happens. Sounds are files in Resources/sounds.
+  // Haptics are the Mac trackpad's three kinds; they are only felt while a finger rests on the trackpad.
+  var FEEDBACK = {
+    open:          { sound: 'open',   haptic: 'alignment' },
+    close:         { sound: 'close',  haptic: null },
+    opened:        { sound: null,     haptic: null },          // the thing opening is its own feedback
+    saved:         { sound: 'save',   haptic: 'levelChange' },
+    captured:      { sound: 'save',   haptic: 'levelChange' },
+    bookmarkMoved: { sound: 'save',   haptic: 'levelChange' },
+    pulled:        { sound: 'pull',   haptic: null },
+    another:       { sound: 'pull',   haptic: null },
+    unknown:       { sound: 'nope',   haptic: 'generic' },
+    answer:        { sound: 'answer', haptic: null },
+    tunerLock:     { sound: 'lock',   haptic: 'alignment' },
+    allInTune:     { sound: 'done',   haptic: 'generic' },
+    timerDone:     { sound: 'done',   haptic: 'generic' }
+  };
+
   // -------------------------------------------------------------- export ----
 
   var api = {
@@ -505,7 +525,7 @@
     match: match, plan: plan, FILLER: FILLER, QUESTION_WORDS: QUESTION_WORDS,
     newStash: newStash, addItem: addItem, serve: serve, another: another, remaining: remaining,
     FRESH_DAYS: FRESH_DAYS, SKIP_LIMIT: SKIP_LIMIT, DAY_MS: DAY_MS,
-    pickLine: pickLine,
+    pickLine: pickLine, FEEDBACK: FEEDBACK,
     ASK_RULES: ASK_RULES, wantsClipboard: wantsClipboard, buildAsk: buildAsk, shapeAnswer: shapeAnswer
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

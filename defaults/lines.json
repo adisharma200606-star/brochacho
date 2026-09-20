@@ -969,6 +969,50 @@
       "text": "The tuning fork is out."
     }
   ],
+  "target:note": [
+    {
+      "id": "nt01",
+      "text": "Noted."
+    },
+    {
+      "id": "nt02",
+      "text": "Written down. In ink."
+    },
+    {
+      "id": "nt03",
+      "text": "I remember, so you can forget."
+    },
+    {
+      "id": "nt04",
+      "text": "It's in the little black book."
+    },
+    {
+      "id": "nt05",
+      "text": "On paper. Safe."
+    }
+  ],
+  "target:reminder": [
+    {
+      "id": "rm01",
+      "text": "I'll tap your shoulder."
+    },
+    {
+      "id": "rm02",
+      "text": "Consider yourself reminded."
+    },
+    {
+      "id": "rm03",
+      "text": "It's in the book."
+    },
+    {
+      "id": "rm04",
+      "text": "I won't let you forget."
+    },
+    {
+      "id": "rm05",
+      "text": "Marked. I'm watching the clock."
+    }
+  ],
   "target:timer": [
     {
       "id": "tm01",

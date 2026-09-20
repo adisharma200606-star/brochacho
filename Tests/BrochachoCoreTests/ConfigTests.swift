@@ -62,6 +62,20 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(rgb[2].red, 191.0 / 255.0, accuracy: 0.001, "a missing colour falls back to Aurora's")
     }
 
+    func testFeedbackAgreesWithTheReference() throws {
+        struct SpecFixture: Decodable {
+            let sound: String?
+            let haptic: String?
+        }
+        let expected = try Fixtures.load([String: SpecFixture].self, "feedback.json")
+        XCTAssertEqual(Set(expected.keys), Set(FeedbackEvent.allCases.map { $0.rawValue }), "the same events on both sides")
+        for event in FeedbackEvent.allCases {
+            let spec = Feedback.spec(for: event)
+            XCTAssertEqual(spec.sound, expected[event.rawValue]?.sound, event.rawValue)
+            XCTAssertEqual(spec.haptic?.rawValue, expected[event.rawValue]?.haptic, event.rawValue)
+        }
+    }
+
     func testProfilesAndTilde() {
         let brave = BraveConfig(personalProfileDir: "Default", workProfileDir: "Profile 2")
         XCTAssertEqual(brave.profileDirectory(for: "work"), "Profile 2")

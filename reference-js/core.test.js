@@ -87,6 +87,14 @@ const MATCH_CASES = [
   ['ti', 'open', 'timer', null, {}, true],
   ['tu', 'open', 'tuner', null, {}, true],
 
+  // capturing: a note or a reminder is a tool that takes words
+  ['note', 'open', 'note', null, {}, true],
+  ['new note', 'open', 'note', null, {}, true],
+  ['note buy new strings', 'search', 'note', 'buy new strings', {}, true],
+  ['remind me to call mom tomorrow at 5', 'search', 'reminder', 'to call mom tomorrow at 5', {}, true],
+  ['todo finish the report', 'search', 'reminder', 'finish the report', {}, true],
+  ['reminder', 'open', 'reminder', null, {}, true],
+
   // asking: a question mark, a question word, or several words that match nothing
   ['how do i undo a git commit?', 'ask', null, 'how do i undo a git commit?', {}, true],
   ['what is a closure', 'ask', null, 'what is a closure', {}, true],
@@ -311,6 +319,14 @@ test('lines: frequency 0 never speaks but still returns the text', () => {
 // Written on every passing run. The Swift tests load these files and must
 // produce identical output.
 
+test('feedback: every sound it names exists as a file', () => {
+  const sounds = path.join(__dirname, '..', 'App', 'Brochacho', 'Resources', 'sounds');
+  for (const [event, spec] of Object.entries(core.FEEDBACK)) {
+    if (spec.sound) assert.ok(fs.existsSync(path.join(sounds, spec.sound + '.wav')), event + ' -> ' + spec.sound + '.wav is missing');
+    assert.ok([null, 'alignment', 'levelChange', 'generic'].includes(spec.haptic), event + ' haptic');
+  }
+});
+
 test('write golden fixtures', () => {
   const dir = path.join(__dirname, '..', 'fixtures');
   fs.mkdirSync(dir, { recursive: true });
@@ -333,6 +349,7 @@ test('write golden fixtures', () => {
     answers: ['It moves your last commit back.\n\n$ git reset --soft HEAD~1\n', 'Rome.', '', 'Line one.\r\nLine two.', '$ ls -la']
       .map(text => ({ text, shaped: core.shapeAnswer(text) }))
   };
+  fs.writeFileSync(path.join(dir, 'feedback.json'), JSON.stringify(core.FEEDBACK, null, 2));
   fs.writeFileSync(path.join(dir, 'matcher.json'), JSON.stringify({ catalog, cases: matcher, ask }, null, 2));
 
   // A long scripted session against the stash.

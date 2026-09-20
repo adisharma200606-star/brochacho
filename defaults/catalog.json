@@ -13,5 +13,7 @@
   {"name": "downloads", "display": "Downloads", "aliases": ["dl"], "kind": "path", "target": "~/Downloads"},
   {"name": "desktop", "display": "Desktop", "aliases": [], "kind": "path", "target": "~/Desktop"},
   {"name": "tuner", "display": "Tuner", "aliases": ["tune", "guitar tuner", "ukulele tuner", "uke"], "kind": "tool", "target": "tuner"},
-  {"name": "timer", "display": "Timer", "aliases": ["countdown"], "kind": "tool", "target": "timer", "takesWords": true}
+  {"name": "timer", "display": "Timer", "aliases": ["countdown"], "kind": "tool", "target": "timer", "takesWords": true},
+  {"name": "note", "display": "New note", "aliases": ["notes", "new note"], "kind": "tool", "target": "note", "takesWords": true},
+  {"name": "reminder", "display": "Reminder", "aliases": ["remind", "remind me", "reminders", "todo", "task"], "kind": "tool", "target": "reminder", "takesWords": true}
 ]

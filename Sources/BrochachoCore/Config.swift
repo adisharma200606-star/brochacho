@@ -258,21 +258,23 @@ public struct Config: Codable, Equatable {
     public var theme: Theme
     public var tuner: TunerConfig
     public var ask: AskConfig
+    public var feedback: FeedbackConfig
     public var catalog: [CatalogEntry]
 
     public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true,
                 theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), ask: AskConfig = AskConfig(),
-                catalog: [CatalogEntry] = DefaultCatalog.entries) {
+                feedback: FeedbackConfig = FeedbackConfig(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
         self.speak = speak
         self.theme = theme
         self.tuner = tuner
         self.ask = ask
+        self.feedback = feedback
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, ask, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, theme, tuner, ask, feedback, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -282,6 +284,7 @@ public struct Config: Codable, Equatable {
         theme = try c.decodeIfPresent(Theme.self, forKey: .theme) ?? Theme()
         tuner = try c.decodeIfPresent(TunerConfig.self, forKey: .tuner) ?? TunerConfig()
         ask = try c.decodeIfPresent(AskConfig.self, forKey: .ask) ?? AskConfig()
+        feedback = try c.decodeIfPresent(FeedbackConfig.self, forKey: .feedback) ?? FeedbackConfig()
         catalog = try c.decodeIfPresent([CatalogEntry].self, forKey: .catalog) ?? DefaultCatalog.entries
     }
 }
