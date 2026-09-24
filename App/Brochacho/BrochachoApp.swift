@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // LSUIElement already hides the Dock icon; this makes sure of it when run from Xcode.
         NSApp.setActivationPolicy(.accessory)
+        NotchTheme.registerFonts()
         let brain = Brain()
         brain.start()
         self.brain = brain

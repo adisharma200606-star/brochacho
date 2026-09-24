@@ -5,6 +5,7 @@
 //  Created by Kai Azim on 2023-08-24.
 //
 
+import AppKit
 import SwiftUI
 
 struct NotchView<Expanded, CompactLeading, CompactTrailing>: View where Expanded: View, CompactLeading: View, CompactTrailing: View {
@@ -59,6 +60,26 @@ struct NotchView<Expanded, CompactLeading, CompactTrailing>: View where Expanded
                 Rectangle()
                     .foregroundStyle(.black)
                     .padding(-50) // The opening/closing animation can overshoot, so this makes sure that it's still black
+            }
+            // BROCHACHO PATCH 3 of 3 (drawing): the grain and the rim line, only while expanded. Both sit inside
+            // the mask, so they follow the notch's shape exactly.
+            .overlay {
+                if dynamicNotch.state == .expanded, let grain = dynamicNotch.grainImage {
+                    Image(nsImage: grain)
+                        .resizable(resizingMode: .tile)
+                        .opacity(dynamicNotch.grainOpacity)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if dynamicNotch.state == .expanded, let rim = dynamicNotch.rimColor {
+                    LinearGradient(colors: [.clear, rim, .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(height: 1)
+                        .padding(.horizontal, bottomCornerRadius + 12)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
             }
             .mask {
                 NotchShape(

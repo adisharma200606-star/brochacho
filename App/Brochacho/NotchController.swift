@@ -42,6 +42,9 @@ final class NotchController {
         )
         notch.glowColors = theme.glowColors
         notch.glowStrength = theme.glowStrength
+        notch.rimColor = theme.accent.opacity(0.85)
+        notch.grainImage = theme.grain > 0 ? NotchTheme.grainImage : nil
+        notch.grainOpacity = theme.grain
     }
 
     /// The screen with the notch if there is one, otherwise the main screen.

@@ -29,8 +29,8 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config.hotkeys.talk, Hotkeys().talk)
         XCTAssertEqual(config.theme.motion.stiffness, 400)
         XCTAssertEqual(config.theme.motion.damping, MotionTheme().damping)
-        XCTAssertEqual(config.theme.look.glowStrength, 0.3)
-        XCTAssertEqual(config.theme.look.glowColors, LookTheme.auroraColors)
+        XCTAssertEqual(config.theme.look.accent, LookTheme.nocturneAccent, "no accent means an old config: it moves to Nocturne")
+        XCTAssertEqual(config.theme.look.glowColors, LookTheme.nocturneGlow)
         XCTAssertEqual(config.theme.voice, VoiceTheme())
         XCTAssertEqual(config.brave, BraveConfig())
         XCTAssertEqual(config.catalog.count, 1)
@@ -58,8 +58,23 @@ final class ConfigTests: XCTestCase {
         let rgb = broken.glowRGB
         XCTAssertEqual(rgb.count, 3, "always three colours, whatever the config says")
         XCTAssertEqual(rgb[0].green, 1)
-        XCTAssertEqual(rgb[1].blue, 1, accuracy: 0.001, "an unreadable colour falls back to Aurora's")
-        XCTAssertEqual(rgb[2].red, 191.0 / 255.0, accuracy: 0.001, "a missing colour falls back to Aurora's")
+        XCTAssertEqual(rgb[1].red, 0x16 / 255.0, accuracy: 0.001, "an unreadable colour falls back to Nocturne's")
+        XCTAssertEqual(rgb[2].blue, 0x22 / 255.0, accuracy: 0.001, "a missing colour falls back to Nocturne's")
+        XCTAssertEqual(LookTheme(accent: "junk").accentRGB.red, 0xA9 / 255.0, accuracy: 0.001)
+    }
+
+    func testAnOldAuroraConfigMovesToNocturneButANewOneIsKept() throws {
+        let old = #"{ "palette": "aurora", "glowColors": ["#FF375F", "#0A84FF", "#BF5AF2"], "glowStrength": 0.8, "textSize": 21 }"#
+        let migrated = try JSONDecoder().decode(LookTheme.self, from: Data(old.utf8))
+        XCTAssertEqual(migrated.palette, "nocturne")
+        XCTAssertEqual(migrated.glowColors, LookTheme.nocturneGlow)
+        XCTAssertEqual(migrated.textSize, 21, "sizes he chose survive the move")
+
+        let chosen = #"{ "accent": "#FFFFFF", "glowColors": ["#111111", "#222222", "#333333"], "grain": 0 }"#
+        let kept = try JSONDecoder().decode(LookTheme.self, from: Data(chosen.utf8))
+        XCTAssertEqual(kept.accent, "#FFFFFF")
+        XCTAssertEqual(kept.glowColors, ["#111111", "#222222", "#333333"])
+        XCTAssertEqual(kept.grain, 0)
     }
 
     func testFeedbackAgreesWithTheReference() throws {

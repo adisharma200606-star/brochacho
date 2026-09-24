@@ -5,6 +5,7 @@
 //  Created by Kai Azim on 2023-08-24.
 //
 
+import AppKit
 import SwiftUI
 
 // MARK: - DynamicNotch
@@ -71,11 +72,17 @@ public final class DynamicNotch<Expanded, CompactLeading, CompactTrailing>: Obse
     /// Configuration for customizing transition animations and behavior.
     public var transitionConfiguration = DynamicNotchTransitionConfiguration()
 
-    // BROCHACHO PATCH 1 of 2: a coloured glow around the expanded notch.
+    // BROCHACHO PATCH 1 of 3: a coloured glow around the expanded notch.
     // Three colours (inner, middle, outer) and a strength from 0 to 1. Empty colours or zero strength means
     // the library behaves exactly as upstream does.
     @Published public var glowColors: [Color] = []
     @Published public var glowStrength: Double = 0
+
+    // BROCHACHO PATCH 3 of 3 (properties): a thin line of light along the bottom edge of the expanded notch,
+    // and a tiling grain texture over its surface. Nil leaves the library exactly as upstream.
+    @Published public var rimColor: Color? = nil
+    @Published public var grainImage: NSImage? = nil
+    @Published public var grainOpacity: Double = 0
 
     /// Content
     let expandedContent: Expanded

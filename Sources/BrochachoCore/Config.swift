@@ -90,47 +90,75 @@ public struct MotionTheme: Codable, Equatable {
     }
 }
 
-/// The "Aurora" look: a black notch, Helvetica Neue, and a soft three-colour glow while it is open.
+/// The look. Version 2 is "Nocturne, liner notes": a black notch, thin Helvetica Neue, small monospaced
+/// labels, one steel-blue accent, a rim of light along the notch's bottom edge and a little film grain.
 public struct LookTheme: Codable, Equatable {
-    /// The name of the palette chosen in the prototype ("aurora", "sunset", "mint", "mono"). Informational.
+    /// The name of the palette ("nocturne"). Informational.
     public var palette: String
-    /// The three glow colours as "#RRGGBB": inner, middle, outer.
+    /// The one accent colour, "#RRGGBB": the selected row's marker, the line he says, the tuner's needle.
+    public var accent: String
+    /// The three colours of the soft light around the open notch: inner, middle, outer.
     public var glowColors: [String]
-    /// 0 turns the glow off, 1 is full strength.
+    /// 0 turns that light off, 1 is full strength.
     public var glowStrength: Double
+    /// How visible the film grain on the notch is, 0 to 1. Around 0.06 is barely there.
+    public var grain: Double
     /// Base text size in points. The typed text and the tuner note scale from it.
     public var textSize: Double
     /// How long one pulse of the cursor takes, in milliseconds.
     public var caretBlinkMs: Double
 
+    public static let nocturneAccent = "#A9BBD6"
+    public static let nocturneGlow = ["#7890C8", "#16233C", "#0B1222"]
+    /// Kept so an old config that names these colours still reads them.
     public static let auroraColors = ["#FF375F", "#0A84FF", "#BF5AF2"]
 
-    public init(palette: String = "aurora", glowColors: [String] = LookTheme.auroraColors, glowStrength: Double = 0.8,
+    public init(palette: String = "nocturne", accent: String = LookTheme.nocturneAccent,
+                glowColors: [String] = LookTheme.nocturneGlow, glowStrength: Double = 0.35, grain: Double = 0.06,
                 textSize: Double = 19, caretBlinkMs: Double = 600) {
         self.palette = palette
+        self.accent = accent
         self.glowColors = glowColors
         self.glowStrength = glowStrength
+        self.grain = grain
         self.textSize = textSize
         self.caretBlinkMs = caretBlinkMs
     }
 
-    private enum CodingKeys: String, CodingKey { case palette, glowColors, glowStrength, textSize, caretBlinkMs }
+    private enum CodingKeys: String, CodingKey { case palette, accent, glowColors, glowStrength, grain, textSize, caretBlinkMs }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let d = LookTheme()
-        palette = try c.decodeIfPresent(String.self, forKey: .palette) ?? d.palette
-        glowColors = try c.decodeIfPresent([String].self, forKey: .glowColors) ?? d.glowColors
-        glowStrength = try c.decodeIfPresent(Double.self, forKey: .glowStrength) ?? d.glowStrength
         textSize = try c.decodeIfPresent(Double.self, forKey: .textSize) ?? d.textSize
         caretBlinkMs = try c.decodeIfPresent(Double.self, forKey: .caretBlinkMs) ?? d.caretBlinkMs
+        // A config written before the Nocturne look has no "accent". Its colours were the old Aurora defaults,
+        // not a choice, so it moves to the new look instead of keeping them.
+        guard c.contains(.accent) else {
+            palette = d.palette
+            accent = d.accent
+            glowColors = d.glowColors
+            glowStrength = d.glowStrength
+            grain = d.grain
+            return
+        }
+        palette = try c.decodeIfPresent(String.self, forKey: .palette) ?? d.palette
+        accent = try c.decodeIfPresent(String.self, forKey: .accent) ?? d.accent
+        glowColors = try c.decodeIfPresent([String].self, forKey: .glowColors) ?? d.glowColors
+        glowStrength = try c.decodeIfPresent(Double.self, forKey: .glowStrength) ?? d.glowStrength
+        grain = try c.decodeIfPresent(Double.self, forKey: .grain) ?? d.grain
+    }
+
+    /// The accent as red, green, blue in 0...1, falling back to the Nocturne steel.
+    public var accentRGB: (red: Double, green: Double, blue: Double) {
+        return LookTheme.rgb(hex: accent) ?? LookTheme.rgb(hex: LookTheme.nocturneAccent) ?? (red: 1, green: 1, blue: 1)
     }
 
     /// The three glow colours as red, green, blue in 0...1. Always returns exactly three, falling back to
-    /// the Aurora colours for anything missing or unreadable.
+    /// the Nocturne colours for anything missing or unreadable.
     public var glowRGB: [(red: Double, green: Double, blue: Double)] {
         return (0..<3).map { index in
-            let fallback = LookTheme.auroraColors[index]
+            let fallback = LookTheme.nocturneGlow[index]
             let hex = index < glowColors.count ? glowColors[index] : fallback
             return LookTheme.rgb(hex: hex) ?? LookTheme.rgb(hex: fallback) ?? (red: 1, green: 1, blue: 1)
         }

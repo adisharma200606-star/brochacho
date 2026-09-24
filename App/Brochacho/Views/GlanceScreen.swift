@@ -6,44 +6,53 @@ struct GlanceScreen: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(model.glanceTitle)
-                .font(model.theme.font(13))
-                .foregroundStyle(NotchTheme.dim)
+        VStack(alignment: .leading, spacing: 10) {
+            Text(model.glanceTitle.liner)
+                .font(model.theme.mono(10))
+                .kerning(1)
+                .foregroundStyle(NotchTheme.faint)
                 .padding(.horizontal, 10)
 
-            if model.glanceItems.isEmpty {
-                Text(model.glanceEmpty)
-                    .font(model.theme.font(model.theme.textSize * 0.9))
-                    .foregroundStyle(NotchTheme.dim)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-            }
-
-            VStack(spacing: 2) {
+            VStack(spacing: 0) {
+                Rectangle().fill(NotchTheme.hairline).frame(height: 1)
+                if model.glanceItems.isEmpty {
+                    Text(model.glanceEmpty.liner)
+                        .font(model.theme.font(model.theme.textSize * 0.85, .light))
+                        .foregroundStyle(NotchTheme.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .frame(height: 44)
+                }
                 ForEach(model.glanceItems) { item in
-                    HStack(spacing: 10) {
+                    HStack(spacing: 12) {
                         if let done = item.done {
                             Button { model.onGlanceTick(item.id) } label: {
-                                Image(systemName: done ? "checkmark.circle.fill" : "circle")
-                                    .font(.system(size: 17, weight: .regular))
-                                    .foregroundStyle(done ? NotchTheme.ok : NotchTheme.dim)
-                                    .frame(width: 26, height: 26)
-                                    .contentShape(Circle())
+                                ZStack {
+                                    Circle().stroke(done ? model.theme.accent : NotchTheme.secondary, lineWidth: 1)
+                                    if done { Circle().fill(model.theme.accent).padding(4) }
+                                }
+                                .frame(width: 14, height: 14)
+                                .frame(width: 24, height: 24)
+                                .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
+                        } else {
+                            Text(String(format: "%02d", item.id + 1))
+                                .font(model.theme.mono(10))
+                                .foregroundStyle(NotchTheme.faint)
+                                .frame(width: 24, alignment: .leading)
                         }
                         Button { model.onGlanceOpen(item.id) } label: {
-                            HStack {
-                                Text(item.title)
-                                    .font(model.theme.font(model.theme.textSize * 0.9))
-                                    .strikethrough(item.done == true)
-                                    .foregroundStyle(item.done == true ? NotchTheme.dim : Color.white)
+                            HStack(alignment: .firstTextBaseline) {
+                                Text(item.title.liner)
+                                    .font(model.theme.font(model.theme.textSize * 0.9, .light))
+                                    .strikethrough(item.done == true, color: NotchTheme.secondary)
+                                    .foregroundStyle(item.done == true ? NotchTheme.secondary : NotchTheme.text)
                                     .lineLimit(1)
                                 Spacer(minLength: 10)
-                                Text(item.detail)
-                                    .font(model.theme.font(12))
-                                    .foregroundStyle(NotchTheme.dim)
+                                Text(item.detail.liner)
+                                    .font(model.theme.mono(10))
+                                    .foregroundStyle(NotchTheme.secondary)
                                     .lineLimit(1)
                             }
                             .frame(maxWidth: .infinity)
@@ -51,9 +60,9 @@ struct GlanceScreen: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 12)
-                    .frame(height: 36)
-                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.white.opacity(0.06)))
+                    .padding(.horizontal, 10)
+                    .frame(height: 40)
+                    .overlay(alignment: .bottom) { Rectangle().fill(NotchTheme.hairline).frame(height: 1) }
                 }
             }
 
@@ -64,8 +73,7 @@ struct GlanceScreen: View {
                             .buttonStyle(PillButtonStyle(theme: model.theme))
                     }
                 }
-                .padding(.horizontal, 6)
-                .padding(.top, 4)
+                .padding(.horizontal, 8)
             }
         }
     }

@@ -23,79 +23,86 @@ struct TunerScreen: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Button { model.onTuningStep(-1) } label: { Image(systemName: "chevron.left") }
-                    .buttonStyle(RoundButtonStyle())
+                Button { model.onTuningStep(-1) } label: { Text("‹") }
+                    .buttonStyle(RoundButtonStyle(theme: model.theme))
                 Spacer()
-                Text(model.tuningName)
-                    .font(model.theme.font(13))
-                    .foregroundStyle(NotchTheme.dim)
+                Text(model.tuningName.liner.replacingOccurrences(of: ", ", with: " / "))
+                    .font(model.theme.mono(10))
+                    .kerning(1)
+                    .foregroundStyle(NotchTheme.faint)
                 Spacer()
-                Button { model.onTuningStep(1) } label: { Image(systemName: "chevron.right") }
-                    .buttonStyle(RoundButtonStyle())
+                Button { model.onTuningStep(1) } label: { Text("›") }
+                    .buttonStyle(RoundButtonStyle(theme: model.theme))
             }
 
             HStack(alignment: .bottom) {
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
                     Text(noteParts.letter)
-                        .font(model.theme.font(96, .ultraLight))
-                        .kerning(-3)
+                        .font(model.theme.font(118, .thin))
+                        .kerning(-5)
+                        .foregroundStyle(inTune ? NotchTheme.text : Color(white: 0.9))
                     Text(noteParts.octave)
-                        .font(model.theme.font(32, .light))
-                        .foregroundStyle(NotchTheme.dim)
+                        .font(model.theme.mono(16))
+                        .foregroundStyle(NotchTheme.faint)
                 }
                 Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
+                VStack(alignment: .trailing, spacing: 4) {
                     if model.tuner.state == .idle {
                         Text("pluck a string")
-                            .font(model.theme.font(13))
-                            .foregroundStyle(NotchTheme.dim)
+                            .font(model.theme.mono(10))
+                            .kerning(0.8)
+                            .foregroundStyle(NotchTheme.faint)
                     } else {
                         Text(inTune ? "in tune" : centsText)
-                            .font(model.theme.font(30, .light))
+                            .font(model.theme.font(inTune ? 30 : 40, .thin))
                             .monospacedDigit()
-                            .foregroundStyle(accent)
+                            .foregroundStyle(inTune ? NotchTheme.text : model.theme.accent)
                         if !inTune {
-                            Text(model.tuner.cents < 0 ? "cents, tune up" : "cents, tune down")
-                                .font(model.theme.font(13))
-                                .foregroundStyle(NotchTheme.dim)
+                            Text(model.tuner.cents < 0 ? "cents · tune up" : "cents · tune down")
+                                .font(model.theme.mono(10))
+                                .kerning(0.8)
+                                .foregroundStyle(NotchTheme.secondary)
                         }
                     }
                 }
-                .padding(.bottom, 10)
+                .padding(.bottom, 12)
             }
-            .frame(height: 96)
-            .padding(.horizontal, 8)
+            .frame(height: 100)
+            .padding(.horizontal, 4)
 
             GeometryReader { proxy in
                 let clamped = max(-50, min(50, model.tuner.cents))
                 let x = proxy.size.width * CGFloat(0.5 + clamped / 100)
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Color.white.opacity(0.18)).frame(height: 4)
-                    Capsule().fill(Color.white.opacity(0.6)).frame(width: 2, height: 18)
+                    Rectangle().fill(Color.white.opacity(0.18)).frame(height: 1)
                         .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
-                    Circle()
-                        .fill(accent)
-                        .frame(width: 18, height: 18)
-                        .shadow(color: accent, radius: 8)
-                        .opacity(model.tuner.state == .idle ? 0.3 : 1)
+                    Rectangle().fill(NotchTheme.text).frame(width: 1, height: 15)
+                        .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                    Rectangle()
+                        .fill(inTune ? NotchTheme.text : model.theme.accent)
+                        .frame(width: 2, height: 11)
+                        .shadow(color: inTune ? .white : model.theme.accent, radius: inTune ? 10 : 6)
+                        .opacity(model.tuner.state == .idle ? 0.25 : 1)
                         .position(x: x, y: proxy.size.height / 2)
                         .animation(.linear(duration: 0.09), value: model.tuner.cents)
                 }
             }
-            .frame(height: 24)
-            .padding(.horizontal, 8)
+            .frame(height: 20)
+            .padding(.horizontal, 4)
 
-            HStack(spacing: 4) {
+            HStack(spacing: 6) {
                 ForEach(Array(model.tuningStrings.enumerated()), id: \.offset) { index, name in
                     let active = model.tuner.state != .idle && model.tuner.stringIndex == index
-                    Text(name)
-                        .font(model.theme.font(15, .medium))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 5)
-                        .foregroundStyle(model.lockedStrings.contains(index) ? NotchTheme.ok : (active ? Color.white : NotchTheme.dim))
-                        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(active ? Color.white.opacity(0.16) : Color.clear))
+                    let locked = model.lockedStrings.contains(index)
+                    VStack(spacing: 6) {
+                        Rectangle().fill(active ? model.theme.accent : Color.clear).frame(height: 1)
+                        Text(name)
+                            .font(model.theme.mono(12))
+                            .foregroundStyle(active ? NotchTheme.text : (locked ? model.theme.accent : Color(white: 0.3)))
+                    }
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -104,11 +111,13 @@ struct TunerScreen: View {
 }
 
 struct RoundButtonStyle: ButtonStyle {
+    let theme: NotchTheme
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 13, weight: .semibold))
-            .frame(width: 32, height: 32)
-            .background(Circle().fill(Color.white.opacity(configuration.isPressed ? 0.25 : 0.12)))
-            .contentShape(Circle())
+            .font(theme.font(18, .light))
+            .foregroundStyle(configuration.isPressed ? theme.accent : NotchTheme.secondary)
+            .frame(width: 28, height: 28)
+            .contentShape(Rectangle())
     }
 }

@@ -1,17 +1,23 @@
 import SwiftUI
 
-/// One line: what he just said, or a confirmation such as "call mom · Tomorrow 17:00".
+/// One line: what he just said, or a confirmation such as "call mom · tomorrow 17:00". Quiet, lowercase,
+/// after a dash, like a credit in the liner notes.
 struct LineScreen: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        Text(model.lineText)
-            .font(model.theme.font(model.theme.textSize * 1.1, .medium))
-            .foregroundStyle(model.theme.tint)
-            .lineLimit(2)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text("—")
+                .font(model.theme.mono(11))
+            Text(model.lineText.liner)
+                .font(model.theme.font(model.theme.textSize * 0.9, .light))
+                .kerning(0.5)
+                .lineLimit(2)
+        }
+        .foregroundStyle(model.theme.tint)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
     }
 }
 
@@ -20,13 +26,18 @@ struct PullScreen: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("from the vault")
+                .font(model.theme.mono(10))
+                .kerning(1)
+                .foregroundStyle(NotchTheme.faint)
             Text(model.pullTitle)
-                .font(model.theme.font(model.theme.textSize, .medium))
+                .font(model.theme.font(model.theme.textSize, .light))
+                .foregroundStyle(NotchTheme.text)
                 .lineLimit(3)
-            Text(model.pullDetail)
-                .font(model.theme.font(13))
-                .foregroundStyle(NotchTheme.dim)
+            Text(model.pullDetail.liner)
+                .font(model.theme.mono(10))
+                .foregroundStyle(NotchTheme.secondary)
                 .lineLimit(1)
             Button("another") { model.onAnother() }
                 .buttonStyle(PillButtonStyle(theme: model.theme))
@@ -42,39 +53,55 @@ struct ChooserScreen: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(model.chooserTitle)
-                .font(model.theme.font(13))
-                .foregroundStyle(NotchTheme.dim)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(model.chooserTitle.liner)
+                .font(model.theme.mono(10))
+                .kerning(0.6)
+                .foregroundStyle(NotchTheme.secondary)
                 .padding(.horizontal, 10)
-            ForEach(Array(model.chooserOptions.enumerated()), id: \.offset) { index, option in
-                Button {
-                    model.onChoose(index)
-                } label: {
-                    Text(option)
-                        .font(model.theme.font(model.theme.textSize))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 14)
-                        .frame(height: 40)
-                        .background(RoundedRectangle(cornerRadius: 13, style: .continuous).fill(NotchTheme.row))
+            VStack(spacing: 0) {
+                Rectangle().fill(NotchTheme.hairline).frame(height: 1)
+                ForEach(Array(model.chooserOptions.enumerated()), id: \.offset) { index, option in
+                    Button {
+                        model.onChoose(index)
+                    } label: {
+                        HStack(spacing: 14) {
+                            Text(String(format: "%02d", index + 1))
+                                .font(model.theme.mono(10))
+                                .foregroundStyle(model.theme.accent)
+                            Text(option.liner)
+                                .font(model.theme.font(model.theme.textSize, .light))
+                                .foregroundStyle(NotchTheme.text)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(height: 42)
+                        .overlay(alignment: .bottom) { Rectangle().fill(NotchTheme.hairline).frame(height: 1) }
                         .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
     }
 }
 
-/// The soft translucent pill used for "another" and "Copy".
+/// Buttons in this look: a hairline outline and a small monospaced label. No fills, no pills of colour.
 struct PillButtonStyle: ButtonStyle {
     let theme: NotchTheme
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(theme.font(14, .medium))
-            .padding(.horizontal, 16)
-            .frame(height: 34)
-            .background(Capsule().fill(Color.white.opacity(configuration.isPressed ? 0.28 : 0.16)))
-            .contentShape(Capsule())
+            .font(theme.mono(11))
+            .kerning(0.6)
+            .textCase(.lowercase)
+            .foregroundStyle(configuration.isPressed ? theme.accent : NotchTheme.text)
+            .padding(.horizontal, 12)
+            .frame(height: 28)
+            .overlay(
+                RoundedRectangle(cornerRadius: 3, style: .continuous)
+                    .stroke(configuration.isPressed ? theme.accent : Color.white.opacity(0.18), lineWidth: 1)
+            )
+            .contentShape(Rectangle())
     }
 }

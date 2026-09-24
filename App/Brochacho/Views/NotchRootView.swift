@@ -24,7 +24,7 @@ struct NotchRootView: View {
         .frame(width: NotchRootView.width, alignment: .leading)
         .padding(.top, 6)
         .padding(.bottom, 4)
-        .foregroundStyle(.white)
+        .foregroundStyle(NotchTheme.text)
         .animation(model.theme.spring, value: model.screen)
         .animation(model.theme.spring, value: model.rows)
     }
@@ -35,9 +35,10 @@ struct CompactLeadingView: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        Circle()
-            .fill(model.theme.glowColors.first ?? .white)
-            .frame(width: 8, height: 8)
+        Rectangle()
+            .fill(model.theme.accent)
+            .frame(width: 2, height: 10)
+            .shadow(color: model.theme.accent, radius: 4)
             .opacity(model.timerText == nil ? 0 : 1)
             .padding(8)
             .contentShape(Rectangle())
@@ -51,9 +52,9 @@ struct CompactTrailingView: View {
 
     var body: some View {
         Text(model.timerText ?? "")
-            .font(model.theme.font(13, .medium))
+            .font(model.theme.mono(12))
             .monospacedDigit()
-            .foregroundStyle(.white)
+            .foregroundStyle(NotchTheme.text)
             .padding(.vertical, 6)
             .contentShape(Rectangle())
             .onTapGesture { model.onTimerTap() }

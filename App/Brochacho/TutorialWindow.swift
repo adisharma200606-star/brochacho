@@ -22,8 +22,8 @@ final class TutorialWindow {
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.isMovableByWindowBackground = true
-        window.backgroundColor = .black
-        window.setContentSize(NSSize(width: 560, height: 420))
+        window.backgroundColor = NSColor(red: 0.012, green: 0.016, blue: 0.024, alpha: 1)
+        window.setContentSize(NSSize(width: 560, height: 440))
         window.isReleasedWhenClosed = false
         window.center()
         self.window = window
@@ -84,30 +84,35 @@ private struct TutorialView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("\(index + 1) / \(slides.count)")
-                .font(theme.font(13))
-                .foregroundStyle(NotchTheme.dim)
-                .padding(.top, 36)
+            Text(String(format: "%02d / %02d", index + 1, slides.count))
+                .font(theme.mono(10))
+                .kerning(1)
+                .foregroundStyle(NotchTheme.faint)
+                .padding(.top, 40)
 
-            Text(slides[index].title)
-                .font(theme.font(44, .light))
-                .kerning(-1)
-                .foregroundStyle(.white)
-                .padding(.top, 6)
-                .padding(.bottom, 22)
+            Text(slides[index].title.liner)
+                .font(theme.font(46, .thin))
+                .kerning(-1.5)
+                .foregroundStyle(NotchTheme.text)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
 
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 0) {
+                Rectangle().fill(NotchTheme.hairline).frame(height: 1)
                 ForEach(Array(slides[index].lines.enumerated()), id: \.offset) { _, line in
-                    HStack(alignment: .firstTextBaseline, spacing: 14) {
-                        Text(line.key)
-                            .font(theme.font(15, .medium))
-                            .foregroundStyle(theme.tint)
+                    HStack(alignment: .firstTextBaseline, spacing: 16) {
+                        Text(line.key.liner)
+                            .font(theme.mono(11))
+                            .foregroundStyle(theme.accent)
                             .frame(width: 150, alignment: .leading)
-                        Text(line.text)
-                            .font(theme.font(15))
-                            .foregroundStyle(Color(white: 0.85))
+                        Text(line.text.liner)
+                            .font(theme.font(14, .light))
+                            .foregroundStyle(Color(white: 0.82))
                             .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
                     }
+                    .padding(.vertical, 11)
+                    .overlay(alignment: .bottom) { Rectangle().fill(NotchTheme.hairline).frame(height: 1) }
                 }
             }
             .id(index)
@@ -115,18 +120,18 @@ private struct TutorialView: View {
 
             Spacer()
 
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 ForEach(0..<slides.count, id: \.self) { dot in
-                    Capsule()
-                        .fill(dot == index ? Color.white : Color.white.opacity(0.25))
-                        .frame(width: dot == index ? 22 : 8, height: 8)
+                    Rectangle()
+                        .fill(dot == index ? theme.accent : Color.white.opacity(0.2))
+                        .frame(width: dot == index ? 22 : 10, height: 1)
                 }
                 Spacer()
                 if index > 0 {
-                    Button("Back") { withAnimation(theme.spring) { index -= 1 } }
+                    Button("back") { withAnimation(theme.spring) { index -= 1 } }
                         .buttonStyle(PillButtonStyle(theme: theme))
                 }
-                Button(index == slides.count - 1 ? "Done" : "Next") {
+                Button(index == slides.count - 1 ? "done" : "next") {
                     if index == slides.count - 1 {
                         close()
                     } else {
@@ -136,17 +141,22 @@ private struct TutorialView: View {
                 .buttonStyle(PillButtonStyle(theme: theme))
                 .keyboardShortcut(.defaultAction)
             }
-            .padding(.bottom, 28)
+            .padding(.bottom, 30)
         }
-        .padding(.horizontal, 40)
-        .frame(width: 560, height: 420, alignment: .topLeading)
+        .padding(.horizontal, 44)
+        .frame(width: 560, height: 440, alignment: .topLeading)
         .background(
             ZStack {
-                Color.black
-                RadialGradient(colors: [theme.glowColors[1].opacity(0.35), .clear], center: .topTrailing, startRadius: 10, endRadius: 420)
-                RadialGradient(colors: [theme.glowColors[0].opacity(0.22), .clear], center: .bottomLeading, startRadius: 10, endRadius: 380)
+                Color(red: 0.012, green: 0.016, blue: 0.024)
+                // One raking beam of light from the top left, like the wallpaper it was designed from.
+                LinearGradient(colors: [.clear, theme.accent.opacity(0.08), .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .rotationEffect(.degrees(-8))
+                    .scaleEffect(1.4)
+                if let grain = NotchTheme.grainImage {
+                    Image(nsImage: grain).resizable(resizingMode: .tile).opacity(theme.grain)
+                }
             }
         )
-        .foregroundStyle(.white)
+        .foregroundStyle(NotchTheme.text)
     }
 }
