@@ -445,23 +445,34 @@ If a new name is exactly the same as one you already have, it warns you.
 
 ## 14. Look and feel
 
-**Status:** look chosen (Aurora) · working in the phone prototype · Mac screens build, never run
+**Status:** chosen 25 September 2026 · builds · the phone prototype still shows the older Aurora look
 
-The look is **Aurora**: a black notch that matches the hardware, Helvetica Neue inside it, soft translucent rows, and a three-colour glow around the edge while it is open. A professional-looking piece of software that happens to talk like an Italian uncle. The contrast is the joke.
+The look is **Nocturne, liner notes**: the back of a CD booklet, at night. It was drawn from Adi's own desktop (the dark blue Deftones wallpaper with its beam of light), then stripped of anything cute.
 
-- **Type:** Helvetica Neue, which ships on every Mac. The name you type is large and medium weight. The tuner's note is very large and very thin.
-- **Rows:** the top match sits on a soft translucent pill. The others are grey.
-- **Glow:** three colours. It fades in as the notch opens, and because it follows the same spring as the notch, a bouncy spring makes it flare for a moment. Palettes: Aurora (pink, blue, purple), Sunset, Mint, and Mono (white only).
-- **Tuner colours:** orange while a string is off, green the moment it locks.
-- **Timer:** a thin bar in the glow colours draining along the bottom of the closed notch.
+- **The notch** stays black like the hardware. Along its bottom edge runs one thin line of steel-blue light, and a little film grain sits on its surface. A faint cold light surrounds it while it is open.
+- **Type.** What matters is in thin Helvetica Neue, large, lowercase. Everything else (hints, where a thing opens, the tuning, "cents · tune up") is in small monospaced type, IBM Plex Mono, which ships inside the app.
+- **Lists** read like a track list: `01 youtube ········ brave / personal`. The highlighted row gets a hairline of steel on its left edge, not a filled box. Rows are separated by hairlines.
+- **His line** appears quietly after a dash, lowercase, in steel: `— it's done. don't ask how.`
+- **The tuner** shows the note huge and thin; the needle is a short steel bar that turns white when the string is in tune. Strings already in tune turn steel.
+- **The timer** is a big thin countdown over a thin steel bar.
+- **Buttons** are outlines with a small monospaced label. There are no coloured fills anywhere.
+- **One accent colour.** Everything that is not ink is the same steel blue.
 
-What you can change without touching code:
+What you can change without touching code, under `theme.look` in the config:
 
-- The notch opens and closes on a **spring**, tuned by you on the phone prototype. The two numbers, `stiffness` and `damping`, mean exactly the same thing on the Mac, so what you feel on the phone is what you get.
-- Glow colours and strength, text size, and how fast the cursor pulses.
-- On a screen with no notch (an external monitor), it appears as a small floating pill at the top centre.
+| Key | Default | What it does |
+|---|---|---|
+| `accent` | `#A9BBD6` (steel) | the one accent colour: the row marker, his line, the needle, the rim of light |
+| `glowColors` | `#7890C8`, `#16233C`, `#0B1222` | the faint light around the open notch, inner to outer |
+| `glowStrength` | `0.35` | 0 turns that light off |
+| `grain` | `0.06` | how visible the film grain is; 0 turns it off |
+| `textSize`, `caretBlinkMs` | `19`, `600` | base text size; cursor pulse |
 
-To apply settings from the prototype: open **Settings to copy**, copy, and paste it over the `theme` block in the config.
+The motion (`theme.motion.stiffness` and `damping`) is unchanged: the same spring as before.
+
+A config written before this look (it has no `accent`) moves to it automatically the first time the new version starts. Text size and motion are kept.
+
+On a screen with no notch (an external monitor, or while the screen is flipped), it appears as a small floating pill at the top centre. The settings window stays a normal Mac window.
 
 ---
 
@@ -504,7 +515,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
   "speechLocale": "en-IN",
   "theme": {
     "motion": { "stiffness": 260, "damping": 24 },
-    "look":   { "palette": "aurora", "glowColors": ["#FF375F", "#0A84FF", "#BF5AF2"], "glowStrength": 0.8, "textSize": 19, "caretBlinkMs": 600 },
+    "look":   { "palette": "nocturne", "accent": "#A9BBD6", "glowColors": ["#7890C8", "#16233C", "#0B1222"], "glowStrength": 0.35, "grain": 0.06, "textSize": 19, "caretBlinkMs": 600 },
     "voice":  { "voiceName": "", "rate": 0.95, "pitch": 0.9, "frequency": 0.6 }
   },
   "tuner": { "a4": 440, "toleranceCents": 5, "lastTuningID": "guitar-standard", "customTunings": [] },
@@ -524,7 +535,9 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
 | `speechLocale` | the accent the Mac should expect when you talk to it. `en-IN` is English as spoken in India; try `en-US` or `en-GB` if it mishears you. |
 | `theme.motion.stiffness` | how hard the notch snaps open. Higher is snappier. |
 | `theme.motion.damping` | how quickly it settles. Lower is bouncier. |
-| `theme.look.glowColors` | the three glow colours, `#RRGGBB`, inner to outer. An unreadable one falls back to Aurora's. |
+| `theme.look.accent` | the one accent colour (section 14) |
+| `theme.look.glowColors` | the three colours of the faint light around the open notch, `#RRGGBB`, inner to outer. An unreadable one falls back to the default. |
+| `theme.look.grain` | film grain on the notch, 0 to 1 |
 | `theme.look.glowStrength` | 0 is no glow, 1 is full |
 | `theme.look.textSize`, `caretBlinkMs` | base text size in points; how long one cursor pulse takes |
 | `theme.voice.voiceName` | which system voice. Empty means the best Italian one installed. |
@@ -587,10 +600,10 @@ This section will grow once the app has actually run. What can already be predic
 | Ask | **Brain built and tested; works in the phone prototype.** On the Mac it answers all at once rather than word by word. |
 | Full line bank | **243 lines written**, in `defaults/lines.json`. Edit freely. |
 | Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |
-| The look | **Aurora chosen.** Live in the phone prototype. |
+| The look (first) | Aurora, in the phone prototype. Replaced on the Mac by Nocturne. |
 | Interface sounds | **Made** (eight WAV files, generated by a script). Playing in the phone prototype. |
 | Round two (25 Sep 2026) | Timer screen with Stop and more time · glance at notes and reminders · every installed app opens by name · app picker in settings · flipping the screen · three-slide tutorial · one-command updates (`scripts/install.sh`). All build; not yet tried on the Mac. |
-| The look | Three new directions on the design canvas (G Nocturne, H Setlist, I Screentone), waiting for a pick. |
+| The look | **Nocturne, liner notes**, chosen and built (section 14). |
 
 Ideas that are parked, not planned: a calculator in the box (so sums never go to the AI), Look (drag a box on the screen and ask about it), finding saved things by meaning, a hook so your own scripts can make him announce things, cheat codes, a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.
 

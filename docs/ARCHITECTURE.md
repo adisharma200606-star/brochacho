@@ -60,7 +60,7 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `NotchController.swift` | Wraps DynamicNotchKit. Adds what a launcher needs: the keyboard from the first moment, Escape, arrow keys, click-away. |
 | `NotchSensor.swift` | An invisible window over the physical notch that is always there, because DynamicNotchKit removes its own window when closed. Click = pull, right-click = menu, drop = save. |
 | `Views/` | One file per screen: `InputScreen`, `LineScreen` (also `PullScreen`, `ChooserScreen`), `TunerScreen`, `AnswerScreen`, `TimerScreen`, `GlanceScreen`, and `NotchRootView`, which switches between them and holds the small timer shown beside the closed notch. |
-| `Theme.swift` | The Aurora look: config values turned into colours, fonts and the spring. |
+| `Theme.swift` | The Nocturne look: config values turned into the accent, ink colours, Helvetica and mono fonts, the spring, the grain texture; registers the bundled fonts at launch. |
 | `HotkeyCenter.swift` | "ctrl+opt+space" from the config into a registered hotkey, with key-down and key-up. |
 | `Opener.swift` | Carries out an `ActionPlan`. Launches Brave's program file directly so the profile flag survives. |
 | `TabGrabber.swift` | Asks the front browser for its page, by AppleScript. |
@@ -74,7 +74,7 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `TutorialWindow.swift` | The three slides. |
 | `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
 | `SettingsWindow.swift` | The settings window: things, voice and sound, Ask, hotkeys and files. |
-| `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`) and `sounds/*.wav` (made by `scripts/make_sounds.py`). |
+| `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`), `sounds/*.wav` (made by `scripts/make_sounds.py`), `fonts/` (IBM Plex Mono) and `textures/grain.png`. Xcode flattens all of these into the top of the app's Resources folder. |
 
 ## What happens when he types `yt` and presses Enter
 
