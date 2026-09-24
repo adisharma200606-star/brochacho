@@ -32,6 +32,7 @@
 		6903B6EA3EFE03FD132F1EE6 /* close.wav in Resources */ = {isa = PBXBuildFile; fileRef = C32CFC1B695956AFADB9D64A /* close.wav */; };
 		6CA0C75B211307D715345AB7 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C61F301664502709E564CDF /* HotkeyCenter.swift */; };
 		744C4DA0616715CA8F13E0E3 /* CaptureWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73F216E3CE38E102D5005B5 /* CaptureWriter.swift */; };
+		8170C74E7F6D7B920001BF68 /* RotationBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 60FB5A278ECE687FE4125D81 /* RotationBridge */; };
 		93B7A147CC181CEEE87F6A67 /* TabGrabber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EA6ACC019B45092C3EA83F /* TabGrabber.swift */; };
 		96FEB60C7C7C3E9D5732D61D /* TutorialWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD465E714E33082FAF68F0F /* TutorialWindow.swift */; };
 		97991B07DCC96FCDD6270D95 /* NotchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C4D7A25F9A4B4AFDC14175 /* NotchController.swift */; };
@@ -58,6 +59,7 @@
 		15B0CA31E1B68B8E4051D163 /* TunerScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunerScreen.swift; sourceTree = "<group>"; };
 		1B4DE10B972177024AB22077 /* GlanceScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceScreen.swift; sourceTree = "<group>"; };
 		2DEBF9617467FDC6755ABF48 /* IBMPlexMono-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "IBMPlexMono-OFL.txt"; sourceTree = "<group>"; };
+		2F25107E1E51E2A0BB8ECF7B /* RotationBridge */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RotationBridge; path = RotationBridge; sourceTree = SOURCE_ROOT; };
 		3241D1C4BC2F559AE0597EDF /* ScreenRotator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRotator.swift; sourceTree = "<group>"; };
 		32D421C1069E6051F3AFEC3A /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		4077E338B48FE2F35C039F0B /* grain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grain.png; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				143F13A7C6D83EB4B2040655 /* BrochachoCore in Frameworks */,
 				3D7C17C7C827804C2678387C /* DynamicNotchKit in Frameworks */,
 				B8496229A0CA4E5BA8769B19 /* HotKey in Frameworks */,
+				8170C74E7F6D7B920001BF68 /* RotationBridge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +134,7 @@
 			children = (
 				CDD9E16F3B09AD76328490EE /* brochacho */,
 				53CC96ED79273D5A25EA4B2D /* DynamicNotchKit */,
+				2F25107E1E51E2A0BB8ECF7B /* RotationBridge */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -244,6 +248,7 @@
 				F30797B154EE6794DC25DE3F /* BrochachoCore */,
 				A4E8DDD2ADA3D6B9E74F739E /* DynamicNotchKit */,
 				DA5E95161E36329A817B9001 /* HotKey */,
+				60FB5A278ECE687FE4125D81 /* RotationBridge */,
 			);
 			productName = Brochacho;
 			productReference = 8D0183D43C328444C43D926E /* Brochacho.app */;
@@ -276,6 +281,7 @@
 				E8BDF4DB8E64C27BDECE2063 /* XCRemoteSwiftPackageReference "HotKey" */,
 				8B2103F0F9A39EA7DBABD430 /* XCLocalSwiftPackageReference ".." */,
 				70B55B775D1BB2341C4DABD8 /* XCLocalSwiftPackageReference "Vendor/DynamicNotchKit" */,
+				447770F3FF7DE489D3B4ACC1 /* XCLocalSwiftPackageReference "RotationBridge" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = ED5E75B505C4E027F8851959 /* Products */;
@@ -534,6 +540,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		447770F3FF7DE489D3B4ACC1 /* XCLocalSwiftPackageReference "RotationBridge" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RotationBridge;
+		};
 		70B55B775D1BB2341C4DABD8 /* XCLocalSwiftPackageReference "Vendor/DynamicNotchKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Vendor/DynamicNotchKit;
@@ -556,6 +566,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		60FB5A278ECE687FE4125D81 /* RotationBridge */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RotationBridge;
+		};
 		A4E8DDD2ADA3D6B9E74F739E /* DynamicNotchKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DynamicNotchKit;
