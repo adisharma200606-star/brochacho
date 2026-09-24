@@ -69,12 +69,24 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `Ears.swift` | Hold-to-talk speech recognition. |
 | `MicTuner.swift` | Microphone into the pitch detector, about twelve readings a second. |
 | `CaptureWriter.swift` | Makes the note (AppleScript, keeping its id) or the reminder (EventKit); reads upcoming reminders and ticks them off; reopens a note by id. |
-| `ScreenRotator.swift` | `one eighty`: rotates the screen through the private MonitorPanel framework, with an IOKit fallback for older Macs. |
+| `ScreenRotator.swift` | `one eighty`: asks `RotationBridge` to rotate the screen, and turns its C result into an `Outcome`. |
 | `AppIndex.swift` | Finds installed apps so any of them opens by name. |
 | `TutorialWindow.swift` | The three slides. |
 | `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
 | `SettingsWindow.swift` | The settings window: things, voice and sound, Ask, hotkeys and files. |
 | `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`), `sounds/*.wav` (made by `scripts/make_sounds.py`), `fonts/` (IBM Plex Mono) and `textures/grain.png`. Xcode flattens all of these into the top of the app's Resources folder. |
+
+## Why rotation is Objective-C, not Swift
+
+Everything else in `App/Brochacho` is Swift. `App/RotationBridge` is a small, separate, all-Objective-C
+Swift Package (like `App/Vendor/DynamicNotchKit`, but original code, not vendored). The reason: rotating the
+screen means calling a private, undocumented macOS class (`MPDisplay`) that has no header anywhere. In
+Objective-C, one line — a category that just *declares* the two method names exist — is enough to let the
+compiler accept a completely ordinary `[[cls alloc] initWithCGSDisplayID:...]` call, which then runs
+correctly at run time against whatever class `cls` actually is. Doing the equivalent from Swift means manually
+resolving `alloc`/`init` through the Objective-C runtime with raw C function pointers — which a first attempt
+at this got wrong, silently, with no compiler to catch it. See `RotationBridge.m` for the actual code and
+`BLIND_SPOTS.md` D1 for the history.
 
 ## What happens when he types `yt` and presses Enter
 

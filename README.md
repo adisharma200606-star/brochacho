@@ -18,7 +18,7 @@ A voice that lives in the MacBook notch.
 | `Sources/BrochachoCore/` + `Tests/` | The brain and the tuner maths ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Compiles and passes all 41 tests on GitHub's cloud Mac.** |
 | `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and builds the app. Logs are also pushed to the `ci-logs` branch. | Running. First run: all green. |
 
-| `App/` | **The Mac app**: the notch, hotkeys, opening things in Brave, drag to save, the voice, sounds, the tuner, the timer, notes and reminders, hold-to-talk, Ask, and the settings window. About 2,500 lines of SwiftUI and AppKit on top of a lightly patched copy of DynamicNotchKit. | **Builds on GitHub's cloud Mac. Never run.** |
+| `App/` | **The Mac app**: the notch, hotkeys, opening things in Brave, drag to save, the voice, sounds, the tuner, the timer, notes and reminders, hold-to-talk, Ask, screen rotation, and the settings window. About 2,500 lines of SwiftUI and AppKit on top of a lightly patched copy of DynamicNotchKit and a small original Objective-C bridge for rotation. | **Running on Adi's MacBook.** |
 
 ## Start here
 
