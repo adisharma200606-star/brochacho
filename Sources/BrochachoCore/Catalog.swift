@@ -1,7 +1,7 @@
 import Foundation
 
 /// What kind of thing a catalog entry opens.
-public enum EntryKind: String, Codable, Equatable {
+public enum EntryKind: String, Codable, Equatable, Sendable {
     case site
     case app
     case path
@@ -10,7 +10,7 @@ public enum EntryKind: String, Codable, Equatable {
 }
 
 /// One thing Brochacho can open. Adding a thing to the app means adding one of these to the config.
-public struct CatalogEntry: Codable, Equatable {
+public struct CatalogEntry: Codable, Equatable, Sendable {
     /// The name that is matched against. Lowercase by convention ("youtube", "vs code").
     public var name: String
     /// How the name is shown on screen ("YouTube"). Falls back to `name`.

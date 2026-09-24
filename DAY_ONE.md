@@ -111,3 +111,11 @@ In Xcode: Product → Show Build Folder in Finder → `Products/Debug/Brochacho.
 - Update the **Status** lines in `docs/GUIDE.md` for everything that now works. Rewrite anything that turned out different.
 - Every `git push` to `main` builds and tests on a cloud Mac (`.github/workflows/ci.yml`); the logs land on the `ci-logs` branch.
 - Parked ideas are at the end of `docs/GUIDE.md`. Version 1 is frozen until the list above is all ticked.
+
+## Updating, from now on
+
+```
+~/Code/brochacho/scripts/install.sh
+```
+
+It gets the newest code, builds it, signs it, replaces the app in Applications and starts it. No Xcode window needed. See "Updating to a new version" at the end of `docs/GUIDE.md`.

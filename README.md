@@ -22,6 +22,8 @@ A voice that lives in the MacBook notch.
 
 ## Start here
 
+- Update to the newest version: **`scripts/install.sh`** (one command).
+
 - On a new Mac: **`DAY_ONE.md`**.
 - A Claude session picking this up: **`CLAUDE.md`**.
 - How the code fits together: `docs/ARCHITECTURE.md`.

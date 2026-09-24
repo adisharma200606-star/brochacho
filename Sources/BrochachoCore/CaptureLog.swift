@@ -61,7 +61,7 @@ public struct CaptureLog: Codable, Equatable {
 /// before it can be typed. Scanning the disk happens in the app; this part only decides what to keep.
 public enum InstalledApps {
 
-    public struct Found: Equatable {
+    public struct Found: Equatable, Sendable {
         public let name: String
         public let bundleID: String?
         public let path: String

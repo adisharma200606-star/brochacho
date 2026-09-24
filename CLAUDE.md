@@ -2,6 +2,10 @@
 
 You are picking up **Brochacho**, a Mac app that lives in the MacBook notch: type or say the name of a thing and it opens, drag something onto the notch and it is saved, click the notch and one saved thing comes back, and an Italian-accented voice says a short line after each action. It was designed and written for one person, Adi, who is a self-taught builder with no computer-science background. Explain things to him in plain language, teach as you go, and be honest rather than flattering. He asked for that explicitly.
 
+## Updating the app on Adi's Mac
+
+After pushing a change, wait for the CI run to finish (it commits the regenerated Xcode project back to `main`), then Adi runs `~/Code/brochacho/scripts/install.sh`, which pulls, builds a Release copy, signs it, installs it in /Applications and relaunches it.
+
 ## The single most important fact
 
 **The app compiles and its brain passes its tests, but the app has never been run.** It was written on a phone, in a sandbox with no Mac. On 24 September 2026 GitHub's cloud Mac (Xcode 16.4, Swift 6.1.2) compiled everything: `swift test` passed all 41 tests, and the app built with no warnings in its own code. What no one has done yet is launch it: nothing about the notch, the hotkeys, the voice, the microphone or the permissions has been seen working. `BLIND_SPOTS.md` lists every runtime guess.

@@ -2,7 +2,9 @@
 
 Everything in here is a guess that could not be checked without a Mac. Each one says **where** it is in the code, **what** was assumed, and **what to try** if it turns out wrong. When you confirm or fix one, delete it from this file, so the file always shows what is still unknown.
 
-The honest headline: **the code compiles and passes its tests, but the app has never been launched.** On 24 September 2026 GitHub's macOS runner (Xcode 16.4, Swift 6.1.2) ran `swift test` (41 tests, all pass) and built the app with no warnings in its own code. Everything below is about what happens when it *runs*.
+The honest headline: **the app runs on Adi's MacBook** (25 September 2026: the notch opens, typing works, `yt` opens YouTube). The first-round guesses below that have not been reported as wrong are still unconfirmed one by one. Section D holds the second round, which compiles but has not been tried.
+
+Earlier headline, kept for history: On 24 September 2026 GitHub's macOS runner (Xcode 16.4, Swift 6.1.2) ran `swift test` (41 tests, all pass) and built the app with no warnings in its own code. Everything below is about what happens when it *runs*.
 
 ---
 
@@ -83,3 +85,18 @@ The whole section that used to be here is gone: the first cloud build compiled e
 - Changing a hotkey takes effect on **Save**, without a restart, but has not been tested.
 - The iPhone shortcuts (`docs/IPHONE.md`) have never been built on a phone.
 - There is no app icon.
+
+## D. Round two (25 September 2026): compiles, not yet tried on the Mac
+
+| # | Where | Assumed | If wrong |
+|---|---|---|---|
+| D1 | `ScreenRotator.swift` | Loading `/System/Library/PrivateFrameworks/MonitorPanel.framework`, making an `MPDisplay` with `initWithCGSDisplayID:` and calling `setOrientation:` with 180 rotates the built-in screen, as the Rotator app does. It is called through C function pointers so that `init` consuming `alloc`'s object does not confuse Swift's memory management. | The notch shows the reason. If it says the methods are missing, Apple changed the framework: look at how Rotator (github.com/B-HS/rotator) does it today. If it crashes, suspect the `alloc`/`init` pointer dance first. |
+| D2 | same | After rotating, macOS does not ask for confirmation (System Settings does, but that is its own dialog). | If a "Keep this rotation?" dialog appears and reverts after a few seconds, click Keep, and tell Claude. |
+| D3 | `NotchController.close`, DynamicNotchKit | While the screen is upside down, `NSScreen.auxiliaryTopLeftArea` is nil, so the notch is treated as absent: the box appears as a floating pill and the timer has no compact form. | If the notch *is* still reported, the box will draw at the top as usual, which is fine. |
+| D4 | `Views/NotchRootView.swift` | The time shown beside the closed notch receives clicks (DynamicNotchKit's window does not ignore mouse events, and the text has a hit area). | If clicking the time does nothing, type `timer` to open the timer screen, and look at the compact views' `contentShape`. |
+| D5 | `CaptureWriter.makeNote` | `make new note` returns the note, and `id of` it is a string like `x-coredata://…` that `show note id "…"` accepts later. | If clicking a note in the glance only opens Notes, the id is empty or not accepted; the fallback already opens Notes. |
+| D6 | `CaptureWriter.upcomingReminders` | `predicateForIncompleteReminders(withDueDateStarting: nil, ending: nil, calendars: nil)` returns undone reminders from every list, with or without a date. | If the glance is empty but Reminders is not, try passing `store.calendars(for: .reminder)` as the calendars. |
+| D7 | `AppIndex.swift` | Scanning /Applications (and one level down), Utilities, /System/Applications and ~/Applications finds the apps, and `FileManager.displayName` gives their proper names. Apps from the Mac App Store and Steam's own app are in /Applications. | If an app is missing, add it in settings with **Add an app**. Steam *games* live elsewhere and are not scanned. |
+| D8 | `Brain.searchable` | Matching against a few hundred installed apps as well as the catalog stays instant (the matcher is a few microseconds per name). | If typing feels slower, measure `Matcher.match`; the installed list can be matched only when the catalog has no strong result. |
+| D9 | `TutorialWindow.swift` | A borderless-looking titled window with a black background shows once, 1.5 s after the first launch, without fighting the permission prompts. | If it appears behind the prompts, raise the delay. It remembers it was seen in the user defaults key `brochacho.tutorialSeen.v1`. |
+| D10 | `scripts/install.sh` | `security find-identity -v -p codesigning` lists an "Apple Development" certificate once an Apple ID is added in Xcode, and signing with it keeps macOS permissions across updates. On the cloud Mac it builds and signs ad hoc correctly. | If permissions are asked again after every update, check the script printed "Signed as: Apple Development…". |

@@ -39,7 +39,8 @@ Two ideas explain most of the design:
 | `Stash.swift` | Saved things, and the rules for handing one back (never repeat, mix fresh and old, skipped things go to the back). |
 | `Lines.swift` | Which line he says, never repeating the last five, and whether it is spoken this time. |
 | `Tuner.swift` | Note maths, YIN pitch detection, string matching, and `TunerSession`, which steadies the display. |
-| `Extras.swift` | The timer (reading "1h30", counting down), living bookmarks (which entry moves), and folding the iPhone's files into the stash. |
+| `Extras.swift` | The timer (reading "1h30", counting down, adding time, words that mean stop), living bookmarks (which entry moves), and folding the iPhone's files into the stash. |
+| `CaptureLog.swift` | The short list of notes and reminders made from the notch, for the glance; and `InstalledApps`, which turns the apps found on disk into things the box can open. |
 | `Capture.swift` | Reading "call mom tomorrow at 5" into a title and a time. |
 | `Ask.swift` | What is sent with a question, when the clipboard is included, and splitting the reply into text and a command. |
 | `Feedback.swift` | Which sound and which trackpad tap go with each event. |
@@ -58,7 +59,7 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `NotchModel.swift` | Everything the notch shows, as published properties, plus the closures the views call. |
 | `NotchController.swift` | Wraps DynamicNotchKit. Adds what a launcher needs: the keyboard from the first moment, Escape, arrow keys, click-away. |
 | `NotchSensor.swift` | An invisible window over the physical notch that is always there, because DynamicNotchKit removes its own window when closed. Click = pull, right-click = menu, drop = save. |
-| `Views/` | One file per screen: `InputScreen`, `LineScreen` (also `PullScreen`, `ChooserScreen`), `TunerScreen`, `AnswerScreen`, and `NotchRootView`, which switches between them. |
+| `Views/` | One file per screen: `InputScreen`, `LineScreen` (also `PullScreen`, `ChooserScreen`), `TunerScreen`, `AnswerScreen`, `TimerScreen`, `GlanceScreen`, and `NotchRootView`, which switches between them and holds the small timer shown beside the closed notch. |
 | `Theme.swift` | The Aurora look: config values turned into colours, fonts and the spring. |
 | `HotkeyCenter.swift` | "ctrl+opt+space" from the config into a registered hotkey, with key-down and key-up. |
 | `Opener.swift` | Carries out an `ActionPlan`. Launches Brave's program file directly so the profile flag survives. |
@@ -67,7 +68,10 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `SoundPlayer.swift` | Plays the eight sounds and the trackpad taps. |
 | `Ears.swift` | Hold-to-talk speech recognition. |
 | `MicTuner.swift` | Microphone into the pitch detector, about twelve readings a second. |
-| `CaptureWriter.swift` | Makes the note (AppleScript) or the reminder (EventKit). |
+| `CaptureWriter.swift` | Makes the note (AppleScript, keeping its id) or the reminder (EventKit); reads upcoming reminders and ticks them off; reopens a note by id. |
+| `ScreenRotator.swift` | `one eighty`: rotates the screen through the private MonitorPanel framework, with an IOKit fallback for older Macs. |
+| `AppIndex.swift` | Finds installed apps so any of them opens by name. |
+| `TutorialWindow.swift` | The three slides. |
 | `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
 | `SettingsWindow.swift` | The settings window: things, voice and sound, Ask, hotkeys and files. |
 | `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`) and `sounds/*.wav` (made by `scripts/make_sounds.py`). |

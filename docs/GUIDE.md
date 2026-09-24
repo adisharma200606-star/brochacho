@@ -23,6 +23,7 @@ When the app runs on your Mac, every Status line gets updated and anything that 
 7. [The tuner](#7-the-tuner)
 8. [The timer](#8-the-timer)
 9. [Notes and reminders](#9-notes-and-reminders)
+9½. [Flipping the screen](#9-flipping-the-screen)
 10. [Ask](#10-ask)
 11. [The voice](#11-the-voice)
 12. [Sounds and touch](#12-sounds-and-touch)
@@ -230,9 +231,9 @@ Add them under `tuner.customTunings` in the config (section 16). Notes are writt
 
 ## 8. The timer
 
-**Status:** brain tested · Swift written · Mac app builds, never run
+**Status:** brain tested · Mac app builds and has run
 
-Type `timer` and how long. The notch closes and a thin bar drains across its bottom edge. When it ends, he tells you. (You asked him to, so rule 4 holds.)
+Type `timer` and how long. The notch closes, and the time left shows beside it. When it ends, he tells you. (You asked him to, so rule 4 holds.)
 
 | You type | You get |
 |---|---|
@@ -246,11 +247,16 @@ Type `timer` and how long. The notch closes and a thin bar drains across its bot
 | `10 min timer` · `set a timer for 10 minutes` | the natural way round works too |
 | `countdown 5` | `countdown` is a nickname for the timer |
 
-Shortest is one second, longest is 24 hours. If he cannot read it ("timer soon"), he says so and starts nothing.
+**Controlling it while it runs**
 
-While it runs, the time left shows beside the closed notch. To cancel, type `timer` on its own, or right-click the notch and choose **Cancel the timer**.
+- **Click the time** beside the notch, or type `timer` on its own. The timer screen opens: the time left in big numbers, a bar draining in the glow colours, and three buttons: **Stop**, **+1 min**, **+5 min**.
+- `timer stop`, `stop timer`, `cancel the timer`: stops it straight away.
+- Right-click the notch → **Cancel the timer** also works.
+- Adding time to a timer that has just finished starts it again from now.
 
-There is one timer at a time. There are no streaks, no history, and no "you focused for 3 hours today". It is a kitchen timer.
+Shortest is one second, longest is 24 hours. There is one timer at a time. If he cannot read what you typed ("timer soon"), he says so and starts nothing.
+
+While the screen is flipped (`one eighty`), there is no notch to sit beside, so the time is only visible on the timer screen.
 
 ---
 
@@ -265,7 +271,8 @@ A thought arrives while you are in the middle of something. Type it into the not
 | `note buy new strings` | a new note in **Apple Notes** with that text |
 | `remind me to call mom tomorrow at 5` | a reminder in **Apple Reminders**: "call mom", tomorrow 17:00 |
 | `todo finish the report` | a reminder with no time, which is what a to-do is |
-| `note` or `reminder` on its own | opens that app, on a fresh note or the list, ready to type |
+| `notes` or `note` on its own | a **glance** at the notes you made from the notch (below) |
+| `reminders` or `reminder` on its own | a **glance** at what is coming up (below) |
 
 Because these are Apple's own apps, everything syncs to your iPhone by itself. A reminder typed on the Mac buzzes your phone at the right time.
 
@@ -287,9 +294,31 @@ Before it closes, the notch shows what it understood (**call mom · Tomorrow 17:
 - A time that has already passed today means tomorrow.
 - Numbers that are not times are left alone: `watch 12 angry men`, `read chapter 5` and `buy 2 sets of strings` stay exactly as typed.
 
+**The glance.** So nothing vanishes the moment the confirmation fades:
+
+- `notes` shows the last six notes you made from the notch, newest first. Click one and Notes opens on that exact note. The buttons at the bottom make a **New note** or **Open Notes**.
+- `reminders` shows up to six reminders that are not done yet, soonest first, from every list: ones you typed here, and ones made on your phone. **Click the circle** to tick one off (click again to undo). Click the words to open Reminders.
+- The glance closes by itself after ten seconds, or press Escape.
+
+Brochacho keeps its own short list of what you captured in `~/.brochacho/captures.json` (the last 50). The notes and reminders themselves live in Apple's apps, as always.
+
 **Not yet:** calendar dates like "25 September" or "the 3rd". Say `in 4 days`, or open Reminders and set it there.
 
 The first time, macOS will ask whether Brochacho may add to your Reminders and control Notes. Say yes once.
+
+---
+
+## 9½. Flipping the screen
+
+**Status:** Mac app builds, never run · uses a private part of macOS (see below)
+
+Type `one eighty` (or `180`, `flip`, `rotate`, `upside down`). The screen turns upside down. Type it again to turn it back. You can also hold the talk key and say "one eighty".
+
+It turns the built-in screen when there is one, otherwise the main screen. There is no "are you sure?" step: if you did not mean it, say it again.
+
+**How it works, and the catch.** macOS has no public way to rotate a screen. System Settings uses a private part of macOS (a framework called MonitorPanel), and Brochacho calls the same thing, the same way the open-source app Rotator does. Private means Apple can change it in any update: if `one eighty` stops working after a macOS update, that is why, and `App/Brochacho/ScreenRotator.swift` is the file to fix. If it fails, he tells you in the notch what went wrong.
+
+While the screen is upside down the notch is at the bottom, so Brochacho appears as a small floating pill at the top instead, and dragging onto the notch and clicking it do not work until you flip back. Everything you type still works, including `bored`.
 
 ---
 
@@ -406,6 +435,10 @@ An entry has:
 
 **Add the page I'm on** fills in the address from the tab you are looking at. You only type the name. That is how `bleach` becomes "open Bleach on Netflix" in five seconds.
 
+**Apps.** You do not need an entry for an app at all: every app installed on this Mac (in Applications, Utilities, Apple's own apps, and `~/Applications`) opens by typing its name. `prime` finds Prime Video, `calc` finds Calculator. Your own entries always come first, and the things you open most rise to the top. To switch this off, untick **Every app on this Mac opens by name too** in settings.
+
+Make an entry for an app when you want a nickname (`wa` for WhatsApp) or to fix which app a name opens. **Add an app** opens the usual file picker on your Applications folder: pick the app and Brochacho fills in everything, icon included. On an existing app entry, **Choose app…** swaps the app. You never need to know a "bundle identifier" again; if one in the config is wrong, Brochacho still finds the app by its name.
+
 If a new name is exactly the same as one you already have, it warns you.
 
 ---
@@ -451,6 +484,8 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
 
 **Right-click the notch** for a small menu: Settings, Mute him, Cancel the timer (when one is running), Quit.
 
+**The tutorial.** Three slides that cover everything: they show once the first time Brochacho starts, and after that whenever you type `help`, or press the **?** at the bottom of the settings window. The hotkeys on the slides are whatever yours are set to.
+
 ---
 
 ## 16. The config file, key by key
@@ -475,6 +510,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
   "tuner": { "a4": 440, "toleranceCents": 5, "lastTuningID": "guitar-standard", "customTunings": [] },
   "ask":   { "model": "claude-haiku-4-5", "maxTokens": 300, "monthlyBudgetUSD": 2 },
   "feedback": { "sounds": true, "volume": 0.5, "haptics": true },
+  "includeInstalledApps": true,
   "catalog": [ ]
 }
 ```
@@ -497,6 +533,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
 | `tuner.*` | see section 7 |
 | `ask.*` | see section 10 |
 | `feedback.*` | see section 12 |
+| `includeInstalledApps` | every installed app opens by name without an entry (section 13) |
 | `catalog` | your entries (section 13). One entry looks like this: |
 
 ```json
@@ -504,7 +541,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
   "target": "https://…", "profile": "personal", "living": true }
 ```
 
-`kind` is `site`, `app`, `path` or `tool`. For an app, `target` is its bundle identifier (for example `com.valvesoftware.steam`). For a folder, it is the path (`~/Downloads`). `tool` is for built-in things: `tuner`, `timer`, `note`, `reminder`, `pull` (what `bored` runs) and `settings`.
+`kind` is `site`, `app`, `path` or `tool`. For an app, `target` is its bundle identifier (for example `com.valvesoftware.steam`). For a folder, it is the path (`~/Downloads`). `tool` is for built-in things: `tuner`, `timer`, `note`, `reminder`, `flip`, `help`, `pull` (what `bored` runs) and `settings`.
 
 ---
 
@@ -515,6 +552,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
 | `~/.brochacho/config.json` | every setting and every entry |
 | `~/.brochacho/usage.json` | how often you open each thing, for tie-breaking |
 | `~/.brochacho/line-state.json` | which lines he used recently, so he does not repeat |
+| `~/.brochacho/captures.json` | the last 50 notes and reminders made from the notch, for the glance |
 | iCloud Drive `/Brochacho/stash.json` | the stash. If iCloud Drive is off, it lives in `~/.brochacho/` instead. |
 | iCloud Drive `/Shortcuts/Brochacho/` | the three small text files the iPhone shortcuts and the Mac pass back and forth (`docs/IPHONE.md`) |
 
@@ -545,12 +583,25 @@ This section will grow once the app has actually run. What can already be predic
 | The same, in Swift | **Compiles and passes all 41 tests on GitHub's cloud Mac** |
 | Phone prototype (notch feel, typing, stash, tuner, voice preview) | **Working** |
 | Cloud-Mac build and test workflow | **Running on every push.** First run all green. |
-| The Mac app: notch, hotkeys, opening things, drag to save, voice, sounds, settings window, tuner, timer, notes and reminders, hold-to-talk, Ask | **Builds cleanly on GitHub's cloud Mac (about 2,500 lines). Never run.** `BLIND_SPOTS.md` lists every runtime guess. `DAY_ONE.md` is how it gets running. |
+| The Mac app: notch, hotkeys, opening things, drag to save, voice, sounds, settings window, tuner, timer, notes and reminders, hold-to-talk, Ask | **Runs on Adi's MacBook** (first launch 25 September 2026). Built and tested on every push by GitHub's cloud Mac. |
 | Ask | **Brain built and tested; works in the phone prototype.** On the Mac it answers all at once rather than word by word. |
 | Full line bank | **243 lines written**, in `defaults/lines.json`. Edit freely. |
 | Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |
 | The look | **Aurora chosen.** Live in the phone prototype. |
 | Interface sounds | **Made** (eight WAV files, generated by a script). Playing in the phone prototype. |
-| **Version 1 is frozen here.** | Nothing new gets added until the Mac app runs. New ideas go on the parked list below. |
+| Round two (25 Sep 2026) | Timer screen with Stop and more time · glance at notes and reminders · every installed app opens by name · app picker in settings · flipping the screen · three-slide tutorial · one-command updates (`scripts/install.sh`). All build; not yet tried on the Mac. |
+| The look | Three new directions on the design canvas (G Nocturne, H Setlist, I Screentone), waiting for a pick. |
 
 Ideas that are parked, not planned: a calculator in the box (so sums never go to the AI), Look (drag a box on the screen and ask about it), finding saved things by meaning, a hook so your own scripts can make him announce things, cheat codes, a metronome, screenshots into the stash, running your own Shortcuts by name, a live football score in the notch, silent "idle" cards (a chord shape, a line of Python) in the closed notch.
+
+---
+
+## Updating to a new version
+
+When new code is ready, one command does everything: gets it, builds it, signs it, replaces the app in Applications and starts it.
+
+```
+~/Code/brochacho/scripts/install.sh
+```
+
+The first time takes a few minutes; after that about a minute. If you added your Apple ID in Xcode (Settings → Accounts), the app is signed the same way every time and macOS keeps its permissions between updates. Without it, macOS may ask for the microphone and the other permissions again after an update.
