@@ -64,13 +64,13 @@ final class ConfigTests: XCTestCase {
     }
 
     func testAnOldAuroraConfigMovesToNocturneButANewOneIsKept() throws {
-        let old = #"{ "palette": "aurora", "glowColors": ["#FF375F", "#0A84FF", "#BF5AF2"], "glowStrength": 0.8, "textSize": 21 }"#
+        let old = ##"{ "palette": "aurora", "glowColors": ["#FF375F", "#0A84FF", "#BF5AF2"], "glowStrength": 0.8, "textSize": 21 }"##
         let migrated = try JSONDecoder().decode(LookTheme.self, from: Data(old.utf8))
         XCTAssertEqual(migrated.palette, "nocturne")
         XCTAssertEqual(migrated.glowColors, LookTheme.nocturneGlow)
         XCTAssertEqual(migrated.textSize, 21, "sizes he chose survive the move")
 
-        let chosen = #"{ "accent": "#FFFFFF", "glowColors": ["#111111", "#222222", "#333333"], "grain": 0 }"#
+        let chosen = ##"{ "accent": "#FFFFFF", "glowColors": ["#111111", "#222222", "#333333"], "grain": 0 }"##
         let kept = try JSONDecoder().decode(LookTheme.self, from: Data(chosen.utf8))
         XCTAssertEqual(kept.accent, "#FFFFFF")
         XCTAssertEqual(kept.glowColors, ["#111111", "#222222", "#333333"])
