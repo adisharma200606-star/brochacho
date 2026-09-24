@@ -10,46 +10,35 @@ Claude Code can run the builds, read the errors and fix the files itself. A norm
 
 ---
 
-## 1. Install the tools (about an hour, mostly downloading)
+## 1. Install Xcode (about an hour, mostly downloading)
 
-1. **Xcode**, from the App Store. It is large. Open it once when it finishes and accept what it asks.
-2. **Homebrew**: go to brew.sh and paste its one-line installer into Terminal.
-3. In Terminal:
-   ```
-   brew install xcodegen node
-   sudo xcodebuild -license accept
-   ```
-   `xcodegen` builds the Xcode project from `App/project.yml`. `node` runs the JavaScript tests.
-4. **Brave**, if it is not installed yet, and sign in to both of your profiles.
+**Xcode**, from the App Store. It is large. Open it once when it finishes and accept what it asks. That is the only tool you need to run the app.
 
-## 2. Get the code onto the Mac
+(Homebrew, `xcodegen` and `node` are only needed if you want to run the JavaScript tests or change `App/project.yml`. Skip them for now.)
 
-It lives at github.com/adisharma200606-star/brochacho. In Terminal:
-```
-mkdir -p ~/Code && cd ~/Code
-git clone https://github.com/adisharma200606-star/brochacho.git
-```
-(If the repo is private, git will ask you to sign in; a GitHub personal access token works as the password.)
+## 2. Get the code, inside Xcode
 
-## 3. Check the brain
+No Terminal needed.
+
+1. Open Xcode. On the welcome screen choose **Clone Git Repository…** (or Source Control → Clone… from the menu).
+2. Paste `https://github.com/adisharma200606-star/brochacho.git` and press Clone.
+3. It will ask you to sign in to GitHub. Choose **Sign in with your GitHub account** (or Xcode → Settings → Accounts → + → GitHub). A personal access token works as the password if it asks for one.
+4. Pick a folder to keep it in, such as `~/Code`.
+
+Xcode may open the folder as a Swift package (the brain). That is fine, but it is not the app. Close it and instead open **`App/Brochacho.xcodeproj`** from the cloned folder (File → Open…). The project file is generated on GitHub's cloud Mac and kept up to date there.
+
+## 3. Check the brain (optional, needs Terminal)
 
 ```
 cd ~/Code/brochacho
-node --test reference-js/*.test.js     # 36 tests. These pass.
-swift test                             # The same brain, in Swift. 41 tests; these pass on the cloud Mac.
+swift test        # 41 tests. These pass on the cloud Mac.
 ```
 
-If `swift test` fails on your Mac, tell Claude. One rule: **never edit anything in `fixtures/` by hand.** Those files are the answer sheet, written by the JavaScript tests. If Swift disagrees with them, Swift is wrong.
+If it fails on your Mac, tell Claude. One rule: **never edit anything in `fixtures/` by hand.** Those files are the answer sheet, written by the JavaScript tests. If Swift disagrees with them, Swift is wrong.
 
 ## 4. Build the app
 
-```
-cd App
-xcodegen generate
-open Brochacho.xcodeproj
-```
-
-In Xcode:
+With `App/Brochacho.xcodeproj` open in Xcode:
 
 1. Click the blue **Brochacho** project at the top of the left sidebar, then the **Brochacho** target, then **Signing & Capabilities**.
 2. Under **Team**, choose your name ("Personal Team"). If it is not there, add your Apple ID under Xcode → Settings → Accounts. It is free.

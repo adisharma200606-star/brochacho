@@ -63,6 +63,21 @@ jobs:
           xcodebuild -project Brochacho.xcodeproj -scheme Brochacho -configuration Debug \
             -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ../app-full.log | grep -E "error:|warning: unre|BUILD|\*\*" | tee -a ../app.log
 
+      # The generated Xcode project is committed back to main, so that on a Mac the app can be opened
+      # straight from Xcode with no Homebrew and no xcodegen. "[skip ci]" stops this commit starting another run.
+      - name: Commit the generated Xcode project
+        if: steps.app.outcome == 'success'
+        run: |
+          git config user.name "brochacho-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -f App/Brochacho.xcodeproj/project.pbxproj App/Brochacho.xcodeproj/xcshareddata 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "project unchanged"
+          else
+            git commit -q -m "CI: regenerate the Xcode project [skip ci]"
+            git push origin HEAD:main
+          fi
+
       - name: Publish logs to the ci-logs branch
         if: always()
         run: |
