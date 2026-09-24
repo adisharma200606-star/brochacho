@@ -1,6 +1,6 @@
 # Day one: from a fresh Mac to Brochacho running
 
-Set aside an afternoon. Most of it is waiting for Xcode to download. The code has **never been compiled**, so the first build will have errors; fixing them is part of today, and it is what Claude is for.
+Set aside an afternoon. Most of it is waiting for Xcode to download. The code already **compiles and passes its tests on GitHub's cloud Mac**, so the build should go through; what has never happened is *running* it, and that is where today's surprises will be.
 
 **The easy way to do all of this:** install Claude Code, open it in this folder, and say:
 
@@ -24,17 +24,22 @@ Claude Code can run the builds, read the errors and fix the files itself. A norm
 
 ## 2. Get the code onto the Mac
 
-Unzip `brochacho-repo.zip` somewhere you will find it again, such as `~/Code/brochacho`. It is already a git repository with its history. (Putting it on GitHub is optional; see the end.)
+It lives at github.com/adisharma200606-star/brochacho. In Terminal:
+```
+mkdir -p ~/Code && cd ~/Code
+git clone https://github.com/adisharma200606-star/brochacho.git
+```
+(If the repo is private, git will ask you to sign in; a GitHub personal access token works as the password.)
 
 ## 3. Check the brain
 
 ```
 cd ~/Code/brochacho
-node --test reference-js/*.test.js     # 36 tests. These already pass.
-swift test                             # The same brain, in Swift. Expect errors the first time.
+node --test reference-js/*.test.js     # 36 tests. These pass.
+swift test                             # The same brain, in Swift. 41 tests; these pass on the cloud Mac.
 ```
 
-`swift test` has never been run. Let Claude fix the Swift until it passes. One rule: **never edit anything in `fixtures/` by hand.** Those files are the answer sheet, written by the JavaScript tests. If Swift disagrees with them, Swift is wrong.
+If `swift test` fails on your Mac, tell Claude. One rule: **never edit anything in `fixtures/` by hand.** Those files are the answer sheet, written by the JavaScript tests. If Swift disagrees with them, Swift is wrong.
 
 ## 4. Build the app
 
@@ -49,7 +54,7 @@ In Xcode:
 1. Click the blue **Brochacho** project at the top of the left sidebar, then the **Brochacho** target, then **Signing & Capabilities**.
 2. Under **Team**, choose your name ("Personal Team"). If it is not there, add your Apple ID under Xcode → Settings → Accounts. It is free.
    *Why this matters:* macOS remembers permissions (microphone, controlling Brave) per signed app. Without a team, every rebuild looks like a new app and macOS asks again, every time.
-3. Press **⌘R** to build and run. Expect errors the first time. Give them to Claude.
+3. Press **⌘R** to build and run. It builds cleanly on the cloud Mac, so it should here too. If not, give the errors to Claude.
 
 When it runs, nothing appears. That is correct: there is no Dock icon and no window. It is waiting in the notch.
 
@@ -115,5 +120,5 @@ In Xcode: Product → Show Build Folder in Finder → `Products/Debug/Brochacho.
 ## Afterwards
 
 - Update the **Status** lines in `docs/GUIDE.md` for everything that now works. Rewrite anything that turned out different.
-- **GitHub (optional, recommended):** create an empty repository, then `git remote add origin <its address>` and `git push -u origin main`. The workflow in `.github/workflows/ci.yml` will then build and test every push on a cloud Mac. A public repository gets that for free.
+- Every `git push` to `main` builds and tests on a cloud Mac (`.github/workflows/ci.yml`); the logs land on the `ci-logs` branch.
 - Parked ideas are at the end of `docs/GUIDE.md`. Version 1 is frozen until the list above is all ticked.

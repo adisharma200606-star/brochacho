@@ -2,22 +2,16 @@
 
 Everything in here is a guess that could not be checked without a Mac. Each one says **where** it is in the code, **what** was assumed, and **what to try** if it turns out wrong. When you confirm or fix one, delete it from this file, so the file always shows what is still unknown.
 
-The honest headline: **no Swift in this repo has ever been compiled.** It passes a syntax check (tree-sitter) and was written against the real source of DynamicNotchKit and HotKey, which are in the repo or pinned. It has not met a type checker.
+The honest headline: **the code compiles and passes its tests, but the app has never been launched.** On 24 September 2026 GitHub's macOS runner (Xcode 16.4, Swift 6.1.2) ran `swift test` (41 tests, all pass) and built the app with no warnings in its own code. Everything below is about what happens when it *runs*.
 
 ---
 
-## A. Things likely to fail at compile time
+## A. Compile time: resolved
 
-| # | Where | The risk | What to try |
-|---|---|---|---|
-| A1 | everywhere in `App/Brochacho` | Swift's concurrency checking. Closures are handed to HotKey, NSEvent monitors, Timer, NotificationCenter, the speech recogniser and the audio tap. The code assumes Swift 5 language mode, where these are warnings. | Keep `SWIFT_VERSION: "5.0"` in `project.yml`. For a real error, wrap the closure body in `Task { @MainActor in … }` or `DispatchQueue.main.async { … }`. |
-| A2 | `NotchController.swift`, `init` | DynamicNotchKit's generic initialiser is called with three trailing closures (`{ } compactLeading: { } compactTrailing: { }`). | If inference fails, spell the labels out: `DynamicNotch(hoverBehavior: [], style: .auto, expanded: { … }, compactLeading: { … }, compactTrailing: { … })`. |
-| A3 | `App/Vendor/DynamicNotchKit` | The vendored library uses Swift 6 tools and `onGeometryChange`, which need **Xcode 16 or newer**. | Install current Xcode. Do not downgrade the library. |
-| A4 | `Views/InputScreen.swift` | `.onChange(of:) { newValue in }` is the older form. On a new SDK it is a deprecation warning, not an error. | Leave it, or switch to the two-argument form once the deployment target is macOS 14. |
-| A5 | `App/project.yml` | The local package `BrochachoCore` is referenced as `path: ..` (the repo root). | If XcodeGen complains, try `path: ../` or move the package reference into Xcode by hand once and compare. |
-| A6 | `SoundPlayer.swift`, `Brain.init` | Resources are looked up at the top of the app bundle (`Bundle.main.url(forResource: "open", withExtension: "wav")`, and `lines.json`). XcodeGen normally flattens resource folders. | If sounds or lines are missing at run time, check the built `.app/Contents/Resources`. `SoundPlayer` already tries a `sounds` subfolder too. |
-| A7 | `Tests/BrochachoCoreTests/ExtrasTests.swift` | One test expects pretty-printed JSON to contain `"living" : true` (with spaces around the colon), which is how Apple's encoder writes it. | If it fails only on that string, loosen the assertion; the behaviour is fine. |
-| A8 | `Sources/BrochachoCore` | The brain has never been compiled either. Foundation-only code is low risk, but not zero. | `swift test` and fix. Never edit `fixtures/`. |
+The whole section that used to be here is gone: the first cloud build compiled everything. Two facts from that build worth keeping:
+
+- Resources land at the top of the app bundle (`Brochacho.app/Contents/Resources/open.wav`, `lines.json`), which is where `SoundPlayer` and `Brain` look first.
+- The build had one warning, from Apple's tooling about AppIntents metadata. It is harmless and not from this code.
 
 ## B. Things likely to misbehave at run time
 

@@ -15,10 +15,10 @@ A voice that lives in the MacBook notch.
 | `defaults/` | The default list of things to open (`catalog.json`), the tuner's tunings (`tunings.json`) and the seed line bank. | Done, editable. |
 | `prototype/` | A phone-friendly page that simulates the notch with real spring physics, the real matcher, the stash and a browser Italian voice. `python3 prototype/build.py` rebuilds `index.html`. | Works in a browser. Used to tune the feel before the Mac exists. |
 
-| `Sources/BrochachoCore/` + `Tests/` | The brain and the tuner maths ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Written, syntax-checked, never compiled.** `swift test` on a Mac, or let CI do it. |
-| `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and (once `App/` exists) builds the app. Logs are also pushed to the `ci-logs` branch. | Ready. Runs as soon as the repo is on GitHub. |
+| `Sources/BrochachoCore/` + `Tests/` | The brain and the tuner maths ported to Swift (Foundation only). Tests load the golden fixtures and must match the JS reference exactly. | **Compiles and passes all 41 tests on GitHub's cloud Mac.** |
+| `.github/workflows/ci.yml` | On every push to `main`, a GitHub cloud Mac runs the JS tests, `swift test`, and builds the app. Logs are also pushed to the `ci-logs` branch. | Running. First run: all green. |
 
-| `App/` | **The Mac app**: the notch, hotkeys, opening things in Brave, drag to save, the voice, sounds, the tuner, the timer, notes and reminders, hold-to-talk, Ask, and the settings window. About 2,500 lines of SwiftUI and AppKit on top of a lightly patched copy of DynamicNotchKit. | **Written. Never compiled, never run.** |
+| `App/` | **The Mac app**: the notch, hotkeys, opening things in Brave, drag to save, the voice, sounds, the tuner, the timer, notes and reminders, hold-to-talk, Ask, and the settings window. About 2,500 lines of SwiftUI and AppKit on top of a lightly patched copy of DynamicNotchKit. | **Builds on GitHub's cloud Mac. Never run.** |
 
 ## Start here
 
@@ -28,8 +28,8 @@ A voice that lives in the MacBook notch.
 - Every guess that could not be checked without a Mac: `BLIND_SPOTS.md`.
 - Third-party code and licences: `REFERENCES.md`.
 
-## Honest status of the Swift code
+## Honest status
 
-No Swift toolchain could be installed where this was written (swift.org is blocked there), and there was no Mac.
-Every Swift file passes a syntax check (tree-sitter) and was written against the real source of the two libraries
-it uses. None of it has met a compiler. The first build will have errors; that is what day one is for.
+The Swift was written without a Mac or a compiler to hand, then compiled for the first time on 24 September 2026 by
+GitHub Actions on a macOS runner (Xcode 16.4): the brain's 41 tests pass and the app builds cleanly. It has not been
+launched on a real Mac yet, so everything about how it *behaves* is still unverified. That is what `DAY_ONE.md` is for.

@@ -6,7 +6,7 @@ Everything Brochacho does, how to use it, and how to change it. Written for you,
 
 - **Brain tested** — the logic exists, runs, and passes tests (in JavaScript, in `reference-js/`).
 - **Swift written** — the same logic is ported to Swift for the Mac. It passes a syntax check. It has not been compiled yet.
-- **Mac app written** — the part you see and touch on the Mac now exists as code. It has never been compiled or run, so treat it as a first draft until day one is done.
+- **Mac app builds** — the part you see and touch on the Mac exists and compiles cleanly on GitHub's cloud Mac. It has never been *run*, so treat it as a first draft until day one is done.
 
 When the app runs on your Mac, every Status line gets updated and anything that turned out different gets rewritten. If the guide and the app ever disagree, that is a bug in one of them. Tell me.
 
@@ -52,7 +52,7 @@ It follows five rules. They explain most of the choices below.
 
 ## 2. Opening things
 
-**Status:** brain tested · Swift written · Mac app written, never run
+**Status:** brain tested · Swift written · Mac app builds, never run
 
 Press the **open** hotkey. The notch grows into a box. Type the name of the thing. Press Enter. It opens, the notch closes, he says a line.
 
@@ -99,7 +99,7 @@ If it is a single word he does not know, he shows `?`, says something like "Neve
 
 ## 3. Talking instead of typing
 
-**Status:** brain tested (spoken words go through the same matcher) · Mac app written, never run · needs the Mac's microphone
+**Status:** brain tested (spoken words go through the same matcher) · Mac app builds, never run · needs the Mac's microphone
 
 **Hold** the talk key, say the name, **let go**. Letting go is what tells it you have finished, which is why it is faster than a button you tap.
 
@@ -114,7 +114,7 @@ Expect to type more than you talk. Typing `yt` is faster than speaking, and it w
 
 ## 4. Saving things (the stash)
 
-**Status:** brain tested · Swift written · Mac app written, never run
+**Status:** brain tested · Swift written · Mac app builds, never run
 
 You find something good and want it later. Three ways to save it, none of which ask you a single question:
 
@@ -130,7 +130,7 @@ Saving the same thing twice does not make a duplicate. It just counts as freshly
 
 ## 5. Getting things back
 
-**Status:** brain tested · Swift written · Mac app written, never run
+**Status:** brain tested · Swift written · Mac app builds, never run
 
 This is the half that other "save for later" tools get wrong. They make you go and look. Brochacho hands things back at the moment you were about to go looking for a distraction anyway.
 
@@ -146,7 +146,7 @@ This is the half that other "save for later" tools get wrong. They make you go a
 
 ## 6. Bookmarks that remember where you stopped
 
-**Status:** brain tested · Swift written · Mac app written, never run
+**Status:** brain tested · Swift written · Mac app builds, never run
 
 A normal entry always opens the same page. A **living** entry opens wherever you last were.
 
@@ -168,7 +168,7 @@ Limit: he can open the page. He cannot press play or scroll to your line. For Ne
 
 ## 7. The tuner
 
-**Status:** brain tested (accurate to about a quarter of a cent on test tones) · Swift written · Mac screen and microphone hookup written, never run
+**Status:** brain tested (accurate to about a quarter of a cent on test tones) · Swift written · Mac screen and microphone hookup build, never run
 
 Type `tune`, `tuner` or `uke`. The notch becomes a tuner. Pluck a string.
 
@@ -230,7 +230,7 @@ Add them under `tuner.customTunings` in the config (section 16). Notes are writt
 
 ## 8. The timer
 
-**Status:** brain tested · Swift written · Mac app written, never run
+**Status:** brain tested · Swift written · Mac app builds, never run
 
 Type `timer` and how long. The notch closes and a thin bar drains across its bottom edge. When it ends, he tells you. (You asked him to, so rule 4 holds.)
 
@@ -256,7 +256,7 @@ There is one timer at a time. There are no streaks, no history, and no "you focu
 
 ## 9. Notes and reminders
 
-**Status:** brain tested (reading the time out of what you typed) · working in the phone prototype · Mac app written, never run
+**Status:** brain tested (reading the time out of what you typed) · working in the phone prototype · Mac app builds, never run
 
 A thought arrives while you are in the middle of something. Type it into the notch and carry on. You never leave what you were doing.
 
@@ -295,7 +295,7 @@ The first time, macOS will ask whether Brochacho may add to your Reminders and c
 
 ## 10. Ask
 
-**Status:** brain tested (recognising a question, what gets sent, splitting the answer) · working in the phone prototype through Claude itself · Mac app written, never run · needs a Claude API key on the Mac
+**Status:** brain tested (recognising a question, what gets sent, splitting the answer) · working in the phone prototype through Claude itself · Mac app builds, never run · needs a Claude API key on the Mac
 
 The box works like a browser's address bar. Type a name and it opens the thing. Type a question and it gets asked. There is nothing to switch and no command to learn.
 
@@ -333,7 +333,7 @@ The API key is stored in the Mac's Keychain, never in the config file. Questions
 
 ## 11. The voice
 
-**Status:** brain tested (which line, how often, no repeats) · Mac app written, never run
+**Status:** brain tested (which line, how often, no repeats) · Mac app builds, never run
 
 ### What he says
 
@@ -363,7 +363,7 @@ The text line **always** shows. Whether it is also *spoken* is a dial:
 
 ## 12. Sounds and touch
 
-**Status:** sounds made and playing in the phone prototype · the map of which sound goes with what is tested · Mac app written, never run
+**Status:** sounds made and playing in the phone prototype · the map of which sound goes with what is tested · Mac app builds, never run
 
 Eight small sounds, all soft and glassy, none longer than a second. They are generated, not downloaded: the script that makes them is `scripts/make_sounds.py`, so any of them can be reshaped.
 
@@ -388,7 +388,7 @@ Settings, under `feedback` in the config: `sounds` (on or off), `volume` (0 to 1
 
 ## 13. Adding your own things
 
-**Status:** brain tested · settings window written, never run
+**Status:** brain tested · settings window builds, never run
 
 Everything he can open is an **entry**. You add entries in the settings window, so you never have to touch a file. Open it by typing `settings` in the notch, or by right-clicking the notch.
 
@@ -412,7 +412,7 @@ If a new name is exactly the same as one you already have, it warns you.
 
 ## 14. Look and feel
 
-**Status:** look chosen (Aurora) · working in the phone prototype · Mac screens written, never run
+**Status:** look chosen (Aurora) · working in the phone prototype · Mac screens build, never run
 
 The look is **Aurora**: a black notch that matches the hardware, Helvetica Neue inside it, soft translucent rows, and a three-colour glow around the edge while it is open. A professional-looking piece of software that happens to talk like an Italian uncle. The contrast is the joke.
 
@@ -542,10 +542,10 @@ This section will grow once the app has actually run. What can already be predic
 | Piece | State |
 |---|---|
 | Matcher, stash, line picker, tuner maths, timer, living bookmarks, iPhone sync, reading reminders, asking | **Built and tested in JavaScript** (36 tests) |
-| The same, in Swift | **Written, syntax-checked, never compiled** |
+| The same, in Swift | **Compiles and passes all 41 tests on GitHub's cloud Mac** |
 | Phone prototype (notch feel, typing, stash, tuner, voice preview) | **Working** |
-| Cloud-Mac build and test workflow | **Written**, waiting for the repo to be on GitHub (optional) |
-| The Mac app: notch, hotkeys, opening things, drag to save, voice, sounds, settings window, tuner, timer, notes and reminders, hold-to-talk, Ask | **Written (about 2,500 lines). Never compiled, never run.** `BLIND_SPOTS.md` lists every guess in it. `DAY_ONE.md` is how it gets running. |
+| Cloud-Mac build and test workflow | **Running on every push.** First run all green. |
+| The Mac app: notch, hotkeys, opening things, drag to save, voice, sounds, settings window, tuner, timer, notes and reminders, hold-to-talk, Ask | **Builds cleanly on GitHub's cloud Mac (about 2,500 lines). Never run.** `BLIND_SPOTS.md` lists every runtime guess. `DAY_ONE.md` is how it gets running. |
 | Ask | **Brain built and tested; works in the phone prototype.** On the Mac it answers all at once rather than word by word. |
 | Full line bank | **243 lines written**, in `defaults/lines.json`. Edit freely. |
 | Saving from the iPhone, and Bored on the iPhone | **Mac-side logic built and tested.** The two shortcuts are written up step by step in `docs/IPHONE.md` and have not been built on a real phone yet. |

@@ -4,15 +4,15 @@ You are picking up **Brochacho**, a Mac app that lives in the MacBook notch: typ
 
 ## The single most important fact
 
-**None of the Swift in this repo has ever been compiled or run.** It was written on a phone, in a sandbox with no Swift toolchain and no Mac. Every Swift file passes a syntax check (tree-sitter) and a careful read, and nothing more. Expect compile errors on the first build, and expect some runtime behaviour to be wrong. That is normal and planned for; `BLIND_SPOTS.md` lists every guess.
+**The app compiles and its brain passes its tests, but the app has never been run.** It was written on a phone, in a sandbox with no Mac. On 24 September 2026 GitHub's cloud Mac (Xcode 16.4, Swift 6.1.2) compiled everything: `swift test` passed all 41 tests, and the app built with no warnings in its own code. What no one has done yet is launch it: nothing about the notch, the hotkeys, the voice, the microphone or the permissions has been seen working. `BLIND_SPOTS.md` lists every runtime guess.
 
-What *has* been run and tested: the JavaScript reference implementation of the brain (`reference-js/`, 36 passing tests) and the phone prototype built on it.
+Also tested: the JavaScript reference implementation of the brain (`reference-js/`, 36 passing tests) and the phone prototype built on it.
 
 ## What to do, in order
 
 1. Read `DAY_ONE.md` and follow it with Adi. It goes from a fresh Mac to a running app.
-2. `swift test` at the repo root. Fix compile errors in `Sources/BrochachoCore` until the tests pass. See "How the tests work" below before touching any test or fixture.
-3. `cd App && xcodegen generate`, then build the `Brochacho` scheme. Fix compile errors in `App/Brochacho`.
+2. `swift test` at the repo root. It passes on the cloud Mac; if it fails here, see "How the tests work" below before touching any test or fixture.
+3. `cd App && xcodegen generate`, then build the `Brochacho` scheme. It builds on the cloud Mac.
 4. Run it. Walk through the smoke test at the end of `DAY_ONE.md`. For each thing that misbehaves, look in `BLIND_SPOTS.md` first: the likely cause is probably already written down.
 5. When something in `docs/GUIDE.md` turns out to be wrong, fix the guide too, and update its Status lines. The guide is Adi's manual and it must stay true.
 
