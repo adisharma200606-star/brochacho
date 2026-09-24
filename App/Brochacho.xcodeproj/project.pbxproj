@@ -16,6 +16,7 @@
 		1D776E48BA5817AC61A7939F /* ScreenRotator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3241D1C4BC2F559AE0597EDF /* ScreenRotator.swift */; };
 		27DE230E0955F6D685B6DF2E /* NotchSensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14915ED8F23A7E43FA2DC473 /* NotchSensor.swift */; };
 		2C793EFC3B7A6A0F61250471 /* NotchRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E2E330FBBE845910C5D42B /* NotchRootView.swift */; };
+		3A05091D044AB5FCD0494C2D /* IBMPlexMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 32D421C1069E6051F3AFEC3A /* IBMPlexMono-Regular.ttf */; };
 		3D7C17C7C827804C2678387C /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = A4E8DDD2ADA3D6B9E74F739E /* DynamicNotchKit */; };
 		3F5746F57618D729634F3C16 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969E69220C1BAA7DADE04503 /* Theme.swift */; };
 		412443DE1915870E0FEBB981 /* open.wav in Resources */ = {isa = PBXBuildFile; fileRef = B0FAAAFDF8B39FAE9E3DCC7F /* open.wav */; };
@@ -40,7 +41,10 @@
 		B201DDCF2C6D78E79BF879A3 /* Mouth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5099179F12E38183C31F02FD /* Mouth.swift */; };
 		B8496229A0CA4E5BA8769B19 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = DA5E95161E36329A817B9001 /* HotKey */; };
 		BBE958D532707112CDE07C02 /* MicTuner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5CB8BA6CB2769783FE3CD0A /* MicTuner.swift */; };
+		C8EE6B79F3FA6E9BBA7A0E49 /* IBMPlexMono-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2DEBF9617467FDC6755ABF48 /* IBMPlexMono-OFL.txt */; };
 		CEBCA7D1380BBC2146B0E195 /* SettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F6BEB71032268347529CF /* SettingsWindow.swift */; };
+		D5C94ACEE3C0997D4ADB278A /* grain.png in Resources */ = {isa = PBXBuildFile; fileRef = 4077E338B48FE2F35C039F0B /* grain.png */; };
+		E1BD29C0BBEA4C36BF23D67F /* IBMPlexMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC5903B1809E7EF27D8D66C9 /* IBMPlexMono-Medium.ttf */; };
 		E201F65010F8C764C15B8217 /* AskClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B6CE38E374590A3D69B55F /* AskClient.swift */; };
 		E30D087A75EF0CE41F2DCE51 /* save.wav in Resources */ = {isa = PBXBuildFile; fileRef = BF6160517C4DB689A7A98ADE /* save.wav */; };
 		E51E5A469FA7AB2A9EC3EF7A /* BrochachoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97E857020B24426078C4C3C /* BrochachoApp.swift */; };
@@ -53,7 +57,10 @@
 		14EA6ACC019B45092C3EA83F /* TabGrabber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabGrabber.swift; sourceTree = "<group>"; };
 		15B0CA31E1B68B8E4051D163 /* TunerScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunerScreen.swift; sourceTree = "<group>"; };
 		1B4DE10B972177024AB22077 /* GlanceScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceScreen.swift; sourceTree = "<group>"; };
+		2DEBF9617467FDC6755ABF48 /* IBMPlexMono-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "IBMPlexMono-OFL.txt"; sourceTree = "<group>"; };
 		3241D1C4BC2F559AE0597EDF /* ScreenRotator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRotator.swift; sourceTree = "<group>"; };
+		32D421C1069E6051F3AFEC3A /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
+		4077E338B48FE2F35C039F0B /* grain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grain.png; sourceTree = "<group>"; };
 		5099179F12E38183C31F02FD /* Mouth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mouth.swift; sourceTree = "<group>"; };
 		52C4D7A25F9A4B4AFDC14175 /* NotchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchController.swift; sourceTree = "<group>"; };
 		53CC96ED79273D5A25EA4B2D /* DynamicNotchKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DynamicNotchKit; path = Vendor/DynamicNotchKit; sourceTree = SOURCE_ROOT; };
@@ -87,6 +94,7 @@
 		DE821C0A53D10749105ED01B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E56F5D4BBD7B2B4AE02569F0 /* SoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
 		F5DF6820A852E7C23D22D0E7 /* Ears.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ears.swift; sourceTree = "<group>"; };
+		FC5903B1809E7EF27D8D66C9 /* IBMPlexMono-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +135,16 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		3CFE35381FD759377FED88AA /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				FC5903B1809E7EF27D8D66C9 /* IBMPlexMono-Medium.ttf */,
+				2DEBF9617467FDC6755ABF48 /* IBMPlexMono-OFL.txt */,
+				32D421C1069E6051F3AFEC3A /* IBMPlexMono-Regular.ttf */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
 		72673F7505A8680875BCF338 = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +166,14 @@
 				15B0CA31E1B68B8E4051D163 /* TunerScreen.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9429A8EC70A15175C056BDAD /* textures */ = {
+			isa = PBXGroup;
+			children = (
+				4077E338B48FE2F35C039F0B /* grain.png */,
+			);
+			path = textures;
 			sourceTree = "<group>";
 		};
 		9D89D6B948E4171FAFCD250E /* Brochacho */ = {
@@ -183,7 +209,9 @@
 			isa = PBXGroup;
 			children = (
 				9B8978B7328CE17D96C0A0A2 /* lines.json */,
+				3CFE35381FD759377FED88AA /* fonts */,
 				0C66342FC75B8CE364587832 /* sounds */,
+				9429A8EC70A15175C056BDAD /* textures */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -264,9 +292,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1BD29C0BBEA4C36BF23D67F /* IBMPlexMono-Medium.ttf in Resources */,
+				C8EE6B79F3FA6E9BBA7A0E49 /* IBMPlexMono-OFL.txt in Resources */,
+				3A05091D044AB5FCD0494C2D /* IBMPlexMono-Regular.ttf in Resources */,
 				F413C2140921CDE3915F2DD8 /* answer.wav in Resources */,
 				6903B6EA3EFE03FD132F1EE6 /* close.wav in Resources */,
 				515C0F02AD9A13CDC59A26F7 /* done.wav in Resources */,
+				D5C94ACEE3C0997D4ADB278A /* grain.png in Resources */,
 				41E5719811704875C190FB87 /* lines.json in Resources */,
 				595CA3F9D9D8955230A191E9 /* lock.wav in Resources */,
 				9A9F7D8938DD9E007ACD71AD /* nope.wav in Resources */,
