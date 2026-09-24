@@ -12,6 +12,17 @@ final class NotchModel: ObservableObject {
         case tuner
         case answer     // the reply to a question
         case chooser    // "which one did you mean?"
+        case timer      // the running timer, with Stop and more time
+        case glance     // recent notes, or upcoming reminders
+    }
+
+    /// One line in the glance.
+    struct GlanceItem: Identifiable, Equatable {
+        let id: Int
+        let title: String
+        let detail: String
+        /// Nil when the item cannot be ticked (notes); true or false for reminders.
+        var done: Bool?
     }
 
     struct Row: Identifiable, Equatable {
@@ -56,9 +67,15 @@ final class NotchModel: ObservableObject {
     @Published var chooserTitle = ""
     @Published var chooserOptions: [String] = []
 
-    // timer, shown beside the closed notch
+    // timer, shown beside the closed notch and on its own screen
     @Published var timerText: String? = nil
     @Published var timerFraction: Double = 0
+
+    // glance
+    @Published var glanceTitle = ""
+    @Published var glanceItems: [GlanceItem] = []
+    @Published var glanceEmpty = ""
+    @Published var glanceButtons: [String] = []
 
     // What the views call. The Brain fills these in.
     var onTextChange: (String) -> Void = { _ in }
@@ -67,6 +84,12 @@ final class NotchModel: ObservableObject {
     var onChoose: (Int) -> Void = { _ in }
     var onTuningStep: (Int) -> Void = { _ in }
     var onCopyCommand: () -> Void = {}
+    var onTimerTap: () -> Void = {}
+    var onStopTimer: () -> Void = {}
+    var onAddTime: (Int) -> Void = { _ in }
+    var onGlanceOpen: (Int) -> Void = { _ in }
+    var onGlanceTick: (Int) -> Void = { _ in }
+    var onGlanceButton: (Int) -> Void = { _ in }
 
     init(theme: NotchTheme) {
         self.theme = theme

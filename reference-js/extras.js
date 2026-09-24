@@ -66,6 +66,20 @@
   }
 
   function startTimer(seconds, nowMs) { return { startedAt: nowMs, durationMs: seconds * 1000 }; }
+
+  /** The same timer with more time on it. Adding to a finished timer counts from now. */
+  function addTime(timer, seconds, nowMs) {
+    var end = Math.max(timer.startedAt + timer.durationMs, nowMs) + seconds * 1000;
+    return { startedAt: timer.startedAt, durationMs: end - timer.startedAt };
+  }
+
+  /** "timer stop", "stop timer", "cancel the timer": words that mean stop, not a length of time. */
+  var STOP_WORDS = ['stop', 'cancel', 'off', 'end', 'kill', 'done', 'enough', 'reset', 'clear'];
+  function isStopWord(text) {
+    var words = String(text || '').toLowerCase().split(/\s+/).map(function (w) { return w.replace(/[^a-z0-9]/g, ''); }).filter(Boolean);
+    return words.length > 0 && words.length <= 3 && words.some(function (w) { return STOP_WORDS.indexOf(w) >= 0; }) &&
+      words.every(function (w) { return STOP_WORDS.indexOf(w) >= 0 || ['the', 'my', 'it', 'please', 'timer'].indexOf(w) >= 0; });
+  }
   function timerStatus(timer, nowMs) {
     var left = Math.max(0, timer.startedAt + timer.durationMs - nowMs);
     return { remainingMs: left, fraction: timer.durationMs === 0 ? 0 : left / timer.durationMs, done: left === 0, text: formatRemaining(left) };
@@ -192,6 +206,7 @@
   var api = {
     parsePhoneLines: parsePhoneLines, ingestPhone: ingestPhone, exportForPhone: exportForPhone,
     parseDuration: parseDuration, formatRemaining: formatRemaining, startTimer: startTimer, timerStatus: timerStatus,
+    addTime: addTime, isStopWord: isStopWord, STOP_WORDS: STOP_WORDS,
     urlParts: urlParts, findLivingEntry: findLivingEntry, moveEntry: moveEntry
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

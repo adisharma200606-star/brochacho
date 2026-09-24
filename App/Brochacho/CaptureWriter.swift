@@ -7,15 +7,38 @@ enum CaptureWriter {
 
     // MARK: Notes (AppleScript: Notes has no other way in)
 
-    /// Makes a note without bringing Notes to the front. Returns false if Notes refused.
-    static func makeNote(_ text: String) -> Bool {
+    /// Makes a note without bringing Notes to the front. Returns the note's id ("x-coredata://…"), which can
+    /// open it again later, or nil if Notes refused.
+    static func makeNote(_ text: String) -> String? {
         let body = htmlEscaped(text).replacingOccurrences(of: "\n", with: "<br>")
         let source = """
         tell application "Notes"
-            make new note with properties {body:"\(appleScriptEscaped(body))"}
+            set newNote to make new note with properties {body:"\(appleScriptEscaped(body))"}
+            return id of newNote
         end tell
         """
-        return run(source)
+        var error: NSDictionary?
+        let result = NSAppleScript(source: source)?.executeAndReturnError(&error)
+        if let error = error {
+            NSLog("Brochacho: Notes said no: \(error)")
+            return nil
+        }
+        return result?.stringValue ?? ""
+    }
+
+    /// Brings Notes forward on one particular note. Falls back to just opening Notes.
+    static func showNote(id: String?) {
+        guard let id = id, !id.isEmpty else {
+            _ = Opener.openApp("com.apple.Notes", name: "Notes")
+            return
+        }
+        let source = """
+        tell application "Notes"
+            activate
+            show note id "\(appleScriptEscaped(id))"
+        end tell
+        """
+        if !run(source) { _ = Opener.openApp("com.apple.Notes", name: "Notes") }
     }
 
     /// Opens Notes on a fresh, empty note, ready to type.
@@ -52,33 +75,87 @@ enum CaptureWriter {
 
     private static let store = EKEventStore()
 
-    /// Makes a reminder. `due` nil means a plain to-do. `completion` runs on the main thread with true on success.
-    static func makeReminder(title: String, due: Date?, completion: @escaping (Bool) -> Void) {
-        let save: (Bool) -> Void = { granted in
-            guard granted else {
-                DispatchQueue.main.async { completion(false) }
+    private static func withAccess(_ then: @escaping (Bool) -> Void) {
+        if #available(macOS 14.0, *) {
+            store.requestFullAccessToReminders { granted, _ in then(granted) }
+        } else {
+            store.requestAccess(to: .reminder) { granted, _ in then(granted) }
+        }
+    }
+
+    /// Makes a reminder. `due` nil means a plain to-do. `completion` runs on the main thread with the
+    /// reminder's identifier on success, or nil.
+    static func makeReminder(title: String, due: Date?, completion: @escaping (String?) -> Void) {
+        withAccess { granted in
+            guard granted, let calendar = store.defaultCalendarForNewReminders() else {
+                DispatchQueue.main.async { completion(nil) }
                 return
             }
             let reminder = EKReminder(eventStore: store)
             reminder.title = title
-            reminder.calendar = store.defaultCalendarForNewReminders()
+            reminder.calendar = calendar
             if let due = due {
                 reminder.dueDateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: due)
                 reminder.addAlarm(EKAlarm(absoluteDate: due))     // this is what makes the phone buzz
             }
             do {
                 try store.save(reminder, commit: true)
-                DispatchQueue.main.async { completion(true) }
+                let identifier = reminder.calendarItemIdentifier
+                DispatchQueue.main.async { completion(identifier) }
             } catch {
                 NSLog("Brochacho: could not save the reminder: \(error)")
-                DispatchQueue.main.async { completion(false) }
+                DispatchQueue.main.async { completion(nil) }
             }
         }
+    }
 
-        if #available(macOS 14.0, *) {
-            store.requestFullAccessToReminders { granted, _ in save(granted) }
-        } else {
-            store.requestAccess(to: .reminder) { granted, _ in save(granted) }
+    /// One reminder, as the glance shows it.
+    struct Upcoming {
+        let identifier: String
+        let title: String
+        let due: Date?
+    }
+
+    /// Reminders that are not done yet, from every list, soonest first; the ones with no date come last.
+    /// `completion` runs on the main thread; nil means Brochacho may not read Reminders.
+    static func upcomingReminders(limit: Int, completion: @escaping ([Upcoming]?) -> Void) {
+        withAccess { granted in
+            guard granted else {
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+            let predicate = store.predicateForIncompleteReminders(withDueDateStarting: nil, ending: nil, calendars: nil)
+            store.fetchReminders(matching: predicate) { reminders in
+                let items = (reminders ?? []).map { reminder -> Upcoming in
+                    let due = reminder.dueDateComponents.flatMap { Calendar.current.date(from: $0) }
+                    return Upcoming(identifier: reminder.calendarItemIdentifier, title: reminder.title ?? "", due: due)
+                }
+                let sorted = items.sorted { a, b in
+                    switch (a.due, b.due) {
+                    case let (x?, y?): return x < y
+                    case (.some, .none): return true
+                    case (.none, .some): return false
+                    case (.none, .none): return a.title < b.title
+                    }
+                }
+                DispatchQueue.main.async { completion(Array(sorted.prefix(limit))) }
+            }
+        }
+    }
+
+    /// Ticks a reminder off (or back on). `completion` gets true if it was saved.
+    static func setDone(_ identifier: String, done: Bool, completion: @escaping (Bool) -> Void) {
+        guard let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder else {
+            completion(false)
+            return
+        }
+        reminder.isCompleted = done
+        do {
+            try store.save(reminder, commit: true)
+            completion(true)
+        } catch {
+            NSLog("Brochacho: could not tick the reminder: \(error)")
+            completion(false)
         }
     }
 

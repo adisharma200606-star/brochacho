@@ -19,6 +19,10 @@ public enum BrochachoPaths {
         return configDirectory.appendingPathComponent("usage.json")
     }
 
+    public static var captureLogFile: URL {
+        return configDirectory.appendingPathComponent("captures.json")
+    }
+
     public static var lineStateFile: URL {
         return configDirectory.appendingPathComponent("line-state.json")
     }
@@ -159,6 +163,16 @@ public enum UsageStore {
 
     public static func save(_ usage: [String: Int], to url: URL = BrochachoPaths.usageFile) {
         try? JSONFile.write(usage, to: url)
+    }
+}
+
+public enum CaptureLogStore {
+    public static func load(from url: URL = BrochachoPaths.captureLogFile) -> CaptureLog {
+        return (try? JSONFile.read(CaptureLog.self, from: url)) ?? CaptureLog()
+    }
+
+    public static func save(_ log: CaptureLog, to url: URL = BrochachoPaths.captureLogFile) {
+        try? JSONFile.write(log, to: url)
     }
 }
 

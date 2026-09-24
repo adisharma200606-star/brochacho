@@ -21,6 +21,8 @@ public enum DefaultCatalog {
         CatalogEntry(name: "note", display: "New note", aliases: ["notes", "new note"], kind: .tool, target: "note", profile: nil, searchTemplate: nil, takesWords: true, living: false),
         CatalogEntry(name: "reminder", display: "Reminder", aliases: ["remind", "remind me", "reminders", "todo", "task"], kind: .tool, target: "reminder", profile: nil, searchTemplate: nil, takesWords: true, living: false),
         CatalogEntry(name: "settings", display: "Settings", aliases: ["preferences", "brochacho"], kind: .tool, target: "settings", profile: nil, searchTemplate: nil, takesWords: false, living: false),
-        CatalogEntry(name: "bored", display: "Something I saved", aliases: ["im bored", "i am bored", "surprise me"], kind: .tool, target: "pull", profile: nil, searchTemplate: nil, takesWords: false, living: false)
+        CatalogEntry(name: "bored", display: "Something I saved", aliases: ["im bored", "i am bored", "surprise me"], kind: .tool, target: "pull", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "flip", display: "Flip the screen", aliases: ["one eighty", "180", "rotate", "flip screen", "upside down"], kind: .tool, target: "flip", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "help", display: "How it works", aliases: ["tutorial", "guide"], kind: .tool, target: "help", profile: nil, searchTemplate: nil, takesWords: false, living: false)
     ]
 }

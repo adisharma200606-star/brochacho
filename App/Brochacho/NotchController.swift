@@ -74,8 +74,10 @@ final class NotchController {
     /// Closes the notch. While a timer is running it shrinks to the compact form, which shows the time left.
     func close() {
         isOpen = false
-        let showTimer = model.timerText != nil
         let screen = NotchController.preferredScreen
+        // The small timer beside the notch only exists on a screen with a notch (for example, not while the
+        // screen is flipped upside down).
+        let showTimer = model.timerText != nil && screen.brochachoNotchFrame != nil
         Task {
             if showTimer {
                 await notch.compact(on: screen)

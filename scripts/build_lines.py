@@ -123,6 +123,20 @@ BANK = {
     "I'll tap your shoulder.", "Consider yourself reminded.", "It's in the book.", "I won't let you forget.",
     "Marked. I'm watching the clock.",
   ]),
+  "target:flip": ("fl", [
+    "The world, upside down.", "Flipped. Like a pancake.", "Other way up, boss.", "Capovolto. Done.",
+    "Now everything is the right way.", "Turned around. Very professional.",
+  ]),
+  "timer_stopped": ("ts", [
+    "Clock stopped.", "Fine. No more waiting.", "Time is yours again.", "Stopped. Like it never started.",
+  ]),
+  "timer_extended": ("te", [
+    "A little more time. Prego.", "More minutes, on the house.", "Extended. Don't tell anyone.",
+  ]),
+  "ticked": ("tk", [
+    "Done. Crossed off.", "One less thing.", "Finito. Next.", "Checked. Beautiful.",
+  ]),
+  "target:help": ("hp", ["Allora. Let me show you.", "The grand tour.", "Sit down. I explain."]),
   "target:timer": ("tm", [
     "The clock, she's running.", "I watch the time. You work.", "Timer set. I'm counting.",
     "Go. I'll tell you when.", "Tick tock, I'm on it.",

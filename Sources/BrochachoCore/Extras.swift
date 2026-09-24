@@ -159,6 +159,30 @@ public struct CountdownTimer: Equatable {
         self.durationMs = seconds * 1000
     }
 
+    private init(startedAt: Int, durationMs: Int) {
+        self.startedAt = startedAt
+        self.durationMs = durationMs
+    }
+
+    /// The same timer with more time on it. Adding to a timer that has already finished counts from now.
+    public func adding(seconds: Int, nowMs: Int) -> CountdownTimer {
+        let end = Swift.max(startedAt + durationMs, nowMs) + seconds * 1000
+        return CountdownTimer(startedAt: startedAt, durationMs: end - startedAt)
+    }
+
+    /// "timer stop", "stop timer", "cancel the timer": words that mean stop, not a length of time.
+    public static let stopWords: Set<String> = ["stop", "cancel", "off", "end", "kill", "done", "enough", "reset", "clear"]
+    private static let harmless: Set<String> = ["the", "my", "it", "please", "timer"]
+
+    public static func isStopWord(_ text: String) -> Bool {
+        let words = text.lowercased()
+            .split(whereSeparator: { $0.isWhitespace })
+            .map { String($0.filter { ($0.isASCII && $0.isLetter) || ($0.isASCII && $0.isNumber) }) }
+            .filter { !$0.isEmpty }
+        guard !words.isEmpty, words.count <= 3 else { return false }
+        return words.contains { stopWords.contains($0) } && words.allSatisfy { stopWords.contains($0) || harmless.contains($0) }
+    }
+
     public func status(nowMs: Int) -> TimerStatus {
         let left = Swift.max(0, startedAt + durationMs - nowMs)
         let fraction = durationMs == 0 ? 0 : Double(left) / Double(durationMs)

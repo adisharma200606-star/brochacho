@@ -17,6 +17,8 @@ struct NotchRootView: View {
             case .tuner: TunerScreen(model: model)
             case .answer: AnswerScreen(model: model)
             case .chooser: ChooserScreen(model: model)
+            case .timer: TimerScreen(model: model)
+            case .glance: GlanceScreen(model: model)
             }
         }
         .frame(width: NotchRootView.width, alignment: .leading)
@@ -37,6 +39,9 @@ struct CompactLeadingView: View {
             .fill(model.theme.glowColors.first ?? .white)
             .frame(width: 8, height: 8)
             .opacity(model.timerText == nil ? 0 : 1)
+            .padding(8)
+            .contentShape(Rectangle())
+            .onTapGesture { model.onTimerTap() }
     }
 }
 
@@ -49,5 +54,8 @@ struct CompactTrailingView: View {
             .font(model.theme.font(13, .medium))
             .monospacedDigit()
             .foregroundStyle(.white)
+            .padding(.vertical, 6)
+            .contentShape(Rectangle())
+            .onTapGesture { model.onTimerTap() }
     }
 }

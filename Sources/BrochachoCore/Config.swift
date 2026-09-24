@@ -284,11 +284,14 @@ public struct Config: Codable, Equatable {
     public var tuner: TunerConfig
     public var ask: AskConfig
     public var feedback: FeedbackConfig
+    /// When on, every app installed on this Mac can be opened by typing its name, with no entry needed.
+    public var includeInstalledApps: Bool
     public var catalog: [CatalogEntry]
 
     public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true, speechLocale: String = "en-IN",
                 theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), ask: AskConfig = AskConfig(),
-                feedback: FeedbackConfig = FeedbackConfig(), catalog: [CatalogEntry] = DefaultCatalog.entries) {
+                feedback: FeedbackConfig = FeedbackConfig(), includeInstalledApps: Bool = true,
+                catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
         self.speak = speak
@@ -297,10 +300,11 @@ public struct Config: Codable, Equatable {
         self.tuner = tuner
         self.ask = ask
         self.feedback = feedback
+        self.includeInstalledApps = includeInstalledApps
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, speechLocale, theme, tuner, ask, feedback, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, speechLocale, theme, tuner, ask, feedback, includeInstalledApps, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -312,6 +316,7 @@ public struct Config: Codable, Equatable {
         tuner = try c.decodeIfPresent(TunerConfig.self, forKey: .tuner) ?? TunerConfig()
         ask = try c.decodeIfPresent(AskConfig.self, forKey: .ask) ?? AskConfig()
         feedback = try c.decodeIfPresent(FeedbackConfig.self, forKey: .feedback) ?? FeedbackConfig()
+        includeInstalledApps = try c.decodeIfPresent(Bool.self, forKey: .includeInstalledApps) ?? true
         catalog = try c.decodeIfPresent([CatalogEntry].self, forKey: .catalog) ?? DefaultCatalog.entries
     }
 }

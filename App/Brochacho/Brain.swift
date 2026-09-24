@@ -17,6 +17,9 @@ final class Brain {
     private var stash: Stash
     private var lineState: LineState
     private var lineBank: LineBank
+    private var captureLog: CaptureLog
+    /// Every installed app, as catalog entries. Filled in shortly after launch.
+    private var installedApps: [CatalogEntry] = []
 
     // The parts.
     private let model: NotchModel
@@ -28,6 +31,7 @@ final class Brain {
     private let ears = Ears()
     private let micTuner = MicTuner()
     private let settingsWindow = SettingsWindow()
+    private let tutorialWindow = TutorialWindow()
 
     // What is going on right now.
     private var decision: Decision?
@@ -41,6 +45,9 @@ final class Brain {
     private var pendingBookmarkURL: String?
     private var pendingBookmarkChoices: [CatalogEntry] = []
     private var askTask: Task<Void, Never>?
+    private var glanceKind = ""
+    private var glanceNotes: [CaptureEntry] = []
+    private var glanceReminders: [CaptureWriter.Upcoming] = []
 
     init() {
         let loaded = ConfigStore.load()
@@ -52,6 +59,7 @@ final class Brain {
         stash = stashLoaded.stash
         if let problem = stashLoaded.problem { NSLog("Brochacho: stash problem: \(problem)") }
         lineBank = LineBankStore.load(from: Bundle.main.url(forResource: "lines", withExtension: "json"))
+        captureLog = CaptureLogStore.load()
 
         model = NotchModel(theme: NotchTheme(config.theme))
         controller = NotchController(model: model)
@@ -72,6 +80,34 @@ final class Brain {
             self?.sounds.play(.close)
             self?.close()
         }
+        refreshInstalledApps()
+        if !TutorialWindow.hasBeenSeen {
+            // A moment after launch, so it does not fight the permission prompts.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.showTutorial() }
+        }
+    }
+
+    /// Scans for installed apps off the main thread, then keeps only the ones the catalog does not already open.
+    func refreshInstalledApps() {
+        guard config.includeInstalledApps else {
+            installedApps = []
+            return
+        }
+        let catalog = config.catalog
+        DispatchQueue.global(qos: .utility).async {
+            let found = AppIndex.scan()
+            let entries = InstalledApps.entries(from: found, excluding: catalog)
+            DispatchQueue.main.async { [weak self] in self?.installedApps = entries }
+        }
+    }
+
+    /// What the box matches against: his own entries first, then every installed app.
+    private var searchable: [CatalogEntry] {
+        return config.includeInstalledApps ? config.catalog + installedApps : config.catalog
+    }
+
+    func showTutorial() {
+        tutorialWindow.show(hotkeys: config.hotkeys, theme: model.theme)
     }
 
     func shutDown() {
@@ -89,6 +125,7 @@ final class Brain {
             NSLog("Brochacho: could not save the config: \(error)")
         }
         applyConfig()
+        refreshInstalledApps()
     }
 
     private func applyConfig() {
@@ -116,6 +153,12 @@ final class Brain {
         model.onChoose = { [weak self] index in self?.chooseBookmark(index) }
         model.onTuningStep = { [weak self] step in self?.stepTuning(step) }
         model.onCopyCommand = { [weak self] in self?.copyCommand() }
+        model.onTimerTap = { [weak self] in self?.showTimer() }
+        model.onStopTimer = { [weak self] in self?.stopTimer() }
+        model.onAddTime = { [weak self] seconds in self?.addTime(seconds) }
+        model.onGlanceOpen = { [weak self] index in self?.openGlanceItem(index) }
+        model.onGlanceTick = { [weak self] index in self?.tickGlanceItem(index) }
+        model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
     }
 
     // MARK: - The box
@@ -141,7 +184,7 @@ final class Brain {
     }
 
     private func textChanged(_ text: String) {
-        let decision = Matcher.match(text, catalog: config.catalog, usage: usage)
+        let decision = Matcher.match(text, catalog: searchable, usage: usage)
         self.decision = decision
         model.selected = 0
         model.isUnknown = decision.mode == .nothing
@@ -165,8 +208,12 @@ final class Brain {
         case .path: return "Finder"
         case .tool:
             switch entry.target {
-            case "note": return "Apple Notes"
-            case "reminder": return "Apple Reminders"
+            case "note": return searching ? "Apple Notes" : "your notes"
+            case "reminder": return searching ? "Apple Reminders" : "coming up"
+            case "flip": return "the screen"
+            case "help": return "the guide"
+            case "pull": return "your stash"
+            case "settings": return "settings"
             default: return "in the notch"
             }
         }
@@ -174,7 +221,7 @@ final class Brain {
 
     /// Enter, or a click on a row. `index` nil means "whichever row is highlighted".
     private func submit(choosing index: Int?) {
-        let decision = self.decision ?? Matcher.match(model.text, catalog: config.catalog, usage: usage)
+        let decision = self.decision ?? Matcher.match(model.text, catalog: searchable, usage: usage)
         let chosen = index ?? model.selected
 
         switch decision.mode {
@@ -211,6 +258,10 @@ final class Brain {
             case "note": capture(note: argument, entry: entry)
             case "reminder": capture(reminder: argument, entry: entry)
             case "pull": pull(fromBox: true)
+            case "flip": flipScreen(entry: entry)
+            case "help":
+                close()
+                showTutorial()
             case "settings":
                 close()
                 settingsWindow.show(brain: self)
@@ -412,7 +463,7 @@ final class Brain {
         guard !ears.isListening else { return }
         mouth.stop()
         openBox(listening: true)
-        let hints = config.catalog.flatMap { $0.keys }
+        let hints = searchable.flatMap { $0.keys }
         ears.start(hints: hints) { [weak self] heard in
             guard let self = self, self.model.isListening else { return }
             self.model.text = heard
@@ -507,10 +558,17 @@ final class Brain {
 
         if words.isEmpty {
             if countdown != nil {
-                cancelTimer()
-                showLine(category: "open_tool", target: nil, text: "Timer cancelled.")
+                showTimer()
             } else {
                 showLine(category: "open_tool", target: nil, text: "Say how long: timer 10, timer 90s, timer 1:30", hold: 3)
+            }
+            return
+        }
+        if CountdownTimer.isStopWord(words) {
+            if countdown != nil {
+                stopTimer()
+            } else {
+                showLine(category: "open_tool", target: nil, text: "No timer running.", hold: 2)
             }
             return
         }
@@ -542,6 +600,33 @@ final class Brain {
         }
     }
 
+    /// The timer's own screen, with Stop and more time.
+    private func showTimer() {
+        guard countdown != nil else { return }
+        cancelAutoClose()
+        refreshTimer()
+        model.screen = .timer
+        controller.open(takeKeyboard: false)
+        closeAfter(8)
+    }
+
+    private func stopTimer() {
+        guard countdown != nil else { return }
+        cancelTimer()
+        sounds.play(.close)
+        showLine(category: "timer_stopped", target: nil, hold: 1.8)
+    }
+
+    private func addTime(_ seconds: Int) {
+        guard let timer = countdown else { return }
+        countdown = timer.adding(seconds: seconds, nowMs: SystemClock.nowMs())
+        refreshTimer()
+        closeAfter(8)
+        let pick = Lines.pick(bank: lineBank, state: &lineState, category: "timer_extended", target: nil,
+                              frequency: config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
+        if let pick = pick, config.speak { mouth.say(pick) }
+    }
+
     private func cancelTimer() {
         countdownTicker?.invalidate()
         countdownTicker = nil
@@ -555,11 +640,15 @@ final class Brain {
     private func capture(note argument: String?, entry: String) {
         let text = (argument ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
-            close()
-            _ = CaptureWriter.openFreshNote()
+            showNotesGlance()
             return
         }
-        let ok = CaptureWriter.makeNote(text)
+        let noteID = CaptureWriter.makeNote(text)
+        let ok = noteID != nil
+        if ok {
+            captureLog.add(kind: "note", text: text, now: SystemClock.nowMs(), externalID: noteID)
+            CaptureLogStore.save(captureLog)
+        }
         sounds.play(ok ? .captured : .unknown)
         showLine(category: "open_tool", target: entry, text: ok ? "Note: \(text)" : "Notes would not take it. Check Privacy, Automation.", hold: 3)
     }
@@ -567,8 +656,7 @@ final class Brain {
     private func capture(reminder argument: String?, entry: String) {
         let text = (argument ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
-            close()
-            CaptureWriter.openReminders()
+            showRemindersGlance()
             return
         }
         let nowWall = ReminderParser.wall(from: Date())
@@ -579,10 +667,125 @@ final class Brain {
         // Show what was understood straight away; the save itself takes a moment.
         sounds.play(.captured)
         showLine(category: "open_tool", target: entry, text: "\(parsed.title)  ·  \(said)", hold: 3.2)
-        CaptureWriter.makeReminder(title: parsed.title, due: due) { [weak self] ok in
-            guard !ok else { return }
-            self?.sounds.play(.unknown)
-            self?.showLine(category: "unknown", target: nil, text: "Reminders would not take it. Check Privacy, Reminders.", hold: 3.5)
+        let logID = captureLog.add(kind: "reminder", text: parsed.title,
+                                   dueMs: due.map { Int(($0.timeIntervalSince1970 * 1000).rounded()) }, now: SystemClock.nowMs())
+        CaptureLogStore.save(captureLog)
+        CaptureWriter.makeReminder(title: parsed.title, due: due) { [weak self] identifier in
+            guard let self = self else { return }
+            guard let identifier = identifier else {
+                self.sounds.play(.unknown)
+                self.showLine(category: "unknown", target: nil, text: "Reminders would not take it. Check Privacy, Reminders.", hold: 3.5)
+                return
+            }
+            self.captureLog.setExternalID(identifier, for: logID)
+            CaptureLogStore.save(self.captureLog)
+        }
+    }
+
+    // MARK: - The glance: recent notes and upcoming reminders
+
+    private static let shortDate: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.doesRelativeDateFormatting = true
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+    private func openGlance(title: String, empty: String, buttons: [String]) {
+        cancelAutoClose()
+        model.glanceTitle = title
+        model.glanceEmpty = empty
+        model.glanceButtons = buttons
+        model.glanceItems = []
+        model.screen = .glance
+        if !controller.isOpen { controller.open(takeKeyboard: false) }
+        closeAfter(10)
+    }
+
+    private func showNotesGlance() {
+        glanceKind = "note"
+        glanceNotes = captureLog.recent("note", limit: 6)
+        openGlance(title: "Notes you made here", empty: "Nothing yet. Type note, then what to remember.", buttons: ["New note", "Open Notes"])
+        let now = Date()
+        model.glanceItems = glanceNotes.enumerated().map { index, note in
+            let made = Date(timeIntervalSince1970: Double(note.createdAt) / 1000)
+            let detail = Calendar.current.isDate(made, inSameDayAs: now) ? "today" : Brain.shortDate.string(from: made)
+            return NotchModel.GlanceItem(id: index, title: note.text, detail: detail, done: nil)
+        }
+    }
+
+    private func showRemindersGlance() {
+        glanceKind = "reminder"
+        glanceReminders = []
+        openGlance(title: "Coming up", empty: "Looking…", buttons: ["Open Reminders"])
+        CaptureWriter.upcomingReminders(limit: 6) { [weak self] items in
+            guard let self = self, self.model.screen == .glance, self.glanceKind == "reminder" else { return }
+            guard let items = items else {
+                self.model.glanceEmpty = "I am not allowed to read Reminders. System Settings, Privacy, Reminders."
+                return
+            }
+            self.glanceReminders = items
+            self.model.glanceEmpty = "Nothing coming up. Type remind me to…"
+            self.model.glanceItems = items.enumerated().map { index, item in
+                let detail = item.due.map { Brain.shortDate.string(from: $0) } ?? "no time"
+                return NotchModel.GlanceItem(id: index, title: item.title, detail: detail, done: false)
+            }
+        }
+    }
+
+    private func openGlanceItem(_ index: Int) {
+        if glanceKind == "note", glanceNotes.indices.contains(index) {
+            close()
+            CaptureWriter.showNote(id: glanceNotes[index].externalID)
+        } else if glanceKind == "reminder" {
+            close()
+            CaptureWriter.openReminders()
+        }
+    }
+
+    private func tickGlanceItem(_ index: Int) {
+        guard glanceKind == "reminder", glanceReminders.indices.contains(index),
+              model.glanceItems.indices.contains(index) else { return }
+        let done = !(model.glanceItems[index].done ?? false)
+        closeAfter(10)
+        CaptureWriter.setDone(glanceReminders[index].identifier, done: done) { [weak self] ok in
+            guard let self = self, ok, self.model.glanceItems.indices.contains(index) else { return }
+            self.model.glanceItems[index].done = done
+            if done {
+                self.sounds.play(.saved)
+                let pick = Lines.pick(bank: self.lineBank, state: &self.lineState, category: "ticked", target: nil,
+                                      frequency: self.config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
+                if let pick = pick, self.config.speak { self.mouth.say(pick) }
+            }
+        }
+    }
+
+    private func glanceButton(_ index: Int) {
+        close()
+        if glanceKind == "note" {
+            if index == 0 { _ = CaptureWriter.openFreshNote() } else { CaptureWriter.showNote(id: nil) }
+        } else {
+            CaptureWriter.openReminders()
+        }
+    }
+
+    // MARK: - Flipping the screen
+
+    private func flipScreen(entry: String) {
+        close()
+        // Let the notch get out of the way before the whole screen turns.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            guard let self = self else { return }
+            switch ScreenRotator.toggleOneEighty() {
+            case .rotated:
+                let pick = Lines.pick(bank: self.lineBank, state: &self.lineState, category: "open_tool", target: entry,
+                                      frequency: self.config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
+                if let pick = pick, self.config.speak { self.mouth.say(pick) }
+            case .failed(let problem):
+                self.sounds.play(.unknown)
+                self.showLine(category: "unknown", target: nil, text: "The screen would not turn: \(problem)", hold: 4)
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 import AppKit
+import UniformTypeIdentifiers
 import BrochachoCore
 import SwiftUI
 
@@ -60,6 +61,32 @@ final class SettingsState: ObservableObject {
         note = tab == nil ? "" : "Filled in from the page in front. Give it a name."
     }
 
+    /// Opens the usual "choose a file" window on the Applications folder and returns the chosen app.
+    static func pickApp() -> URL? {
+        let panel = NSOpenPanel()
+        panel.title = "Choose an app"
+        panel.prompt = "Choose"
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+        panel.allowedContentTypes = [.application]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        return panel.runModal() == .OK ? panel.url : nil
+    }
+
+    func addApp() {
+        guard let url = SettingsState.pickApp() else { return }
+        let app = AppIndex.describe(url)
+        var name = app.name.lowercased()
+        var n = 2
+        while config.catalog.contains(where: { $0.name == name }) {
+            name = "\(app.name.lowercased()) \(n)"
+            n += 1
+        }
+        config.catalog.append(CatalogEntry(name: name, display: app.name, aliases: [], kind: .app, target: app.bundleID ?? url.path))
+        selection = name
+        note = "Added \(app.name). Give it a shorter name or nicknames if you like, then Save."
+    }
+
     func addFrontPage() {
         guard let tab = TabGrabber.frontTab() else {
             note = "No browser page in front, or the browser would not say. Open the page, then try again."
@@ -105,6 +132,16 @@ struct SettingsView: View {
         .padding(16)
         .safeAreaInset(edge: .bottom) {
             HStack {
+                Button {
+                    state.brain.showTutorial()
+                } label: {
+                    Image(systemName: "questionmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.bordered)
+                .clipShape(Circle())
+                .help("How Brochacho works")
                 Text(state.note).foregroundStyle(.secondary)
                 Spacer()
                 Button("Save") { state.save() }
@@ -131,11 +168,14 @@ private struct ThingsTab: View {
                     }
                 }
                 HStack {
-                    Button("Add") { state.addEntry() }
-                    Button("Add the page I'm on") { state.addFrontPage() }
+                    Button("Add a page") { state.addEntry() }
+                    Button("Add an app") { state.addApp() }
                     Spacer()
                     Button("Delete") { state.deleteSelected() }.disabled(state.selectedIndex == nil)
                 }
+                Button("Add the page I'm on") { state.addFrontPage() }
+                Toggle("Every app on this Mac opens by name too", isOn: $state.config.includeInstalledApps)
+                    .font(.caption)
             }
             .frame(width: 270)
 
@@ -185,7 +225,18 @@ private struct EntryForm: View {
                 Text("Something built in").tag(EntryKind.tool)
             }
 
-            TextField(targetLabel, text: $entry.target)
+            if entry.kind == .app {
+                HStack {
+                    if let icon = appIcon {
+                        Image(nsImage: icon).resizable().frame(width: 28, height: 28)
+                    }
+                    Text(appSummary).foregroundStyle(.secondary).lineLimit(1)
+                    Spacer()
+                    Button("Choose app…") { chooseApp() }
+                }
+            } else {
+                TextField(targetLabel, text: $entry.target)
+            }
 
             if entry.kind == .site {
                 Picker("Brave profile", selection: Binding(get: { entry.profile ?? "personal" }, set: { entry.profile = $0 })) {
@@ -203,12 +254,39 @@ private struct EntryForm: View {
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
+    /// The app this entry opens, if it can be found.
+    private var appURL: URL? {
+        if entry.target.hasSuffix(".app") { return URL(fileURLWithPath: BrochachoPaths.expandTilde(entry.target)) }
+        return NSWorkspace.shared.urlForApplication(withBundleIdentifier: entry.target) ?? Opener.findApp(named: entry.name)
+    }
+
+    private var appIcon: NSImage? {
+        guard let url = appURL else { return nil }
+        return NSWorkspace.shared.icon(forFile: url.path)
+    }
+
+    private var appSummary: String {
+        guard let url = appURL else { return entry.target.isEmpty ? "No app chosen" : "Not found on this Mac" }
+        return AppIndex.describe(url).name
+    }
+
+    private func chooseApp() {
+        guard let url = SettingsState.pickApp() else { return }
+        let app = AppIndex.describe(url)
+        entry.target = app.bundleID ?? url.path
+        if entry.display == nil || entry.display?.isEmpty == true { entry.display = app.name }
+        if entry.name.hasPrefix("new thing") {
+            entry.name = app.name.lowercased()
+            selection = entry.name
+        }
+    }
+
     private var targetLabel: String {
         switch entry.kind {
         case .site: return "Address"
         case .app: return "Bundle identifier, like com.valvesoftware.steam"
         case .path: return "Path, like ~/Downloads"
-        case .tool: return "Tool name: tuner, timer, note, reminder or settings"
+        case .tool: return "Tool name: tuner, timer, note, reminder, flip, pull, help or settings"
         }
     }
 }

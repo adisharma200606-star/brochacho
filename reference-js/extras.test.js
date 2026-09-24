@@ -34,6 +34,23 @@ test('timer: counting down and formatting', () => {
   assert.strictEqual(x.timerStatus(t, 999999).done, true);
 });
 
+const STOPS = [['stop', true], ['cancel', true], ['stop it', true], ['cancel the timer', true], ['off', true], ['please stop', true],
+  ['10', false], ['stop 10', false], ['', false], ['stopwatch', false], ['end of the world now please', false], ['5 min', false]];
+
+test('timer: words that mean stop', () => {
+  for (const [text, stop] of STOPS) assert.strictEqual(x.isStopWord(text), stop, JSON.stringify(text));
+  for (const [text, stop] of STOPS) if (stop) assert.strictEqual(x.parseDuration(text), null, 'a stop word is never a duration: ' + text);
+});
+
+test('timer: adding time', () => {
+  const t = x.startTimer(600, 1000);
+  assert.deepStrictEqual(x.addTime(t, 60, 301000), { startedAt: 1000, durationMs: 660000 });
+  assert.strictEqual(x.timerStatus(x.addTime(t, 60, 301000), 301000).text, '6:00');
+  const late = x.addTime(t, 60, 700000);                       // already finished: a minute from now
+  assert.strictEqual(x.timerStatus(late, 700000).text, '1:00');
+  assert.strictEqual(x.timerStatus(late, 700000).done, false);
+});
+
 const site = (name, target, living) => ({ name, aliases: [], kind: 'site', target, profile: 'personal', living });
 const CATALOG = [
   site('youtube', 'https://www.youtube.com', false),
@@ -131,6 +148,10 @@ test('write extras fixtures', () => {
   const phone = { inbox: INBOX, opened: OPENED, now: NOW, initial, counts, final: pstash, forPhone: x.exportForPhone(pstash),
     lines: x.parsePhoneLines(INBOX, NOW) };
   fs.writeFileSync(path.join(dir, 'extras.json'), JSON.stringify({
-    durations: DURATIONS.map(([text, seconds]) => ({ text, seconds })), formats, catalog: CATALOG, bookmarks, phone
+    durations: DURATIONS.map(([text, seconds]) => ({ text, seconds })), formats, catalog: CATALOG, bookmarks, phone,
+    stops: STOPS.map(([text, stop]) => ({ text, stop })),
+    added: [[600, 1000, 60, 301000], [600, 1000, 60, 700000], [90, 0, 300, 10000]].map(([secs, start, add, now]) => {
+      const r = x.addTime(x.startTimer(secs, start), add, now); return { seconds: secs, start, add, now, startedAt: r.startedAt, durationMs: r.durationMs };
+    })
   }, null, 2));
 });

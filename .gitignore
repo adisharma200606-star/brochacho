@@ -9,3 +9,5 @@ DerivedData/
 .DS_Store
 node_modules/
 *.log
+App/build/
+App/build.log

@@ -1013,6 +1013,96 @@
       "text": "Marked. I'm watching the clock."
     }
   ],
+  "target:flip": [
+    {
+      "id": "fl01",
+      "text": "The world, upside down."
+    },
+    {
+      "id": "fl02",
+      "text": "Flipped. Like a pancake."
+    },
+    {
+      "id": "fl03",
+      "text": "Other way up, boss."
+    },
+    {
+      "id": "fl04",
+      "text": "Capovolto. Done."
+    },
+    {
+      "id": "fl05",
+      "text": "Now everything is the right way."
+    },
+    {
+      "id": "fl06",
+      "text": "Turned around. Very professional."
+    }
+  ],
+  "timer_stopped": [
+    {
+      "id": "ts01",
+      "text": "Clock stopped."
+    },
+    {
+      "id": "ts02",
+      "text": "Fine. No more waiting."
+    },
+    {
+      "id": "ts03",
+      "text": "Time is yours again."
+    },
+    {
+      "id": "ts04",
+      "text": "Stopped. Like it never started."
+    }
+  ],
+  "timer_extended": [
+    {
+      "id": "te01",
+      "text": "A little more time. Prego."
+    },
+    {
+      "id": "te02",
+      "text": "More minutes, on the house."
+    },
+    {
+      "id": "te03",
+      "text": "Extended. Don't tell anyone."
+    }
+  ],
+  "ticked": [
+    {
+      "id": "tk01",
+      "text": "Done. Crossed off."
+    },
+    {
+      "id": "tk02",
+      "text": "One less thing."
+    },
+    {
+      "id": "tk03",
+      "text": "Finito. Next."
+    },
+    {
+      "id": "tk04",
+      "text": "Checked. Beautiful."
+    }
+  ],
+  "target:help": [
+    {
+      "id": "hp01",
+      "text": "Allora. Let me show you."
+    },
+    {
+      "id": "hp02",
+      "text": "The grand tour."
+    },
+    {
+      "id": "hp03",
+      "text": "Sit down. I explain."
+    }
+  ],
   "target:timer": [
     {
       "id": "tm01",

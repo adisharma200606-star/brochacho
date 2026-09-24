@@ -49,7 +49,23 @@ final class ExtrasTests: XCTestCase {
         }
     }
 
+    private struct StopFixture: Decodable {
+        let text: String
+        let stop: Bool
+    }
+
+    private struct AddedFixture: Decodable {
+        let seconds: Int
+        let start: Int
+        let add: Int
+        let now: Int
+        let startedAt: Int
+        let durationMs: Int
+    }
+
     private struct FileFixture: Decodable {
+        let stops: [StopFixture]
+        let added: [AddedFixture]
         let phone: PhoneFixture
         let durations: [DurationFixture]
         let formats: [FormatFixture]
@@ -95,6 +111,18 @@ final class ExtrasTests: XCTestCase {
             }
             XCTAssertEqual(result, b.result, b.url)
             XCTAssertEqual(names, b.names, b.url)
+        }
+    }
+
+    func testStoppingAndAddingTimeAgreeWithTheReference() throws {
+        let file = try Fixtures.load(FileFixture.self, "extras.json")
+        for s in file.stops {
+            XCTAssertEqual(CountdownTimer.isStopWord(s.text), s.stop, "\"\(s.text)\"")
+        }
+        for a in file.added {
+            let timer = CountdownTimer(seconds: a.seconds, nowMs: a.start).adding(seconds: a.add, nowMs: a.now)
+            XCTAssertEqual(timer.startedAt, a.startedAt)
+            XCTAssertEqual(timer.durationMs, a.durationMs)
         }
     }
 

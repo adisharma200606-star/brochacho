@@ -187,6 +187,29 @@
       ],
       "kind": "tool",
       "target": "pull"
+    },
+    {
+      "name": "flip",
+      "display": "Flip the screen",
+      "aliases": [
+        "one eighty",
+        "180",
+        "rotate",
+        "flip screen",
+        "upside down"
+      ],
+      "kind": "tool",
+      "target": "flip"
+    },
+    {
+      "name": "help",
+      "display": "How it works",
+      "aliases": [
+        "tutorial",
+        "guide"
+      ],
+      "kind": "tool",
+      "target": "help"
     }
   ],
   "cases": [
@@ -363,7 +386,7 @@
           "band": "prefix"
         },
         {
-          "name": "tuner",
+          "name": "help",
           "band": "prefix"
         }
       ],
@@ -821,6 +844,10 @@
         {
           "name": "downloads",
           "band": "prefix"
+        },
+        {
+          "name": "flip",
+          "band": "wordPrefix"
         }
       ],
       "plan": {
@@ -1105,7 +1132,7 @@
           "band": "prefix"
         },
         {
-          "name": "tuner",
+          "name": "help",
           "band": "prefix"
         }
       ],
@@ -1310,6 +1337,10 @@
         {
           "name": "timer",
           "band": "prefix"
+        },
+        {
+          "name": "help",
+          "band": "subsequence"
         }
       ],
       "plan": {
@@ -1328,12 +1359,124 @@
         {
           "name": "tuner",
           "band": "prefix"
+        },
+        {
+          "name": "help",
+          "band": "prefix"
         }
       ],
       "plan": {
         "type": "openTool",
         "tool": "tuner",
         "entry": "tuner"
+      }
+    },
+    {
+      "input": "one eighty",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "flip",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "flip",
+        "entry": "flip"
+      }
+    },
+    {
+      "input": "180",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "flip",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "flip",
+        "entry": "flip"
+      }
+    },
+    {
+      "input": "flip",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "flip",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "flip",
+        "entry": "flip"
+      }
+    },
+    {
+      "input": "rotate",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "flip",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "flip",
+        "entry": "flip"
+      }
+    },
+    {
+      "input": "help",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "help",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "help",
+        "entry": "help"
+      }
+    },
+    {
+      "input": "tutorial",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "help",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "help",
+        "entry": "help"
       }
     },
     {

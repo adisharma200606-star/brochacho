@@ -442,5 +442,81 @@
         "dated": true
       }
     ]
-  }
+  },
+  "stops": [
+    {
+      "text": "stop",
+      "stop": true
+    },
+    {
+      "text": "cancel",
+      "stop": true
+    },
+    {
+      "text": "stop it",
+      "stop": true
+    },
+    {
+      "text": "cancel the timer",
+      "stop": true
+    },
+    {
+      "text": "off",
+      "stop": true
+    },
+    {
+      "text": "please stop",
+      "stop": true
+    },
+    {
+      "text": "10",
+      "stop": false
+    },
+    {
+      "text": "stop 10",
+      "stop": false
+    },
+    {
+      "text": "",
+      "stop": false
+    },
+    {
+      "text": "stopwatch",
+      "stop": false
+    },
+    {
+      "text": "end of the world now please",
+      "stop": false
+    },
+    {
+      "text": "5 min",
+      "stop": false
+    }
+  ],
+  "added": [
+    {
+      "seconds": 600,
+      "start": 1000,
+      "add": 60,
+      "now": 301000,
+      "startedAt": 1000,
+      "durationMs": 660000
+    },
+    {
+      "seconds": 600,
+      "start": 1000,
+      "add": 60,
+      "now": 700000,
+      "startedAt": 1000,
+      "durationMs": 759000
+    },
+    {
+      "seconds": 90,
+      "start": 0,
+      "add": 300,
+      "now": 10000,
+      "startedAt": 0,
+      "durationMs": 390000
+    }
+  ]
 }

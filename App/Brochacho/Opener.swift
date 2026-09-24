@@ -10,8 +10,8 @@ enum Opener {
         switch plan {
         case .openURL(let url, let profile, _):
             return openInBrave(url, profileDirectory: config.brave.profileDirectory(for: profile), brave: config.brave)
-        case .openApp(let bundleID, _):
-            return openApp(bundleID)
+        case .openApp(let bundleID, let entry):
+            return openApp(bundleID, name: entry)
         case .openPath(let path, _):
             return NSWorkspace.shared.open(URL(fileURLWithPath: BrochachoPaths.expandTilde(path)))
         case .openTool, .ask:
@@ -44,13 +44,38 @@ enum Opener {
         return NSWorkspace.shared.open(url)
     }
 
-    static func openApp(_ bundleID: String) -> Bool {
-        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
-            NSLog("Brochacho: no app with bundle id \(bundleID)")
+    /// Opens an app. `target` is normally a bundle identifier ("com.valvesoftware.steam"), but a path to an
+    /// .app works too. If neither finds anything, the app is looked for by name in the usual folders, so a
+    /// wrong bundle identifier in the config still opens "Steam.app" for an entry called "steam".
+    static func openApp(_ target: String, name: String = "") -> Bool {
+        var url: URL? = nil
+        if target.hasSuffix(".app"), FileManager.default.fileExists(atPath: BrochachoPaths.expandTilde(target)) {
+            url = URL(fileURLWithPath: BrochachoPaths.expandTilde(target))
+        } else {
+            url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: target)
+        }
+        if url == nil { url = findApp(named: name.isEmpty ? target : name) }
+        guard let appURL = url else {
+            NSLog("Brochacho: could not find an app for \(target)")
             return false
         }
-        NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+        NSWorkspace.shared.openApplication(at: appURL, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
         return true
+    }
+
+    /// "whatsapp" finds WhatsApp.app. Case and spaces do not matter.
+    static func findApp(named name: String) -> URL? {
+        let wanted = TextTools.normalize(name)
+        guard !wanted.isEmpty else { return nil }
+        for folder in AppIndex.folders {
+            guard let items = try? FileManager.default.contentsOfDirectory(atPath: folder.path) else { continue }
+            for item in items where item.hasSuffix(".app") {
+                if TextTools.normalize(String(item.dropLast(4))) == wanted {
+                    return folder.appendingPathComponent(item)
+                }
+            }
+        }
+        return nil
     }
 
     /// Opens something from the stash. Links go to the personal Brave profile; files open in their own app.

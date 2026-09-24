@@ -87,6 +87,12 @@ const MATCH_CASES = [
   ['ti', 'open', 'timer', null, {}, true],
   ['tu', 'open', 'tuner', null, {}, true],
 
+  ['one eighty', 'open', 'flip', null, {}, true],
+  ['180', 'open', 'flip', null, {}, true],
+  ['flip', 'open', 'flip', null, {}, true],
+  ['rotate', 'open', 'flip', null, {}, true],
+  ['help', 'open', 'help', null, {}, true],
+  ['tutorial', 'open', 'help', null, {}, true],
   ['bored', 'open', 'bored', null, {}, true],
   ["i'm bored", 'open', 'bored', null, {}, true],
   ['settings', 'open', 'settings', null, {}, true],
