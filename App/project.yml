@@ -20,6 +20,9 @@ packages:
   HotKey:
     url: https://github.com/soffes/HotKey
     exactVersion: 0.2.1
+  # A small Objective-C bridge for rotating the screen ("one eighty"). Original code, written here.
+  RotationBridge:
+    path: RotationBridge
 
 targets:
   Brochacho:
@@ -31,6 +34,7 @@ targets:
       - package: BrochachoCore
       - package: DynamicNotchKit
       - package: HotKey
+      - package: RotationBridge
     info:
       path: Brochacho/Info.plist
       properties:
