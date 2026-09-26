@@ -611,7 +611,7 @@ Ideas that are parked, not planned: a calculator in the box (so sums never go to
 
 ## Updating to a new version
 
-When new code is ready, one command does everything: gets it, builds it, signs it, replaces the app in Applications and starts it.
+When new code is ready, one command does everything: gets it, builds it, signs it, replaces the app in Applications and starts it. New built-in commands (like `flip`, `settings`, `help` and `bored`, all added after the first release) are added to your config automatically the next time Brochacho starts after an update. If you had deliberately deleted one of them in Settings, it stays deleted; only genuinely new commands get added.
 
 ```
 ~/Code/brochacho/scripts/install.sh

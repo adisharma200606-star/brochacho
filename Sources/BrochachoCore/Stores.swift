@@ -23,6 +23,10 @@ public enum BrochachoPaths {
         return configDirectory.appendingPathComponent("captures.json")
     }
 
+    public static var catalogMigrationFile: URL {
+        return configDirectory.appendingPathComponent("catalog-migrations.json")
+    }
+
     public static var lineStateFile: URL {
         return configDirectory.appendingPathComponent("line-state.json")
     }

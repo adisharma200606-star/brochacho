@@ -41,6 +41,7 @@ Two ideas explain most of the design:
 | `Tuner.swift` | Note maths, YIN pitch detection, string matching, and `TunerSession`, which steadies the display. |
 | `Extras.swift` | The timer (reading "1h30", counting down, adding time, words that mean stop), living bookmarks (which entry moves), and folding the iPhone's files into the stash. |
 | `CaptureLog.swift` | The short list of notes and reminders made from the notch, for the glance; and `InstalledApps`, which turns the apps found on disk into things the box can open. |
+| `CatalogMigration.swift` | Keeps an existing `config.json` in step with new built-in commands added in later updates — see the note below. |
 | `Capture.swift` | Reading "call mom tomorrow at 5" into a title and a time. |
 | `Ask.swift` | What is sent with a question, when the clipboard is included, and splitting the reply into text and a command. |
 | `Feedback.swift` | Which sound and which trackpad tap go with each event. |
@@ -75,6 +76,23 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
 | `SettingsWindow.swift` | The settings window: things, voice and sound, Ask, hotkeys and files. |
 | `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`), `sounds/*.wav` (made by `scripts/make_sounds.py`), `fonts/` (IBM Plex Mono) and `textures/grain.png`. Xcode flattens all of these into the top of the app's Resources folder. |
+
+## Why an existing config.json needs a migration
+
+`config.json` is written once, the very first time Brochacho runs, with whichever built-in commands
+existed in `DefaultCatalog.entries` at that moment. Every command added in a later update — `flip`,
+`settings`, `help`, `bored`, and whatever comes after them — would otherwise never reach someone who
+already has a config.json, no matter how many times they update: loading a config that already has a
+`catalog` array just uses it as-is.
+
+`CatalogMigration.merge`, run once at every launch (`Brain.init`, right after loading the config), fixes
+this: it adds any built-in entry that is missing and has never been offered before, and remembers every
+built-in it has ever offered in a small separate file, `catalog-migrations.json` — so if the person deletes
+a built-in on purpose from Settings, it stays deleted forever rather than reappearing on the next update.
+Nothing about a person's own entries is ever touched.
+
+This is also the actual root cause found for "`180` does nothing": on Adi's Mac, `flip` (and `settings`,
+`help`, `bored`) had simply never existed in his live catalog, because his config.json predated them.
 
 ## Why rotation is Objective-C, not Swift
 

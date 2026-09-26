@@ -42,9 +42,16 @@ enum ScreenRotator {
 
     /// Returns nil on success, or a short description of what went wrong.
     static func setRotation(_ degrees: Int, of display: CGDirectDisplayID) -> String? {
+        let before = currentRotation(of: display)
         var errorPointer: UnsafeMutablePointer<CChar>?
         let result = BrochachoRotateDisplay(display, Int32(degrees), &errorPointer)
         defer { if let errorPointer = errorPointer { free(errorPointer) } }
+        // CGDisplayRotation is a public, always-available reading of what macOS itself currently thinks the
+        // rotation is. Logging it right after the call, regardless of what the private call claimed,
+        // catches exactly the failure mode seen on real hardware once already: the call reports success
+        // but the screen (and macOS's own idea of its rotation) never actually changes.
+        let after = currentRotation(of: display)
+        NSLog("Brochacho: [rotate] display \(display): was \(before)°, asked for \(degrees)°, bridge returned \(result), macOS now reports \(after)°")
         if result == 0 { return nil }
         return errorPointer.map { String(cString: $0) } ?? "the rotation call failed (\(result))"
     }

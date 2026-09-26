@@ -1,0 +1,866 @@
+{
+  "cases": [
+    {
+      "existing": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        }
+      ],
+      "defaults": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "offered": [],
+      "result": {
+        "catalog": [
+          {
+            "name": "youtube",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://youtube"
+          },
+          {
+            "name": "gmail",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://gmail"
+          },
+          {
+            "name": "tuner",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://tuner"
+          },
+          {
+            "name": "timer",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://timer"
+          },
+          {
+            "name": "note",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://note"
+          },
+          {
+            "name": "reminder",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://reminder"
+          },
+          {
+            "name": "flip",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://flip"
+          },
+          {
+            "name": "settings",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://settings"
+          },
+          {
+            "name": "help",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://help"
+          },
+          {
+            "name": "bored",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://bored"
+          }
+        ],
+        "offered": [
+          "bored",
+          "flip",
+          "gmail",
+          "help",
+          "note",
+          "reminder",
+          "settings",
+          "timer",
+          "tuner",
+          "youtube"
+        ]
+      }
+    },
+    {
+      "existing": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "defaults": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "offered": [
+        "bored",
+        "flip",
+        "gmail",
+        "help",
+        "note",
+        "reminder",
+        "settings",
+        "timer",
+        "tuner",
+        "youtube"
+      ],
+      "result": {
+        "catalog": [
+          {
+            "name": "youtube",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://youtube"
+          },
+          {
+            "name": "gmail",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://gmail"
+          },
+          {
+            "name": "tuner",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://tuner"
+          },
+          {
+            "name": "timer",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://timer"
+          },
+          {
+            "name": "note",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://note"
+          },
+          {
+            "name": "reminder",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://reminder"
+          },
+          {
+            "name": "flip",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://flip"
+          },
+          {
+            "name": "settings",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://settings"
+          },
+          {
+            "name": "help",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://help"
+          },
+          {
+            "name": "bored",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://bored"
+          }
+        ],
+        "offered": [
+          "bored",
+          "flip",
+          "gmail",
+          "help",
+          "note",
+          "reminder",
+          "settings",
+          "timer",
+          "tuner",
+          "youtube"
+        ]
+      }
+    },
+    {
+      "existing": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        }
+      ],
+      "defaults": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "offered": [
+        "tuner",
+        "youtube"
+      ],
+      "result": {
+        "catalog": [
+          {
+            "name": "youtube",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://youtube"
+          },
+          {
+            "name": "gmail",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://gmail"
+          },
+          {
+            "name": "timer",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://timer"
+          },
+          {
+            "name": "note",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://note"
+          },
+          {
+            "name": "reminder",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://reminder"
+          },
+          {
+            "name": "flip",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://flip"
+          },
+          {
+            "name": "settings",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://settings"
+          },
+          {
+            "name": "help",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://help"
+          },
+          {
+            "name": "bored",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://bored"
+          }
+        ],
+        "offered": [
+          "bored",
+          "flip",
+          "gmail",
+          "help",
+          "note",
+          "reminder",
+          "settings",
+          "timer",
+          "tuner",
+          "youtube"
+        ]
+      }
+    },
+    {
+      "existing": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "bat",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://x",
+          "living": true
+        }
+      ],
+      "defaults": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "offered": [],
+      "result": {
+        "catalog": [
+          {
+            "name": "youtube",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://youtube"
+          },
+          {
+            "name": "gmail",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://gmail"
+          },
+          {
+            "name": "tuner",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://tuner"
+          },
+          {
+            "name": "timer",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://timer"
+          },
+          {
+            "name": "bat",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://x",
+            "living": true
+          },
+          {
+            "name": "note",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://note"
+          },
+          {
+            "name": "reminder",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://reminder"
+          },
+          {
+            "name": "flip",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://flip"
+          },
+          {
+            "name": "settings",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://settings"
+          },
+          {
+            "name": "help",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://help"
+          },
+          {
+            "name": "bored",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://bored"
+          }
+        ],
+        "offered": [
+          "bored",
+          "flip",
+          "gmail",
+          "help",
+          "note",
+          "reminder",
+          "settings",
+          "timer",
+          "tuner",
+          "youtube"
+        ]
+      }
+    },
+    {
+      "existing": [],
+      "defaults": [
+        {
+          "name": "youtube",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://youtube"
+        },
+        {
+          "name": "gmail",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://gmail"
+        },
+        {
+          "name": "tuner",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://tuner"
+        },
+        {
+          "name": "timer",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://timer"
+        },
+        {
+          "name": "note",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://note"
+        },
+        {
+          "name": "reminder",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://reminder"
+        },
+        {
+          "name": "flip",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://flip"
+        },
+        {
+          "name": "settings",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://settings"
+        },
+        {
+          "name": "help",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://help"
+        },
+        {
+          "name": "bored",
+          "aliases": [],
+          "kind": "site",
+          "target": "https://bored"
+        }
+      ],
+      "offered": [],
+      "result": {
+        "catalog": [
+          {
+            "name": "youtube",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://youtube"
+          },
+          {
+            "name": "gmail",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://gmail"
+          },
+          {
+            "name": "tuner",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://tuner"
+          },
+          {
+            "name": "timer",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://timer"
+          },
+          {
+            "name": "note",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://note"
+          },
+          {
+            "name": "reminder",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://reminder"
+          },
+          {
+            "name": "flip",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://flip"
+          },
+          {
+            "name": "settings",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://settings"
+          },
+          {
+            "name": "help",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://help"
+          },
+          {
+            "name": "bored",
+            "aliases": [],
+            "kind": "site",
+            "target": "https://bored"
+          }
+        ],
+        "offered": [
+          "bored",
+          "flip",
+          "gmail",
+          "help",
+          "note",
+          "reminder",
+          "settings",
+          "timer",
+          "tuner",
+          "youtube"
+        ]
+      }
+    }
+  ]
+}

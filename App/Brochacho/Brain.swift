@@ -61,6 +61,20 @@ final class Brain {
         lineBank = LineBankStore.load(from: Bundle.main.url(forResource: "lines", withExtension: "json"))
         captureLog = CaptureLogStore.load()
 
+        // Bring an existing config up to date with any built-in command added since it was first written
+        // (config.json otherwise keeps whatever catalog it had on day one, forever — see CatalogMigration).
+        let migrationState = CatalogMigrationStore.load()
+        let migrated = CatalogMigration.merge(existing: config.catalog, defaults: DefaultCatalog.entries,
+                                              alreadyOffered: Set(migrationState.offered))
+        if migrated.catalog.count != config.catalog.count {
+            NSLog("Brochacho: added \(migrated.catalog.count - config.catalog.count) built-in command(s) new since this config was written")
+        }
+        if migrated.catalog != config.catalog || migrated.offered != migrationState.offered.sorted() {
+            config.catalog = migrated.catalog
+            CatalogMigrationStore.save(CatalogMigrationState(offered: migrated.offered))
+            try? ConfigStore.save(config)
+        }
+
         model = NotchModel(theme: NotchTheme(config.theme))
         controller = NotchController(model: model)
     }
