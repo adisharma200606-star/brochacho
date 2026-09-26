@@ -63,17 +63,30 @@ final class Brain {
 
         // Bring an existing config up to date with any built-in command added since it was first written
         // (config.json otherwise keeps whatever catalog it had on day one, forever — see CatalogMigration).
+        // Logs every step unconditionally: the first version of this silently did nothing on real hardware
+        // for a reason still not understood, so this time nothing about it is left to infer.
         let migrationState = CatalogMigrationStore.load()
+        NSLog("Brochacho: [migrate] on disk: \(config.catalog.count) entries; already offered before: \(migrationState.offered)")
+        NSLog("Brochacho: [migrate] DefaultCatalog.entries has \(DefaultCatalog.entries.count) entries; contains flip: \(DefaultCatalog.entries.contains { $0.name == "flip" })")
         let migrated = CatalogMigration.merge(existing: config.catalog, defaults: DefaultCatalog.entries,
                                               alreadyOffered: Set(migrationState.offered))
-        if migrated.catalog.count != config.catalog.count {
-            NSLog("Brochacho: added \(migrated.catalog.count - config.catalog.count) built-in command(s) new since this config was written")
-        }
-        if migrated.catalog != config.catalog || migrated.offered != migrationState.offered.sorted() {
+        NSLog("Brochacho: [migrate] merge() returned \(migrated.catalog.count) entries; contains flip: \(migrated.catalog.contains { $0.name == "flip" }); offered after: \(migrated.offered)")
+        let catalogChanged = migrated.catalog != config.catalog
+        let offeredChanged = migrated.offered != migrationState.offered.sorted()
+        NSLog("Brochacho: [migrate] catalogChanged=\(catalogChanged) offeredChanged=\(offeredChanged)")
+        if catalogChanged || offeredChanged {
             config.catalog = migrated.catalog
             CatalogMigrationStore.save(CatalogMigrationState(offered: migrated.offered))
-            try? ConfigStore.save(config)
+            do {
+                try ConfigStore.save(config)
+                NSLog("Brochacho: [migrate] saved config.json with \(config.catalog.count) entries")
+            } catch {
+                NSLog("Brochacho: [migrate] FAILED to save config.json: \(error)")
+            }
+        } else {
+            NSLog("Brochacho: [migrate] nothing to do")
         }
+        NSLog("Brochacho: [migrate] final in-memory catalog: \(config.catalog.count) entries; contains flip: \(config.catalog.contains { $0.name == "flip" })")
 
         model = NotchModel(theme: NotchTheme(config.theme))
         controller = NotchController(model: model)
