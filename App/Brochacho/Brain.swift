@@ -107,6 +107,7 @@ final class Brain {
             self?.sounds.play(.close)
             self?.close()
         }
+        controller.onEnter = { [weak self] in self?.submit(choosing: nil) }
         refreshInstalledApps()
         if !TutorialWindow.hasBeenSeen {
             // A moment after launch, so it does not fight the permission prompts.

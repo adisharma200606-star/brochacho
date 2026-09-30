@@ -16,6 +16,11 @@ final class NotchController {
     private(set) var isOpen = false
     /// Called when the person dismisses the notch themselves (Escape, or a click somewhere else).
     var onDismiss: () -> Void = {}
+    /// Called on Return/Enter while the box is open. Handled here, in the same reliable local key
+    /// monitor as Escape and the arrow keys, rather than relying only on SwiftUI's TextField `.onSubmit` —
+    /// a real case existed where Return stopped reaching that callback (remote input via iPhone Mirroring)
+    /// while every other key kept working fine through this monitor.
+    var onEnter: () -> Void = {}
 
     init(model: NotchModel) {
         self.model = model
@@ -98,6 +103,12 @@ final class NotchController {
             case 53:    // Escape
                 self.onDismiss()
                 return nil
+            case 36, 76:  // Return, and the numeric-keypad Enter
+                if self.model.screen == .input {
+                    self.onEnter()
+                    return nil
+                }
+                return event
             case 125:   // down arrow
                 if self.model.screen == .input { self.model.moveSelection(1); return nil }
                 return event

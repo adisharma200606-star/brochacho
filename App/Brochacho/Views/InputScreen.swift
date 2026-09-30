@@ -16,7 +16,10 @@ struct InputScreen: View {
                     .tint(model.theme.accent)
                     .focused($focused)
                     .disableAutocorrection(true)
-                    .onSubmit { model.onSubmit(nil) }
+                    // Enter is handled centrally in NotchController's key monitor, not here — see the
+                    // comment on `onEnter` there. Only one path exists, on purpose: with both wired up, a
+                    // single Enter press would fire submit() twice, which for a toggle like "flip" means
+                    // rotating and immediately rotating back, looking exactly like nothing happened.
                     .onChange(of: model.text) { newValue in model.onTextChange(newValue) }
 
                 if model.isListening {
