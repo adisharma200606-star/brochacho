@@ -188,6 +188,23 @@ final class Brain {
         model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
     }
 
+    // MARK: - Temporary diagnostic file
+    // Writes one plain line every time Enter is pressed, so a real mismatch between what you typed and
+    // what the matcher decided is visible with a plain `cat`, no terminal log syntax needed. Safe to
+    // remove once "flip" is confirmed working again.
+    private func appendDebug(_ line: String) {
+        let url = BrochachoPaths.configDirectory.appendingPathComponent("debug.log")
+        let stamp = ISO8601DateFormatter().string(from: Date())
+        guard let data = "\(stamp) \(line)\n".data(using: .utf8) else { return }
+        if FileManager.default.fileExists(atPath: url.path), let handle = try? FileHandle(forWritingTo: url) {
+            handle.seekToEndOfFile()
+            handle.write(data)
+            try? handle.close()
+        } else {
+            try? data.write(to: url)
+        }
+    }
+
     // MARK: - The box
 
     private func toggleBox() {
@@ -249,6 +266,8 @@ final class Brain {
     /// Enter, or a click on a row. `index` nil means "whichever row is highlighted".
     private func submit(choosing index: Int?) {
         let decision = self.decision ?? Matcher.match(model.text, catalog: searchable, usage: usage)
+        let topName = decision.results.first?.entry.name ?? "none"
+        appendDebug("submit typed=\"\(model.text)\" mode=\(decision.mode.rawValue) top=\(topName) confident=\(decision.confident) catalogSize=\(searchable.count)")
         let chosen = index ?? model.selected
 
         switch decision.mode {
