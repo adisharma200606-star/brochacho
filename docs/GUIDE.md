@@ -310,15 +310,23 @@ The first time, macOS will ask whether Brochacho may add to your Reminders and c
 
 ## 9½. Flipping the screen
 
-**Status:** Mac app builds, never run · uses a private part of macOS (see below)
+**Status:** works on Adi's Mac with only the built-in screen · HDMI-connected fix shipped 9 Oct 2026, waiting to be tried · uses a private part of macOS (see below)
 
 Type `one eighty` (or `180`, `flip`, `rotate`, `upside down`). The screen turns upside down. Type it again to turn it back. You can also hold the talk key and say "one eighty".
 
-It turns the built-in screen when there is one, otherwise the main screen. There is no "are you sure?" step: if you did not mean it, say it again.
+It turns the laptop's own screen whenever the lid is open, even with an HDMI screen plugged in; with the lid closed it turns the external screen. There is no "are you sure?" step: if you did not mean it, say it again.
+
+**With an HDMI screen plugged in.** There are several ways to ask macOS to rotate a screen, and one that works with the laptop alone can be quietly ignored once a second screen is connected. So Brochacho asks one way, watches whether the screen actually turned, and if not, asks the next way, up to three. It can take a second or two longer than usual. Only then does he speak. If you are *mirroring* (the same picture on both screens), macOS treats the pair as one screen; Brochacho tries that too, and if macOS still refuses he tells you to switch the HDMI screen to **Extended display** in System Settings → Displays.
+
+If it ever fails, the notch says why, and the full story of the last attempt is in `~/.brochacho/flip.log`. To see it, paste this into Terminal on its own:
+
+```
+cat ~/.brochacho/flip.log
+```
 
 **How it works, and the catch.** macOS has no public way to rotate a screen. System Settings uses a private part of macOS (a framework called MonitorPanel), and Brochacho calls the same thing, the same way the open-source app Rotator does. Private means Apple can change it in any update: if `one eighty` stops working after a macOS update, that is why, and `App/Brochacho/ScreenRotator.swift` is the file to fix. If it fails, he tells you in the notch what went wrong.
 
-While the screen is upside down the notch is at the bottom, so Brochacho appears as a small floating pill at the top instead, and dragging onto the notch and clicking it do not work until you flip back. Everything you type still works, including `bored`.
+While the screen is upside down the notch is at the bottom, so Brochacho appears as a small floating pill at the top of the laptop screen instead (it stays on the laptop even with an HDMI screen connected), and dragging onto the notch and clicking it do not work until you flip back. Everything you type still works, including `bored`.
 
 ---
 

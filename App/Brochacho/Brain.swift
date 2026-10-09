@@ -63,30 +63,22 @@ final class Brain {
 
         // Bring an existing config up to date with any built-in command added since it was first written
         // (config.json otherwise keeps whatever catalog it had on day one, forever — see CatalogMigration).
-        // Logs every step unconditionally: the first version of this silently did nothing on real hardware
-        // for a reason still not understood, so this time nothing about it is left to infer.
         let migrationState = CatalogMigrationStore.load()
-        NSLog("Brochacho: [migrate] on disk: \(config.catalog.count) entries; already offered before: \(migrationState.offered)")
-        NSLog("Brochacho: [migrate] DefaultCatalog.entries has \(DefaultCatalog.entries.count) entries; contains flip: \(DefaultCatalog.entries.contains { $0.name == "flip" })")
         let migrated = CatalogMigration.merge(existing: config.catalog, defaults: DefaultCatalog.entries,
                                               alreadyOffered: Set(migrationState.offered))
-        NSLog("Brochacho: [migrate] merge() returned \(migrated.catalog.count) entries; contains flip: \(migrated.catalog.contains { $0.name == "flip" }); offered after: \(migrated.offered)")
-        let catalogChanged = migrated.catalog != config.catalog
-        let offeredChanged = migrated.offered != migrationState.offered.sorted()
-        NSLog("Brochacho: [migrate] catalogChanged=\(catalogChanged) offeredChanged=\(offeredChanged)")
-        if catalogChanged || offeredChanged {
+        if migrated.catalog != config.catalog || migrated.offered != migrationState.offered.sorted() {
+            // A local copy: a closure may not touch `self` (and so `config`) until init has set every property.
+            let before = Set(config.catalog.map(\.name))
+            let added = migrated.catalog.map(\.name).filter { !before.contains($0) }
             config.catalog = migrated.catalog
             CatalogMigrationStore.save(CatalogMigrationState(offered: migrated.offered))
             do {
                 try ConfigStore.save(config)
-                NSLog("Brochacho: [migrate] saved config.json with \(config.catalog.count) entries")
+                NSLog("Brochacho: added built-in commands to config.json: \(added)")
             } catch {
-                NSLog("Brochacho: [migrate] FAILED to save config.json: \(error)")
+                NSLog("Brochacho: could not save config.json after adding built-ins: \(error)")
             }
-        } else {
-            NSLog("Brochacho: [migrate] nothing to do")
         }
-        NSLog("Brochacho: [migrate] final in-memory catalog: \(config.catalog.count) entries; contains flip: \(config.catalog.contains { $0.name == "flip" })")
 
         model = NotchModel(theme: NotchTheme(config.theme))
         controller = NotchController(model: model)
@@ -189,23 +181,6 @@ final class Brain {
         model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
     }
 
-    // MARK: - Temporary diagnostic file
-    // Writes one plain line every time Enter is pressed, so a real mismatch between what you typed and
-    // what the matcher decided is visible with a plain `cat`, no terminal log syntax needed. Safe to
-    // remove once "flip" is confirmed working again.
-    private func appendDebug(_ line: String) {
-        let url = BrochachoPaths.configDirectory.appendingPathComponent("debug.log")
-        let stamp = ISO8601DateFormatter().string(from: Date())
-        guard let data = "\(stamp) \(line)\n".data(using: .utf8) else { return }
-        if FileManager.default.fileExists(atPath: url.path), let handle = try? FileHandle(forWritingTo: url) {
-            handle.seekToEndOfFile()
-            handle.write(data)
-            try? handle.close()
-        } else {
-            try? data.write(to: url)
-        }
-    }
-
     // MARK: - The box
 
     private func toggleBox() {
@@ -267,8 +242,6 @@ final class Brain {
     /// Enter, or a click on a row. `index` nil means "whichever row is highlighted".
     private func submit(choosing index: Int?) {
         let decision = self.decision ?? Matcher.match(model.text, catalog: searchable, usage: usage)
-        let topName = decision.results.first?.entry.name ?? "none"
-        appendDebug("submit typed=\"\(model.text)\" mode=\(decision.mode.rawValue) top=\(topName) confident=\(decision.confident) catalogSize=\(searchable.count)")
         let chosen = index ?? model.selected
 
         switch decision.mode {
@@ -821,17 +794,23 @@ final class Brain {
 
     private func flipScreen(entry: String) {
         close()
-        // Let the notch get out of the way before the whole screen turns.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+        // Let the notch get out of the way before the whole screen turns. ScreenRotator then checks that
+        // the screen really moved, trying other ways of asking if it did not (which can take a couple of
+        // seconds with an HDMI screen plugged in), so the line is only said once it has actually turned.
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            let outcome = await ScreenRotator.toggleOneEighty()
             guard let self = self else { return }
-            switch ScreenRotator.toggleOneEighty() {
+            switch outcome {
             case .rotated:
                 let pick = Lines.pick(bank: self.lineBank, state: &self.lineState, category: "open_tool", target: entry,
                                       frequency: self.config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
                 if let pick = pick, self.config.speak { self.mouth.say(pick) }
+            case .busy:
+                break
             case .failed(let problem):
                 self.sounds.play(.unknown)
-                self.showLine(category: "unknown", target: nil, text: "The screen would not turn: \(problem)", hold: 4)
+                self.showLine(category: "unknown", target: nil, text: problem, hold: 6)
             }
         }
     }

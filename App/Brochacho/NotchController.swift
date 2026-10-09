@@ -52,9 +52,13 @@ final class NotchController {
         notch.grainOpacity = theme.grain
     }
 
-    /// The screen with the notch if there is one, otherwise the main screen.
+    /// The screen with the notch if there is one, then the laptop's own screen, then the main screen.
+    /// The middle step matters with "one eighty" and an HDMI screen plugged in: upside down, the laptop
+    /// screen's notch is at the bottom, so macOS stops reporting a notch at the top, and without this the
+    /// box would jump to the HDMI screen (usually "main") instead of staying where you are looking.
     static var preferredScreen: NSScreen {
         if let notched = NSScreen.screens.first(where: { $0.brochachoNotchFrame != nil }) { return notched }
+        if let builtIn = NSScreen.screens.first(where: { $0.brochachoIsBuiltIn }) { return builtIn }
         return NSScreen.main ?? NSScreen.screens[0]
     }
 
@@ -130,6 +134,12 @@ final class NotchController {
 }
 
 extension NSScreen {
+    /// True for the laptop's own screen.
+    var brochachoIsBuiltIn: Bool {
+        guard let number = deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else { return false }
+        return CGDisplayIsBuiltin(CGDirectDisplayID(number.uint32Value)) != 0
+    }
+
     /// The rectangle of the physical notch in screen coordinates, or nil on a screen without one.
     /// (DynamicNotchKit has the same calculation, but keeps it private.)
     var brochachoNotchFrame: NSRect? {

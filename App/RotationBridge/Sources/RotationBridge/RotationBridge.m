@@ -10,84 +10,107 @@
 // declare it (it was quietly deprecated).
 extern io_service_t CGDisplayIOServicePort(CGDirectDisplayID display);
 
-// System Settings rotates the screen through a private class, MPDisplay, in a private framework,
-// MonitorPanel. Neither is in any public header, so the compiler has no idea `-initWithCGSDisplayID:` or
-// `-setOrientation:` exist on anything. This category is a one-line white lie that fixes that: it tells
-// the compiler "some class somewhere implements these two methods", which is all Objective-C needs to let
-// us write a normal `[[cls alloc] initWithCGSDisplayID:...]` call below. At run time, since MPDisplayClass
-// really is MPDisplay, the real implementation runs — nothing here overrides anything.
+// System Settings rotates the screen through private classes, MPDisplay and MPDisplayMgr, in a private
+// framework, MonitorPanel. None of them is in a public header, so the compiler has no idea these methods
+// exist. This category is a white lie that fixes that: it tells the compiler "some class somewhere
+// implements these", which is all Objective-C needs to let us write ordinary message sends below. At run
+// time the real MonitorPanel implementations run; nothing here overrides anything. Every call is guarded
+// by respondsToSelector:, so a macOS update that renames one of them fails politely instead of crashing.
 @interface NSObject (BrochachoMonitorPanel)
 - (instancetype)initWithCGSDisplayID:(CGDirectDisplayID)displayID;
 - (void)setOrientation:(NSInteger)orientation;
 - (NSInteger)orientation;
+- (BOOL)canChangeOrientation;
+- (id)displayWithID:(CGDirectDisplayID)displayID;
+- (NSArray *)displays;
+- (CGDirectDisplayID)displayID;
 @end
 
 static void BrochachoSetError(char **outError, NSString *message) {
     if (outError != NULL) {
-        const char *utf8 = message.UTF8String ?: "Unknown display rotation error";
+        free(*outError);
+        const char *utf8 = message.UTF8String ?: "unknown rotation error";
         *outError = strdup(utf8);
     }
 }
 
-/// The modern way: ask MonitorPanel to do exactly what System Settings does.
-/// Logs every step unconditionally (NSLog, visible in Console.app / `log stream`), because the first
-/// version of this file failed *silently* on real hardware — no exception, no error, no rotation — and
-/// that is precisely the failure mode these logs exist to catch next time.
-static BOOL BrochachoTryMonitorPanel(CGDirectDisplayID displayID, int32_t degrees, char **outError) {
-    static void *monitorPanelHandle;
+static BOOL BrochachoLoadMonitorPanel(void) {
+    static void *handle;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        monitorPanelHandle = dlopen("/System/Library/PrivateFrameworks/MonitorPanel.framework/MonitorPanel",
-                                    RTLD_LAZY | RTLD_LOCAL);
+        handle = dlopen("/System/Library/PrivateFrameworks/MonitorPanel.framework/MonitorPanel",
+                        RTLD_LAZY | RTLD_LOCAL);
     });
-    NSLog(@"Brochacho: [rotate] dlopen MonitorPanel -> %s", monitorPanelHandle ? "loaded" : "FAILED");
-    if (monitorPanelHandle == NULL) {
-        BrochachoSetError(outError, @"MonitorPanel.framework is not on this Mac");
-        return NO;
-    }
+    return handle != NULL;
+}
 
-    Class MPDisplayClass = NSClassFromString(@"MPDisplay");
-    NSLog(@"Brochacho: [rotate] MPDisplay class -> %@", MPDisplayClass ? NSStringFromClass(MPDisplayClass) : @"MISSING");
-    if (MPDisplayClass == Nil) {
-        BrochachoSetError(outError, @"MPDisplay is missing from MonitorPanel");
-        return NO;
-    }
+/// A fresh MPDisplay for this ID, or nil.
+static id BrochachoFreshDisplay(CGDirectDisplayID displayID) {
+    if (!BrochachoLoadMonitorPanel()) { return nil; }
+    Class cls = NSClassFromString(@"MPDisplay");
+    if (cls == Nil || ![cls instancesRespondToSelector:@selector(initWithCGSDisplayID:)]) { return nil; }
+    return [[cls alloc] initWithCGSDisplayID:displayID];
+}
 
-    BOOL respondsInit = [MPDisplayClass instancesRespondToSelector:@selector(initWithCGSDisplayID:)];
-    BOOL respondsSet = [MPDisplayClass instancesRespondToSelector:@selector(setOrientation:)];
-    NSLog(@"Brochacho: [rotate] responds to initWithCGSDisplayID: %d, setOrientation: %d", respondsInit, respondsSet);
-    if (!respondsInit || !respondsSet) {
-        BrochachoSetError(outError, @"MPDisplay no longer has the methods this expects");
-        return NO;
-    }
+/// The MPDisplay that MonitorPanel's own manager keeps for this ID (how System Settings gets it), or nil.
+/// The manager is kept alive for the life of the app: making a new one per request would make it
+/// re-read every display each time, and it may need to stay around to finish applying a change.
+static id BrochachoManagedDisplay(CGDirectDisplayID displayID) {
+    if (!BrochachoLoadMonitorPanel()) { return nil; }
+    static id manager;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class cls = NSClassFromString(@"MPDisplayMgr");
+        if (cls != Nil) {
+            @try { manager = [[cls alloc] init]; } @catch (NSException *e) { manager = nil; }
+        }
+    });
+    if (manager == nil) { return nil; }
 
     @try {
-        id display = [[MPDisplayClass alloc] initWithCGSDisplayID:displayID];
-        NSLog(@"Brochacho: [rotate] initWithCGSDisplayID:%u -> %@", displayID, display ? @"got an object" : @"nil");
-        if (display == nil) {
-            BrochachoSetError(outError, @"MPDisplay would not open this display");
-            return NO;
+        if ([manager respondsToSelector:@selector(displayWithID:)]) {
+            id display = [manager displayWithID:displayID];
+            if (display != nil) { return display; }
         }
-        if ([display respondsToSelector:@selector(orientation)]) {
-            NSLog(@"Brochacho: [rotate] orientation before setOrientation: -> %ld", (long)[display orientation]);
+        if ([manager respondsToSelector:@selector(displays)]) {
+            for (id display in [manager displays]) {
+                if ([display respondsToSelector:@selector(displayID)] && [display displayID] == displayID) {
+                    return display;
+                }
+            }
         }
-        NSLog(@"Brochacho: [rotate] calling setOrientation:%d", degrees);
+    } @catch (NSException *e) {
+        NSLog(@"Brochacho: [rotate] MPDisplayMgr lookup raised %@: %@", e.name, e.reason);
+    }
+    return nil;
+}
+
+static int32_t BrochachoRotateWithPanel(CGDirectDisplayID displayID, int32_t degrees, BOOL viaManager, char **outError) {
+    if (!BrochachoLoadMonitorPanel()) {
+        BrochachoSetError(outError, @"MonitorPanel is not on this Mac");
+        return 2;
+    }
+    id display = viaManager ? BrochachoManagedDisplay(displayID) : BrochachoFreshDisplay(displayID);
+    if (display == nil) {
+        BrochachoSetError(outError, viaManager ? @"MonitorPanel's display manager does not know this screen"
+                                               : @"MonitorPanel would not open this screen");
+        return 3;
+    }
+    if (![display respondsToSelector:@selector(setOrientation:)]) {
+        BrochachoSetError(outError, @"MonitorPanel no longer has setOrientation:");
+        return 4;
+    }
+    @try {
         [display setOrientation:(NSInteger)degrees];
-        NSLog(@"Brochacho: [rotate] setOrientation: returned (no exception thrown)");
-        if ([display respondsToSelector:@selector(orientation)]) {
-            NSLog(@"Brochacho: [rotate] orientation right after -> %ld", (long)[display orientation]);
-        }
-        return YES;
+        return 0;
     } @catch (NSException *exception) {
-        NSLog(@"Brochacho: [rotate] EXCEPTION calling MPDisplay: %@ — %@", exception.name, exception.reason);
-        BrochachoSetError(outError, exception.reason ?: @"MPDisplay raised an exception");
-        return NO;
+        BrochachoSetError(outError, exception.reason ?: @"MonitorPanel raised an exception");
+        return 5;
     }
 }
 
-/// The old way, kept for Intel Macs and anything MonitorPanel refuses: ask the framebuffer directly.
-/// Apple Silicon's display pipeline usually ignores this, which is exactly why the modern path is tried first.
-static BOOL BrochachoTryLegacyIOKit(CGDirectDisplayID displayID, int32_t degrees, char **outError) {
+/// The old way: ask the framebuffer directly. Apple Silicon usually ignores it, which is why it is last.
+static int32_t BrochachoRotateWithIOKit(CGDirectDisplayID displayID, int32_t degrees, char **outError) {
     const IOOptionBits kIOFBSetTransform = 0x00000400;
     IOOptionBits transform;
     switch (degrees) {
@@ -97,46 +120,42 @@ static BOOL BrochachoTryLegacyIOKit(CGDirectDisplayID displayID, int32_t degrees
         case 270: transform = kIOScaleRotate270; break;
         default:
             BrochachoSetError(outError, @"degrees must be 0, 90, 180 or 270");
-            return NO;
+            return 1;
     }
-
     io_service_t service = CGDisplayIOServicePort(displayID);
-    NSLog(@"Brochacho: [rotate] legacy IOKit service port -> %u", service);
     if (service == MACH_PORT_NULL) {
-        BrochachoSetError(outError, @"Could not find this display's IOKit service");
-        return NO;
+        BrochachoSetError(outError, @"no IOKit service for this screen");
+        return 6;
     }
-
     kern_return_t result = IOServiceRequestProbe(service, kIOFBSetTransform | (transform << 16));
-    NSLog(@"Brochacho: [rotate] legacy IOKit IOServiceRequestProbe -> 0x%x", result);
     if (result != KERN_SUCCESS) {
-        BrochachoSetError(outError, [NSString stringWithFormat:@"IOKit refused the rotation (0x%x)", result]);
-        return NO;
+        BrochachoSetError(outError, [NSString stringWithFormat:@"IOKit refused (0x%x)", result]);
+        return 7;
     }
-    return YES;
+    return 0;
 }
 
-int32_t BrochachoRotateDisplay(uint32_t displayID, int32_t degrees, char **outError) {
-    NSLog(@"Brochacho: [rotate] BrochachoRotateDisplay(displayID: %u, degrees: %d)", displayID, degrees);
+int32_t BrochachoRotate(uint32_t displayID, int32_t degrees, int32_t method, char **outError) {
     if (outError != NULL) { *outError = NULL; }
     if (displayID == 0 || (degrees != 0 && degrees != 90 && degrees != 180 && degrees != 270)) {
-        BrochachoSetError(outError, @"Invalid display or rotation angle");
+        BrochachoSetError(outError, @"invalid screen or angle");
         return 1;
     }
-
-    char *monitorPanelError = NULL;
-    BOOL monitorPanelWorked = BrochachoTryMonitorPanel(displayID, degrees, &monitorPanelError);
-    NSLog(@"Brochacho: [rotate] MonitorPanel path -> %@", monitorPanelWorked ? @"reported success" : @"failed");
-    if (monitorPanelWorked) {
-        free(monitorPanelError);
-        return 0;
+    switch (method) {
+        case 0: return BrochachoRotateWithPanel(displayID, degrees, NO, outError);
+        case 1: return BrochachoRotateWithPanel(displayID, degrees, YES, outError);
+        case 2: return BrochachoRotateWithIOKit(displayID, degrees, outError);
     }
-    NSLog(@"Brochacho: MonitorPanel could not rotate (%s); trying the legacy IOKit path",
-          monitorPanelError ? monitorPanelError : "no detail");
-    free(monitorPanelError);
+    BrochachoSetError(outError, @"unknown method");
+    return 1;
+}
 
-    if (BrochachoTryLegacyIOKit(displayID, degrees, outError)) {
-        return 0;
+int32_t BrochachoCanRotate(uint32_t displayID) {
+    @try {
+        id display = BrochachoFreshDisplay(displayID);
+        if (display == nil || ![display respondsToSelector:@selector(canChangeOrientation)]) { return -1; }
+        return [display canChangeOrientation] ? 1 : 0;
+    } @catch (NSException *e) {
+        return -1;
     }
-    return 2;
 }

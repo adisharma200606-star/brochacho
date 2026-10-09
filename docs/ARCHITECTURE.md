@@ -70,7 +70,7 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `Ears.swift` | Hold-to-talk speech recognition. |
 | `MicTuner.swift` | Microphone into the pitch detector, about twelve readings a second. |
 | `CaptureWriter.swift` | Makes the note (AppleScript, keeping its id) or the reminder (EventKit); reads upcoming reminders and ticks them off; reopens a note by id. |
-| `ScreenRotator.swift` | `one eighty`: asks `RotationBridge` to rotate the screen, and turns its C result into an `Outcome`. |
+| `ScreenRotator.swift` | `one eighty`: picks the screen (laptop when the lid is open, else main), asks `RotationBridge` to rotate it one way at a time, checks with `CGDisplayRotation` that it really turned before trying the next way, handles mirroring, and writes `~/.brochacho/flip.log`. |
 | `AppIndex.swift` | Finds installed apps so any of them opens by name. |
 | `TutorialWindow.swift` | The three slides. |
 | `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
