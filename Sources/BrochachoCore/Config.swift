@@ -301,6 +301,102 @@ public struct AskConfig: Codable, Equatable {
     }
 }
 
+/// When he comes out of the notch about jobs. Times are "HH:MM" on the wall clock.
+public struct JobsConfig: Codable, Equatable {
+    /// He does not come out before this.
+    public var dayStart: String
+    /// After this the only job left is sleep. Times before 04:00 mean after midnight.
+    public var bedtime: String
+    /// Least minutes between two appearances about jobs with no time set.
+    public var cooldownMinutes: Int
+    /// What "later" puts a job off by.
+    public var laterMinutes: Int
+    /// How bold he gets when ignored, 0 to 3. 0 means he only ever bobs just under the notch.
+    public var maxLevel: Int
+    /// Minutes he roams before giving up and flying home.
+    public var roamMinutes: Double
+    /// Words he has learned start a particular thing: "read" to "books". Filled in when you pick one.
+    public var bindings: [String: String]
+
+    public init(dayStart: String = "09:00", bedtime: String = "00:30", cooldownMinutes: Int = 45, laterMinutes: Int = 30,
+                maxLevel: Int = 3, roamMinutes: Double = 3, bindings: [String: String] = [:]) {
+        self.dayStart = dayStart
+        self.bedtime = bedtime
+        self.cooldownMinutes = cooldownMinutes
+        self.laterMinutes = laterMinutes
+        self.maxLevel = maxLevel
+        self.roamMinutes = roamMinutes
+        self.bindings = bindings
+    }
+
+    private enum CodingKeys: String, CodingKey { case dayStart, bedtime, cooldownMinutes, laterMinutes, maxLevel, roamMinutes, bindings }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = JobsConfig()
+        dayStart = try c.decodeIfPresent(String.self, forKey: .dayStart) ?? d.dayStart
+        bedtime = try c.decodeIfPresent(String.self, forKey: .bedtime) ?? d.bedtime
+        cooldownMinutes = try c.decodeIfPresent(Int.self, forKey: .cooldownMinutes) ?? d.cooldownMinutes
+        laterMinutes = try c.decodeIfPresent(Int.self, forKey: .laterMinutes) ?? d.laterMinutes
+        maxLevel = try c.decodeIfPresent(Int.self, forKey: .maxLevel) ?? d.maxLevel
+        roamMinutes = try c.decodeIfPresent(Double.self, forKey: .roamMinutes) ?? d.roamMinutes
+        bindings = try c.decodeIfPresent([String: String].self, forKey: .bindings) ?? d.bindings
+    }
+
+    /// The numbers the brain works with. A time it cannot read falls back to the default.
+    public var settings: JobSettings {
+        let d = JobSettings()
+        return JobSettings(dayStartMin: Jobs.clockMinutes(dayStart) ?? d.dayStartMin,
+                           bedtimeMin: Jobs.clockMinutes(bedtime) ?? d.bedtimeMin,
+                           cooldownMin: max(1, cooldownMinutes), laterMin: max(1, laterMinutes),
+                           maxLevel: min(3, max(0, maxLevel)))
+    }
+}
+
+/// The character who lives in the notch.
+public struct CharacterConfig: Codable, Equatable {
+    /// A folder of PNG frames: idle_0.png, idle_1.png… and fly_0.png, fly_1.png…, facing right.
+    /// Empty or missing means the little dragon that ships with the app.
+    public var folder: String
+    /// How big he is on screen, in points, before he gets bolder.
+    public var size: Double
+    /// Off: he never leaves the notch; a due job only shows as his head beside it.
+    public var roam: Bool
+
+    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = true) {
+        self.folder = folder
+        self.size = size
+        self.roam = roam
+    }
+
+    private enum CodingKeys: String, CodingKey { case folder, size, roam }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = CharacterConfig()
+        folder = try c.decodeIfPresent(String.self, forKey: .folder) ?? d.folder
+        size = try c.decodeIfPresent(Double.self, forKey: .size) ?? d.size
+        roam = try c.decodeIfPresent(Bool.self, forKey: .roam) ?? d.roam
+    }
+}
+
+/// "play beabadoobee". The Spotify keys, when there are any, live in the Keychain, not here.
+public struct MusicConfig: Codable, Equatable {
+    /// "spotify" or "music" (Apple Music).
+    public var player: String
+
+    public init(player: String = "spotify") {
+        self.player = player
+    }
+
+    private enum CodingKeys: String, CodingKey { case player }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        player = try c.decodeIfPresent(String.self, forKey: .player) ?? MusicConfig().player
+    }
+}
+
 public struct Config: Codable, Equatable {
     public var hotkeys: Hotkeys
     public var brave: BraveConfig
@@ -314,11 +410,15 @@ public struct Config: Codable, Equatable {
     public var feedback: FeedbackConfig
     /// When on, every app installed on this Mac can be opened by typing its name, with no entry needed.
     public var includeInstalledApps: Bool
+    public var jobs: JobsConfig
+    public var character: CharacterConfig
+    public var music: MusicConfig
     public var catalog: [CatalogEntry]
 
     public init(hotkeys: Hotkeys = Hotkeys(), brave: BraveConfig = BraveConfig(), speak: Bool = true, speechLocale: String = "en-IN",
                 theme: Theme = Theme(), tuner: TunerConfig = TunerConfig(), ask: AskConfig = AskConfig(),
                 feedback: FeedbackConfig = FeedbackConfig(), includeInstalledApps: Bool = true,
+                jobs: JobsConfig = JobsConfig(), character: CharacterConfig = CharacterConfig(), music: MusicConfig = MusicConfig(),
                 catalog: [CatalogEntry] = DefaultCatalog.entries) {
         self.hotkeys = hotkeys
         self.brave = brave
@@ -329,10 +429,13 @@ public struct Config: Codable, Equatable {
         self.ask = ask
         self.feedback = feedback
         self.includeInstalledApps = includeInstalledApps
+        self.jobs = jobs
+        self.character = character
+        self.music = music
         self.catalog = catalog
     }
 
-    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, speechLocale, theme, tuner, ask, feedback, includeInstalledApps, catalog }
+    private enum CodingKeys: String, CodingKey { case hotkeys, brave, speak, speechLocale, theme, tuner, ask, feedback, includeInstalledApps, jobs, character, music, catalog }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -345,6 +448,9 @@ public struct Config: Codable, Equatable {
         ask = try c.decodeIfPresent(AskConfig.self, forKey: .ask) ?? AskConfig()
         feedback = try c.decodeIfPresent(FeedbackConfig.self, forKey: .feedback) ?? FeedbackConfig()
         includeInstalledApps = try c.decodeIfPresent(Bool.self, forKey: .includeInstalledApps) ?? true
+        jobs = try c.decodeIfPresent(JobsConfig.self, forKey: .jobs) ?? JobsConfig()
+        character = try c.decodeIfPresent(CharacterConfig.self, forKey: .character) ?? CharacterConfig()
+        music = try c.decodeIfPresent(MusicConfig.self, forKey: .music) ?? MusicConfig()
         catalog = try c.decodeIfPresent([CatalogEntry].self, forKey: .catalog) ?? DefaultCatalog.entries
     }
 }

@@ -6,9 +6,10 @@ struct LineScreen: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Text("—")
-                .font(model.theme.mono(11))
+        HStack(alignment: .center, spacing: 10) {
+            // He is the one talking, so he sits beside what he says.
+            CharacterView(frames: model.character)
+                .frame(width: 26, height: 26)
             Text(model.lineText.liner)
                 .font(model.theme.font(model.theme.textSize * 0.9, .light))
                 .kerning(0.5)

@@ -43,6 +43,7 @@ Two ideas explain most of the design:
 | `CaptureLog.swift` | The short list of notes and reminders made from the notch, for the glance; and `InstalledApps`, which turns the apps found on disk into things the box can open. |
 | `CatalogMigration.swift` | Keeps an existing `config.json` in step with new built-in commands added in later updates — see the note below. |
 | `Capture.swift` | Reading "call mom tomorrow at 5" into a title and a time. |
+| `Jobs.swift` | The day's jobs: reading "read 30 min, duolingo by 10pm", which of his things starts each job, carrying unfinished jobs to the next day, and `Jobs.nextNudge`, which decides when the character comes out, about what, and how boldly. Port of `reference-js/jobs.js`. |
 | `Ask.swift` | What is sent with a question, when the clipboard is included, and splitting the reply into text and a command. |
 | `Feedback.swift` | Which sound and which trackpad tap go with each event. |
 | `Config.swift` | Every setting, each with a default, so a partial or old config file always loads. |
@@ -69,11 +70,16 @@ Each of these is a port of a file in `reference-js/`. The port is kept honest by
 | `SoundPlayer.swift` | Plays the eight sounds and the trackpad taps. |
 | `Ears.swift` | Hold-to-talk speech recognition. |
 | `MicTuner.swift` | Microphone into the pitch detector, about twelve readings a second. |
-| `CaptureWriter.swift` | Makes the note (AppleScript, keeping its id) or the reminder (EventKit); reads upcoming reminders and ticks them off; reopens a note by id. |
+| `CaptureWriter.swift` | Makes the note (AppleScript, keeping its id) or the reminder (EventKit); reads upcoming reminders and ticks them off; reopens a note by id; appends to the day's diary note. |
 | `ScreenRotator.swift` | `one eighty`: picks the screen (laptop when the lid is open, else main), asks `RotationBridge` to rotate it one way at a time, checks with `CGDisplayRotation` that it really turned before trying the next way, handles mirroring, and writes `~/.brochacho/flip.log`. |
 | `AppIndex.swift` | Finds installed apps so any of them opens by name. |
 | `TutorialWindow.swift` | The three slides. |
-| `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain. Monthly spending ledger. |
+| `AskClient.swift` | One HTTPS call to the Claude API. Key in the Keychain (which also holds the Spotify keys). Monthly spending ledger. |
+| `Character/CharacterSprite.swift` | The character's frames (from `~/.brochacho/character/`, else the bundled dragon) and the animated view. |
+| `Character/Roamer.swift` | The small window he flies around the screen in. The window *is* him, so every other click goes through. Paths per boldness level, flying out from and back into the notch. |
+| `Character/JobCard.swift` | The card beside him when he is clicked: the job, a line, two or three buttons. |
+| `FocusFilter.swift` | A Focus filter (AppIntents) that keeps him in the notch during the Focus modes Adi picks. |
+| `MusicPlayer.swift` | "play beabadoobee": Spotify's search (with a free key) or Apple Music's library, then AppleScript to play. Pause, next, volume. |
 | `SettingsWindow.swift` | The settings window: things, voice and sound, Ask, hotkeys and files. |
 | `Resources/` | `lines.json` (copied from `defaults/` by `scripts/sync_app_resources.py`), `sounds/*.wav` (made by `scripts/make_sounds.py`), `fonts/` (IBM Plex Mono) and `textures/grain.png`. Xcode flattens all of these into the top of the app's Resources folder. |
 
@@ -116,6 +122,13 @@ at this got wrong, silently, with no compiler to catch it. See `RotationBridge.m
 6. Then `count` bumps the usage counter, and `showLine` picks a line (`Lines.pick`), shows it, maybe says it (`Mouth`), and schedules the notch to close.
 
 Every other feature follows the same pattern: a trigger, a decision from the brain, the action, then the line.
+
+## What happens when a job is due
+
+1. Every 30 seconds `Brain.checkJobs` asks `Jobs.nextNudge` (pure, tested) whether he should come out. It knows only the clock, `jobs.json`, the settings, whether a Focus filter or `quiet` is holding him in, and how many seconds since the last key press or mouse move.
+2. If so, `Roamer.flyOut` sends him out of the notch at the right boldness. No sound, no voice.
+3. A click opens `JobCard`. **start it** runs the job's starter through `Opener` first (rule 1), starts the timer for the job's length, then says a line. He flies home.
+4. If nobody clicks him, `Roamer` gives up after `jobs.roamMinutes`, and `JobDay.ignored` makes the next visit one level bolder.
 
 ## Threads
 

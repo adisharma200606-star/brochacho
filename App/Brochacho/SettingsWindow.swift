@@ -34,12 +34,16 @@ final class SettingsState: ObservableObject {
     @Published var config: Config
     @Published var selection: String? = nil
     @Published var apiKey: String = ""
+    @Published var spotifyID: String = ""
+    @Published var spotifySecret: String = ""
     @Published var note: String = ""
 
     init(brain: Brain) {
         self.brain = brain
         self.config = brain.config
         self.apiKey = AskClient.Keychain.read() ?? ""
+        self.spotifyID = AskClient.Keychain.read(account: MusicPlayer.clientIDAccount) ?? ""
+        self.spotifySecret = AskClient.Keychain.read(account: MusicPlayer.clientSecretAccount) ?? ""
     }
 
     var selectedIndex: Int? {
@@ -114,6 +118,8 @@ final class SettingsState: ObservableObject {
 
     func save() {
         AskClient.Keychain.write(apiKey)
+        AskClient.Keychain.write(spotifyID, account: MusicPlayer.clientIDAccount)
+        AskClient.Keychain.write(spotifySecret, account: MusicPlayer.clientSecretAccount)
         brain.update(config)
         note = "Saved."
     }
@@ -127,6 +133,7 @@ struct SettingsView: View {
             ThingsTab(state: state).tabItem { Text("Things") }
             VoiceTab(state: state).tabItem { Text("Voice and sound") }
             AskTab(state: state).tabItem { Text("Ask") }
+            JobsTab(state: state).tabItem { Text("Jobs and music") }
             KeysTab(state: state).tabItem { Text("Hotkeys and files") }
         }
         .padding(16)
@@ -333,6 +340,41 @@ private struct AskTab: View {
             TextField("Monthly budget in US dollars", value: $state.config.ask.monthlyBudgetUSD, format: .number)
             Text(String(format: "Spent this month: $%.4f", AskClient.Spending.thisMonth()))
                 .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: Jobs, the character, music
+
+private struct JobsTab: View {
+    @ObservedObject var state: SettingsState
+
+    var body: some View {
+        Form {
+            TextField("He comes out from (HH:MM)", text: $state.config.jobs.dayStart)
+            TextField("Bedtime (HH:MM; before 04:00 means after midnight)", text: $state.config.jobs.bedtime)
+            TextField("Minutes between visits", value: $state.config.jobs.cooldownMinutes, format: .number)
+            TextField("Minutes \"later\" waits", value: $state.config.jobs.laterMinutes, format: .number)
+            Stepper("How bold he gets when ignored: \(state.config.jobs.maxLevel)", value: $state.config.jobs.maxLevel, in: 0...3)
+            Toggle("He may fly out of the notch", isOn: $state.config.character.roam)
+            Text("To keep him in during some Focus modes: System Settings → Focus → a Focus → Focus filters → Brochacho.")
+                .font(.caption).foregroundStyle(.secondary)
+
+            Divider()
+            TextField("Character folder", text: $state.config.character.folder)
+            TextField("Size in points", value: $state.config.character.size, format: .number)
+            Text("PNG frames named idle_0.png, idle_1.png… and fly_0.png, fly_1.png…, facing right. Empty means the little dragon.")
+                .font(.caption).foregroundStyle(.secondary)
+
+            Divider()
+            Picker("Music plays in", selection: $state.config.music.player) {
+                Text("Spotify").tag("spotify")
+                Text("Apple Music").tag("music")
+            }
+            TextField("Spotify Client ID", text: $state.spotifyID)
+            SecureField("Spotify Client secret", text: $state.spotifySecret)
+            Text("Optional. From developer.spotify.com → Dashboard → Create app. Without them, \"play\" opens Spotify's search instead of playing. Kept in the Keychain.")
+                .font(.caption).foregroundStyle(.secondary)
         }
     }
 }

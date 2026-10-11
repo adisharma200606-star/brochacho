@@ -1103,6 +1103,448 @@
       "text": "Sit down. I explain."
     }
   ],
+  "job_added": [
+    {
+      "id": "ja01",
+      "text": "The jobs are on the books."
+    },
+    {
+      "id": "ja02",
+      "text": "Noted. The family thanks you."
+    },
+    {
+      "id": "ja03",
+      "text": "It's in the ledger now."
+    },
+    {
+      "id": "ja04",
+      "text": "Consider it a contract."
+    },
+    {
+      "id": "ja05",
+      "text": "Jobs assigned. I'll be around."
+    },
+    {
+      "id": "ja06",
+      "text": "Written down. In pen."
+    },
+    {
+      "id": "ja07",
+      "text": "I got the list, boss."
+    },
+    {
+      "id": "ja08",
+      "text": "Capisce. The jobs are set."
+    },
+    {
+      "id": "ja09",
+      "text": "On the books. No backing out."
+    },
+    {
+      "id": "ja10",
+      "text": "A day's work. I like it."
+    }
+  ],
+  "job_started": [
+    {
+      "id": "js01",
+      "text": "Now we're talking business."
+    },
+    {
+      "id": "js02",
+      "text": "Good. Go do the job."
+    },
+    {
+      "id": "js03",
+      "text": "That's my guy."
+    },
+    {
+      "id": "js04",
+      "text": "The work, she begins."
+    },
+    {
+      "id": "js05",
+      "text": "Atta boy. I'll leave you to it."
+    },
+    {
+      "id": "js06",
+      "text": "Professional. Very professional."
+    },
+    {
+      "id": "js07",
+      "text": "Get in there, boss."
+    },
+    {
+      "id": "js08",
+      "text": "This is how it's done."
+    },
+    {
+      "id": "js09",
+      "text": "Respect. Go get it."
+    },
+    {
+      "id": "js10",
+      "text": "The family is proud already."
+    }
+  ],
+  "job_done": [
+    {
+      "id": "jd01",
+      "text": "Job's done. Clean work."
+    },
+    {
+      "id": "jd02",
+      "text": "Paid in full."
+    },
+    {
+      "id": "jd03",
+      "text": "Beautiful. Not a trace."
+    },
+    {
+      "id": "jd04",
+      "text": "That's a made man."
+    },
+    {
+      "id": "jd05",
+      "text": "Crossed off the books."
+    },
+    {
+      "id": "jd06",
+      "text": "The family thanks you."
+    },
+    {
+      "id": "jd07",
+      "text": "Like a professional. Bellissimo."
+    },
+    {
+      "id": "jd08",
+      "text": "Done. We never discuss it."
+    },
+    {
+      "id": "jd09",
+      "text": "Another one, handled."
+    },
+    {
+      "id": "jd10",
+      "text": "Respect. Real respect."
+    },
+    {
+      "id": "jd11",
+      "text": "Finito. You earned your cannoli."
+    },
+    {
+      "id": "jd12",
+      "text": "Debt settled."
+    }
+  ],
+  "job_skipped": [
+    {
+      "id": "jk01",
+      "text": "Fine. We forget about it."
+    },
+    {
+      "id": "jk02",
+      "text": "Off the books. This time."
+    },
+    {
+      "id": "jk03",
+      "text": "I didn't see nothing."
+    },
+    {
+      "id": "jk04",
+      "text": "Skipped. It happens to everybody."
+    },
+    {
+      "id": "jk05",
+      "text": "We let it slide. Today."
+    },
+    {
+      "id": "jk06",
+      "text": "Forget about it."
+    }
+  ],
+  "job_later": [
+    {
+      "id": "jl01",
+      "text": "Later. I'll come back around."
+    },
+    {
+      "id": "jl02",
+      "text": "Half an hour. I'm counting."
+    },
+    {
+      "id": "jl03",
+      "text": "I'll be back. Don't make me."
+    },
+    {
+      "id": "jl04",
+      "text": "Okay. I know where you live."
+    },
+    {
+      "id": "jl05",
+      "text": "Later then. I'm patient. Mostly."
+    },
+    {
+      "id": "jl06",
+      "text": "Fine. I'll wait outside."
+    }
+  ],
+  "job_card": [
+    {
+      "id": "jc01",
+      "text": "Got a job for you."
+    },
+    {
+      "id": "jc02",
+      "text": "Boss. The job."
+    },
+    {
+      "id": "jc03",
+      "text": "We need to talk business."
+    },
+    {
+      "id": "jc04",
+      "text": "The job won't do itself."
+    },
+    {
+      "id": "jc05",
+      "text": "A little job. Nothing heavy."
+    },
+    {
+      "id": "jc06",
+      "text": "Excuse me. Business."
+    },
+    {
+      "id": "jc07",
+      "text": "I'm here about the job."
+    },
+    {
+      "id": "jc08",
+      "text": "Time to earn, boss."
+    },
+    {
+      "id": "jc09",
+      "text": "Allora. The work is waiting."
+    },
+    {
+      "id": "jc10",
+      "text": "A favour, for the family."
+    },
+    {
+      "id": "jc11",
+      "text": "Psst. The job."
+    },
+    {
+      "id": "jc12",
+      "text": "You know why I'm here."
+    }
+  ],
+  "job_check": [
+    {
+      "id": "jh01",
+      "text": "So. Is it done."
+    },
+    {
+      "id": "jh02",
+      "text": "Checking on the job."
+    },
+    {
+      "id": "jh03",
+      "text": "How's the work going, boss."
+    },
+    {
+      "id": "jh04",
+      "text": "I'm just asking. Is it finished."
+    },
+    {
+      "id": "jh05",
+      "text": "Report back to me."
+    },
+    {
+      "id": "jh06",
+      "text": "The job. Tell me it's handled."
+    }
+  ],
+  "job_owed": [
+    {
+      "id": "jo01",
+      "text": "You still owe me this."
+    },
+    {
+      "id": "jo02",
+      "text": "Another day. Still owed."
+    },
+    {
+      "id": "jo03",
+      "text": "This one's getting old, boss."
+    },
+    {
+      "id": "jo04",
+      "text": "The interest is piling up."
+    },
+    {
+      "id": "jo05",
+      "text": "I'm a patient man. Usually."
+    },
+    {
+      "id": "jo06",
+      "text": "This debt, it follows you."
+    },
+    {
+      "id": "jo07",
+      "text": "The books don't lie, boss."
+    },
+    {
+      "id": "jo08",
+      "text": "Three days. I'm counting."
+    }
+  ],
+  "bedtime": [
+    {
+      "id": "bt01",
+      "text": "Why you up. Bed."
+    },
+    {
+      "id": "bt02",
+      "text": "Hey. The bed misses you."
+    },
+    {
+      "id": "bt03",
+      "text": "It's late. Go to sleep."
+    },
+    {
+      "id": "bt04",
+      "text": "Even the family sleeps, boss."
+    },
+    {
+      "id": "bt05",
+      "text": "Lights out. I mean it."
+    },
+    {
+      "id": "bt06",
+      "text": "Nobody good is awake now."
+    },
+    {
+      "id": "bt07",
+      "text": "The night shift is mine. Sleep."
+    },
+    {
+      "id": "bt08",
+      "text": "Bed. Before I get upset."
+    },
+    {
+      "id": "bt09",
+      "text": "Close the books. Sleep."
+    },
+    {
+      "id": "bt10",
+      "text": "Mamma says go to bed."
+    }
+  ],
+  "sleep_going": [
+    {
+      "id": "sg01",
+      "text": "Buonanotte, boss."
+    },
+    {
+      "id": "sg02",
+      "text": "Sleep good. I keep watch."
+    },
+    {
+      "id": "sg03",
+      "text": "Sogni d'oro."
+    },
+    {
+      "id": "sg04",
+      "text": "Good man. Good night."
+    },
+    {
+      "id": "sg05",
+      "text": "The books are closed. Rest."
+    },
+    {
+      "id": "sg06",
+      "text": "Goodnight. Tomorrow, more business."
+    }
+  ],
+  "diary_saved": [
+    {
+      "id": "dy01",
+      "text": "Into the diary. Very private."
+    },
+    {
+      "id": "dy02",
+      "text": "Written down. I didn't read it."
+    },
+    {
+      "id": "dy03",
+      "text": "Your secrets are safe."
+    },
+    {
+      "id": "dy04",
+      "text": "Dear diary, he says."
+    },
+    {
+      "id": "dy05",
+      "text": "In the book. Locked."
+    },
+    {
+      "id": "dy06",
+      "text": "The memoirs grow."
+    }
+  ],
+  "quiet_on": [
+    {
+      "id": "qt01",
+      "text": "Okay. I stay in the notch."
+    },
+    {
+      "id": "qt02",
+      "text": "Quiet as a mouse."
+    },
+    {
+      "id": "qt03",
+      "text": "Not a peep. Until tomorrow."
+    },
+    {
+      "id": "qt04",
+      "text": "I'll be in the back."
+    }
+  ],
+  "music_play": [
+    {
+      "id": "mp01",
+      "text": "Music for the boss."
+    },
+    {
+      "id": "mp02",
+      "text": "The band is playing."
+    },
+    {
+      "id": "mp03",
+      "text": "Put the needle down."
+    },
+    {
+      "id": "mp04",
+      "text": "A little music. Bellissimo."
+    },
+    {
+      "id": "mp05",
+      "text": "Turn it up, I say."
+    },
+    {
+      "id": "mp06",
+      "text": "The jukebox, she obeys."
+    },
+    {
+      "id": "mp07",
+      "text": "Music. For the soul."
+    },
+    {
+      "id": "mp08",
+      "text": "Ecco. Your song."
+    }
+  ],
   "target:timer": [
     {
       "id": "tm01",

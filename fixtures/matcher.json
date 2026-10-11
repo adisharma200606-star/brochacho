@@ -210,6 +210,130 @@
       ],
       "kind": "tool",
       "target": "help"
+    },
+    {
+      "name": "books",
+      "display": "Books",
+      "aliases": [
+        "read",
+        "reading",
+        "apple books"
+      ],
+      "kind": "app",
+      "target": "com.apple.iBooksX"
+    },
+    {
+      "name": "duolingo",
+      "display": "Duolingo",
+      "aliases": [
+        "duo"
+      ],
+      "kind": "site",
+      "target": "https://www.duolingo.com/learn",
+      "profile": "personal"
+    },
+    {
+      "name": "jobs",
+      "display": "Today's jobs",
+      "aliases": [
+        "job",
+        "today",
+        "todo list",
+        "my jobs"
+      ],
+      "kind": "tool",
+      "target": "jobs",
+      "takesWords": true
+    },
+    {
+      "name": "done",
+      "display": "Job done",
+      "aliases": [
+        "finished"
+      ],
+      "kind": "tool",
+      "target": "done",
+      "takesWords": true
+    },
+    {
+      "name": "diary",
+      "display": "Diary",
+      "aliases": [
+        "dear diary",
+        "journal"
+      ],
+      "kind": "tool",
+      "target": "diary",
+      "takesWords": true
+    },
+    {
+      "name": "quiet",
+      "display": "Quiet for today",
+      "aliases": [
+        "hush",
+        "be quiet",
+        "leave me alone"
+      ],
+      "kind": "tool",
+      "target": "quiet"
+    },
+    {
+      "name": "music",
+      "display": "Play music",
+      "aliases": [],
+      "kind": "tool",
+      "target": "music",
+      "takesWords": true
+    },
+    {
+      "name": "pause",
+      "display": "Pause or resume",
+      "aliases": [
+        "resume",
+        "pause music"
+      ],
+      "kind": "tool",
+      "target": "playpause"
+    },
+    {
+      "name": "next song",
+      "display": "Next song",
+      "aliases": [
+        "next",
+        "skip",
+        "skip song"
+      ],
+      "kind": "tool",
+      "target": "next"
+    },
+    {
+      "name": "louder",
+      "display": "Louder",
+      "aliases": [
+        "volume up",
+        "turn it up"
+      ],
+      "kind": "tool",
+      "target": "louder"
+    },
+    {
+      "name": "quieter",
+      "display": "Quieter",
+      "aliases": [
+        "volume down",
+        "turn it down",
+        "softer"
+      ],
+      "kind": "tool",
+      "target": "quieter"
+    },
+    {
+      "name": "volume",
+      "display": "Volume",
+      "aliases": [],
+      "kind": "tool",
+      "target": "volume",
+      "takesWords": true
     }
   ],
   "cases": [
@@ -464,6 +588,10 @@
         {
           "name": "linkedin",
           "band": "exact"
+        },
+        {
+          "name": "jobs",
+          "band": "wordPrefix"
         }
       ],
       "plan": {
@@ -610,6 +738,10 @@
         {
           "name": "downloads",
           "band": "exact"
+        },
+        {
+          "name": "duolingo",
+          "band": "subsequence"
         }
       ],
       "plan": {
@@ -848,6 +980,10 @@
         {
           "name": "flip",
           "band": "wordPrefix"
+        },
+        {
+          "name": "quieter",
+          "band": "wordPrefix"
         }
       ],
       "plan": {
@@ -886,7 +1022,15 @@
           "band": "prefix"
         },
         {
-          "name": "desktop",
+          "name": "duolingo",
+          "band": "prefix"
+        },
+        {
+          "name": "done",
+          "band": "prefix"
+        },
+        {
+          "name": "diary",
           "band": "prefix"
         }
       ],
@@ -897,22 +1041,22 @@
       }
     },
     {
-      "input": "music",
+      "input": "lofi music",
       "usage": {},
-      "mode": "open",
+      "mode": "search",
       "confident": true,
-      "query": null,
+      "query": "lofi",
       "results": [
         {
-          "name": "youtube music",
-          "band": "wordPrefix"
+          "name": "music",
+          "band": "exact"
         }
       ],
       "plan": {
-        "type": "openURL",
-        "url": "https://music.youtube.com",
-        "profile": "personal",
-        "entry": "youtube music"
+        "type": "openTool",
+        "tool": "music",
+        "argument": "lofi",
+        "entry": "music"
       }
     },
     {
@@ -995,7 +1139,9 @@
     },
     {
       "input": "s",
-      "usage": {},
+      "usage": {
+        "steam": 1
+      },
       "mode": "open",
       "confident": true,
       "query": null,
@@ -1005,15 +1151,15 @@
           "band": "prefix"
         },
         {
+          "name": "next song",
+          "band": "prefix"
+        },
+        {
+          "name": "quieter",
+          "band": "prefix"
+        },
+        {
           "name": "spotify",
-          "band": "prefix"
-        },
-        {
-          "name": "settings",
-          "band": "prefix"
-        },
-        {
-          "name": "bored",
           "band": "prefix"
         }
       ],
@@ -1037,15 +1183,15 @@
           "band": "prefix"
         },
         {
+          "name": "next song",
+          "band": "prefix"
+        },
+        {
           "name": "steam",
           "band": "prefix"
         },
         {
-          "name": "settings",
-          "band": "prefix"
-        },
-        {
-          "name": "bored",
+          "name": "quieter",
           "band": "prefix"
         }
       ],
@@ -1339,6 +1485,14 @@
           "band": "prefix"
         },
         {
+          "name": "louder",
+          "band": "acronym"
+        },
+        {
+          "name": "quieter",
+          "band": "acronym"
+        },
+        {
           "name": "help",
           "band": "subsequence"
         }
@@ -1362,6 +1516,14 @@
         },
         {
           "name": "help",
+          "band": "prefix"
+        },
+        {
+          "name": "louder",
+          "band": "prefix"
+        },
+        {
+          "name": "quieter",
           "band": "prefix"
         }
       ],
@@ -1660,6 +1822,355 @@
         "type": "openTool",
         "tool": "reminder",
         "entry": "reminder"
+      }
+    },
+    {
+      "input": "jobs",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "jobs",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "jobs",
+        "entry": "jobs"
+      }
+    },
+    {
+      "input": "jobs read 30 min, duolingo by 10pm",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "read 30 min, duolingo by 10pm",
+      "results": [
+        {
+          "name": "jobs",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "jobs",
+        "argument": "read 30 min, duolingo by 10pm",
+        "entry": "jobs"
+      }
+    },
+    {
+      "input": "today call dad",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "call dad",
+      "results": [
+        {
+          "name": "jobs",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "jobs",
+        "argument": "call dad",
+        "entry": "jobs"
+      }
+    },
+    {
+      "input": "done read",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "read",
+      "results": [
+        {
+          "name": "done",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "done",
+        "argument": "read",
+        "entry": "done"
+      }
+    },
+    {
+      "input": "diary long day, good one",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "long day, good one",
+      "results": [
+        {
+          "name": "diary",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "diary",
+        "argument": "long day, good one",
+        "entry": "diary"
+      }
+    },
+    {
+      "input": "hush",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "quiet",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "quiet",
+        "entry": "quiet"
+      }
+    },
+    {
+      "input": "read",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "books",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.apple.iBooksX",
+        "entry": "books"
+      }
+    },
+    {
+      "input": "play beabadoobee",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "beabadoobee",
+      "results": [
+        {
+          "name": "music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "music",
+        "argument": "beabadoobee",
+        "entry": "music"
+      }
+    },
+    {
+      "input": "play some arctic monkeys",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "arctic monkeys",
+      "results": [
+        {
+          "name": "music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "music",
+        "argument": "arctic monkeys",
+        "entry": "music"
+      }
+    },
+    {
+      "input": "play what is love",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "what is love",
+      "results": [
+        {
+          "name": "music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "music",
+        "argument": "what is love",
+        "entry": "music"
+      }
+    },
+    {
+      "input": "play spotify",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "spotify",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openApp",
+        "bundleID": "com.spotify.client",
+        "entry": "spotify"
+      }
+    },
+    {
+      "input": "music beabadoobee",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "beabadoobee",
+      "results": [
+        {
+          "name": "music",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "music",
+        "argument": "beabadoobee",
+        "entry": "music"
+      }
+    },
+    {
+      "input": "music",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "music",
+          "band": "exact"
+        },
+        {
+          "name": "pause",
+          "band": "wordPrefix"
+        },
+        {
+          "name": "youtube music",
+          "band": "wordPrefix"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "music",
+        "entry": "music"
+      }
+    },
+    {
+      "input": "pause",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "pause",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "playpause",
+        "entry": "pause"
+      }
+    },
+    {
+      "input": "next",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "next song",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "next",
+        "entry": "next song"
+      }
+    },
+    {
+      "input": "skip",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "next song",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "next",
+        "entry": "next song"
+      }
+    },
+    {
+      "input": "volume up",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "louder",
+          "band": "exact"
+        },
+        {
+          "name": "quieter",
+          "band": "prefixEdit"
+        },
+        {
+          "name": "volume",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "louder",
+        "entry": "louder"
+      }
+    },
+    {
+      "input": "volume 30",
+      "usage": {},
+      "mode": "search",
+      "confident": true,
+      "query": "30",
+      "results": [
+        {
+          "name": "volume",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "volume",
+        "argument": "30",
+        "entry": "volume"
       }
     },
     {

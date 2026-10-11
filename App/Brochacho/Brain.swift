@@ -18,6 +18,8 @@ final class Brain {
     private var lineState: LineState
     private var lineBank: LineBank
     private var captureLog: CaptureLog
+    /// Today's jobs (~/.brochacho/jobs.json). Rolled over to a new day at 04:00, unfinished jobs carried along.
+    private var jobDay: JobDay
     /// Every installed app, as catalog entries. Filled in shortly after launch.
     private var installedApps: [CatalogEntry] = []
 
@@ -32,6 +34,8 @@ final class Brain {
     private let micTuner = MicTuner()
     private let settingsWindow = SettingsWindow()
     private let tutorialWindow = TutorialWindow()
+    private let roamer = Roamer()
+    private let jobCard = JobCard()
 
     // What is going on right now.
     private var decision: Decision?
@@ -48,6 +52,16 @@ final class Brain {
     private var glanceKind = ""
     private var glanceNotes: [CaptureEntry] = []
     private var glanceReminders: [CaptureWriter.Upcoming] = []
+    private var glanceJobIDs: [String] = []
+    /// What he is out of the notch about, while he is.
+    private var outNudge: Nudge?
+    private var jobTicker: Timer?
+    /// The job the running timer belongs to, so its end can ask "done?".
+    private var countdownJobID: String?
+    /// A job that has nothing to open yet. Whatever he opens next from the box becomes its starter.
+    private var pendingBindJobID: String?
+    /// When set, a row picked on the chooser screen goes here instead of to the living bookmarks.
+    private var chooserAction: ((Int) -> Void)?
 
     init() {
         let loaded = ConfigStore.load()
@@ -60,6 +74,8 @@ final class Brain {
         if let problem = stashLoaded.problem { NSLog("Brochacho: stash problem: \(problem)") }
         lineBank = LineBankStore.load(from: Bundle.main.url(forResource: "lines", withExtension: "json"))
         captureLog = CaptureLogStore.load()
+        jobDay = Jobs.rollover(JobsStore.load(), to: Jobs.dayKey(ReminderParser.wall(from: Date())))
+        JobsStore.save(jobDay)
 
         // Bring an existing config up to date with any built-in command added since it was first written
         // (config.json otherwise keeps whatever catalog it had on day one, forever — see CatalogMigration).
@@ -100,6 +116,7 @@ final class Brain {
             self?.close()
         }
         controller.onEnter = { [weak self] in self?.submit(choosing: nil) }
+        startJobs()
         refreshInstalledApps()
         if !TutorialWindow.hasBeenSeen {
             // A moment after launch, so it does not fight the permission prompts.
@@ -134,6 +151,7 @@ final class Brain {
         micTuner.stop()
         mouth.stop()
         persistStash()
+        JobsStore.save(jobDay)
     }
 
     /// Called by the settings window. Saves, then re-applies everything that depends on the config.
@@ -155,6 +173,7 @@ final class Brain {
         sounds.apply(config.feedback)
         ears.setLocale(config.speechLocale)
         tunerSession.options.toleranceCents = config.tuner.toleranceCents
+        model.character = CharacterFrames.load(folder: config.character.folder)
 
         hotkeys.removeAll()
         let ok = [
@@ -170,7 +189,7 @@ final class Brain {
         model.onTextChange = { [weak self] text in self?.textChanged(text) }
         model.onSubmit = { [weak self] index in self?.submit(choosing: index) }
         model.onAnother = { [weak self] in self?.pull(another: true) }
-        model.onChoose = { [weak self] index in self?.chooseBookmark(index) }
+        model.onChoose = { [weak self] index in self?.choose(index) }
         model.onTuningStep = { [weak self] step in self?.stepTuning(step) }
         model.onCopyCommand = { [weak self] in self?.copyCommand() }
         model.onTimerTap = { [weak self] in self?.showTimer() }
@@ -179,6 +198,7 @@ final class Brain {
         model.onGlanceOpen = { [weak self] index in self?.openGlanceItem(index) }
         model.onGlanceTick = { [weak self] index in self?.tickGlanceItem(index) }
         model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
+        model.onJobWaitingTap = { [weak self] in self?.showJobs() }
     }
 
     // MARK: - The box
@@ -234,6 +254,13 @@ final class Brain {
             case "help": return "the guide"
             case "pull": return "your stash"
             case "settings": return "settings"
+            case "jobs": return searching ? "the books" : "today's jobs"
+            case "done": return "the books"
+            case "diary": return "apple notes"
+            case "quiet": return "until tomorrow"
+            case "music": return searching ? "music" : "play"
+            case "playpause", "next": return "music"
+            case "louder", "quieter", "volume": return "volume"
             default: return "in the notch"
             }
         }
@@ -268,6 +295,7 @@ final class Brain {
             // Rule 1: the thing opens first.
             Opener.run(plan, config: config)
             count(plan.entryName)
+            if let jobID = pendingBindJobID { bindStarter(jobID, to: plan.entryName) }
             showLine(category: plan.lineCategory, target: plan.entryName)
 
         case .openTool(let tool, let argument, let entry):
@@ -285,6 +313,12 @@ final class Brain {
             case "settings":
                 close()
                 settingsWindow.show(brain: self)
+            case "jobs": jobsCommand(argument)
+            case "done": doneCommand(argument)
+            case "diary": diary(argument)
+            case "quiet": quietForToday()
+            case "music": playMusic(argument)
+            case "playpause", "next", "louder", "quieter", "volume": musicControl(tool, argument)
             default:
                 sounds.play(.unknown)
                 showLine(category: "unknown", target: nil)
@@ -342,6 +376,9 @@ final class Brain {
         stopTuner()
         if ears.isListening { ears.stop { _ in } }
         model.isListening = false
+        model.inputHint = nil
+        pendingBindJobID = nil
+        chooserAction = nil
         controller.close()
     }
 
@@ -459,6 +496,16 @@ final class Brain {
         case .noMatch:
             sounds.play(.unknown)
             showLine(category: "unknown", target: nil, text: "Nothing here remembers its place yet.", hold: 2.6)
+        }
+    }
+
+    /// A row on the chooser screen. Jobs use it to ask "done?"; otherwise it is the living bookmarks.
+    private func choose(_ index: Int) {
+        if let action = chooserAction {
+            chooserAction = nil
+            action(index)
+        } else {
+            chooseBookmark(index)
         }
     }
 
@@ -598,14 +645,19 @@ final class Brain {
             return
         }
 
+        beginCountdown(seconds: seconds)
+        showLine(category: "open_tool", target: entry)
+    }
+
+    /// Starts the one timer. `job` is the job it belongs to, if any: its end then asks whether the job is done.
+    private func beginCountdown(seconds: Int, job: String? = nil) {
         cancelTimer()
-        let timer = CountdownTimer(seconds: seconds, nowMs: SystemClock.nowMs())
-        countdown = timer
+        countdown = CountdownTimer(seconds: seconds, nowMs: SystemClock.nowMs())
+        countdownJobID = job
         refreshTimer()
         countdownTicker = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refreshTimer() }
         }
-        showLine(category: "open_tool", target: entry)
     }
 
     private func refreshTimer() {
@@ -614,9 +666,14 @@ final class Brain {
         model.timerText = status.text
         model.timerFraction = status.fraction
         if status.done {
+            let jobID = countdownJobID
             cancelTimer()
             sounds.play(.timerDone)
-            showLine(category: "timer_done", target: nil, alwaysSpeak: true, hold: 3)
+            if let id = jobID, let job = jobDay.job(id), job.status == .started {
+                askIfDone(job)
+            } else {
+                showLine(category: "timer_done", target: nil, alwaysSpeak: true, hold: 3)
+            }
         }
     }
 
@@ -651,6 +708,7 @@ final class Brain {
         countdownTicker?.invalidate()
         countdownTicker = nil
         countdown = nil
+        countdownJobID = nil
         model.timerText = nil
         model.timerFraction = 0
     }
@@ -755,6 +813,10 @@ final class Brain {
     }
 
     private func openGlanceItem(_ index: Int) {
+        if glanceKind == "jobs" {
+            if glanceJobIDs.indices.contains(index) { startJob(glanceJobIDs[index]) }
+            return
+        }
         if glanceKind == "note", glanceNotes.indices.contains(index) {
             close()
             CaptureWriter.showNote(id: glanceNotes[index].externalID)
@@ -765,6 +827,11 @@ final class Brain {
     }
 
     private func tickGlanceItem(_ index: Int) {
+        if glanceKind == "jobs" {
+            guard glanceJobIDs.indices.contains(index), let job = jobDay.job(glanceJobIDs[index]), job.status != .done else { return }
+            finishJob(job.id)
+            return
+        }
         guard glanceKind == "reminder", glanceReminders.indices.contains(index),
               model.glanceItems.indices.contains(index) else { return }
         let done = !(model.glanceItems[index].done ?? false)
@@ -782,6 +849,10 @@ final class Brain {
     }
 
     private func glanceButton(_ index: Int) {
+        if glanceKind == "jobs" {
+            if let next = jobDay.jobs.first(where: { $0.status == .open }) { startJob(next.id) } else { close() }
+            return
+        }
         close()
         if glanceKind == "note" {
             if index == 0 { _ = CaptureWriter.openFreshNote() } else { CaptureWriter.showNote(id: nil) }
@@ -858,6 +929,404 @@ final class Brain {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(command, forType: .string)
         model.didCopy = true
+    }
+
+    // MARK: - Jobs
+    //
+    // The day's list, Sopranos style. Each job has a "starter", the thing "start it" opens, because the
+    // incentive is taking away the first step, not guilt. When a job is due he flies out of the notch and
+    // roams the screen without a word; the voice only comes once he is clicked.
+
+    private var nowWall: Int {
+        return ReminderParser.wall(from: Date())
+    }
+
+    private func saveJobs() {
+        JobsStore.save(jobDay)
+    }
+
+    /// Past 04:00, a new job day starts and whatever was not finished comes along, owed one more day.
+    private func rollJobs() {
+        let key = Jobs.dayKey(nowWall)
+        guard jobDay.day != key else { return }
+        jobDay = Jobs.rollover(jobDay, to: key)
+        saveJobs()
+    }
+
+    private func startJobs() {
+        roamer.onClick = { [weak self] in self?.roamerClicked() }
+        roamer.onGaveUp = { [weak self] in self?.roamerGaveUp() }
+        roamer.menuProvider = { [weak self] in self?.roamerMenu() }
+        jobCard.onButton = { [weak self] index in self?.cardButton(index) }
+        jobCard.onDismiss = { [weak self] in self?.cardDismissed() }
+        jobTicker = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.checkJobs() }
+        }
+    }
+
+    /// "jobs read 30 min, swift course, duolingo by 10pm", or "jobs" on its own for the list.
+    private func jobsCommand(_ argument: String?) {
+        rollJobs()
+        let words = (argument ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if words.isEmpty {
+            showJobs()
+            return
+        }
+        let drafts = Jobs.parse(words, nowWall: nowWall, catalog: searchable, bindings: config.jobs.bindings)
+        guard !drafts.isEmpty else {
+            sounds.play(.unknown)
+            showLine(category: "unknown", target: nil, text: "I could not find a job in that.", hold: 2.6)
+            return
+        }
+        jobDay.add(drafts, now: nowWall)
+        saveJobs()
+        sounds.play(.captured)
+        // Say back what was understood, so a misread never goes unnoticed: "read · duolingo by 22:00".
+        let said = drafts.map { draft in draft.title + (draft.dueWall.map { " by \(Jobs.clockText($0))" } ?? "") }
+        showLine(category: "job_added", target: nil, text: "on the books: " + said.joined(separator: " · "), hold: 3.4)
+    }
+
+    /// The list: tick to finish, click to start.
+    private func showJobs() {
+        rollJobs()
+        glanceKind = "jobs"
+        let live = jobDay.jobs.contains { $0.status == .open }
+        openGlance(title: "Today's jobs", empty: "No jobs yet. Type jobs, then what needs doing.", buttons: live ? ["Start the next one"] : [])
+        glanceJobIDs = jobDay.jobs.map { $0.id }
+        model.glanceItems = jobDay.jobs.enumerated().map { index, job in
+            NotchModel.GlanceItem(id: index, title: job.title, detail: describe(job), done: job.status == .done)
+        }
+    }
+
+    /// "by 22:00 · 30 min · opens books".
+    private func describe(_ job: Job) -> String {
+        var parts = [Jobs.describe(job)].filter { !$0.isEmpty }
+        if let starter = job.starter, job.status == .open || job.status == .started {
+            let shown = searchable.first { $0.name == starter }?.shownName ?? starter
+            parts.append("opens \(shown)")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    /// "done read". On its own: the one job that was started, if there is only one.
+    private func doneCommand(_ argument: String?) {
+        rollJobs()
+        let words = (argument ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let started = jobDay.jobs.filter { $0.status == .started }
+        let job = words.isEmpty ? (started.count == 1 ? started.first : nil) : jobDay.find(words)
+        guard let found = job else {
+            if words.isEmpty {
+                showJobs()
+            } else {
+                sounds.play(.unknown)
+                showLine(category: "unknown", target: nil, text: "No job called that on the books.", hold: 2.6)
+            }
+            return
+        }
+        finishJob(found.id)
+    }
+
+    /// "start it": the starter opens first (rule 1), then the timer for the job's length, then the line.
+    private func startJob(_ id: String) {
+        rollJobs()
+        guard let job = jobDay.job(id) else { return }
+        let entry = job.starter.flatMap { name in searchable.first { $0.name == name } }
+        let plan = entry.flatMap { entry in
+            ActionPlan.make(from: Decision(mode: .open, results: [Hit(entry: entry, band: .exact, quality: 1, usage: 0)],
+                                           query: nil, confident: true))
+        }
+        if let plan = plan {
+            Opener.run(plan, config: config)
+            count(plan.entryName)
+        }
+        jobDay.start(id, now: nowWall)
+        saveJobs()
+        if let minutes = job.minutes { beginCountdown(seconds: minutes * 60, job: id) }
+
+        if plan == nil {
+            // Nothing opens this job yet. Open the box and ask: whatever he opens next becomes its starter,
+            // and the first word of the job is remembered, so "read" opens it every day after.
+            openBox()
+            model.inputHint = "what opens “\(job.title)”?"
+            pendingBindJobID = id
+            return
+        }
+        sounds.play(.saved)
+        let text = job.minutes.map { "\(job.title) · \($0) min on the clock" }
+        showLine(category: "job_started", target: nil, text: text, hold: 2.6)
+    }
+
+    /// Remembers what opens a job, for this job and every later one that starts with the same word.
+    private func bindStarter(_ jobID: String, to entryName: String) {
+        pendingBindJobID = nil
+        model.inputHint = nil
+        guard !entryName.isEmpty, let index = jobDay.jobs.firstIndex(where: { $0.id == jobID }),
+              let entry = searchable.first(where: { $0.name == entryName }), entry.kind != .tool else { return }
+        jobDay.jobs[index].starter = entryName
+        saveJobs()
+        if let word = TextTools.words(jobDay.jobs[index].title).first {
+            var updated = config
+            updated.jobs.bindings[word] = entryName
+            update(updated)
+        }
+    }
+
+    private func finishJob(_ id: String) {
+        jobDay.finish(id, now: nowWall)
+        saveJobs()
+        if countdownJobID == id { cancelTimer() }
+        sounds.play(.allInTune)
+        showLine(category: "job_done", target: nil, hold: 2.4)
+    }
+
+    private func laterJob(_ id: String) {
+        jobDay.later(id, now: nowWall, settings: config.jobs.settings)
+        saveJobs()
+        showLine(category: "job_later", target: nil, hold: 2.2)
+    }
+
+    private func skipJob(_ id: String) {
+        jobDay.skip(id)
+        saveJobs()
+        if countdownJobID == id { cancelTimer() }
+        showLine(category: "job_skipped", target: nil, hold: 2.2)
+    }
+
+    /// The timer for a job ran out. He asked to be told, so this one is spoken.
+    private func askIfDone(_ job: Job) {
+        cancelAutoClose()
+        let pick = Lines.pick(bank: lineBank, state: &lineState, category: "timer_done", target: nil,
+                              frequency: 1, rng: { Double.random(in: 0..<1) })
+        if let pick = pick, config.speak { mouth.say(pick) }
+        let id = job.id
+        model.chooserTitle = "\(job.title): time's up. done?"
+        model.chooserOptions = ["done", "not yet", "skip it"]
+        chooserAction = { [weak self] index in
+            switch index {
+            case 0: self?.finishJob(id)
+            case 1: self?.laterJob(id)
+            default: self?.skipJob(id)
+            }
+        }
+        model.screen = .chooser
+        controller.open(takeKeyboard: false)
+        closeAfter(30)
+    }
+
+    /// "quiet": he stays in the notch until the job day ends.
+    private func quietForToday() {
+        let now = nowWall
+        let shifted = now - Jobs.rolloverHour * 3_600_000
+        let dayStart = shifted - ((shifted % 86_400_000) + 86_400_000) % 86_400_000 + Jobs.rolloverHour * 3_600_000
+        jobDay.quietUntil = dayStart + 86_400_000
+        saveJobs()
+        jobCard.close()
+        outNudge = nil
+        roamer.goHome()
+        showLine(category: "quiet_on", target: nil, hold: 2.2)
+    }
+
+    // MARK: Coming out of the notch
+
+    /// Every 30 seconds: is there a job he should come out about?
+    private func checkJobs() {
+        rollJobs()
+        let now = nowWall
+        let held = FocusQuiet.isOn || !config.character.roam || (jobDay.quietUntil.map { now < $0 } ?? false)
+
+        // While he is kept in, his head beside the notch says a job is waiting.
+        let waiting = jobDay.jobs.contains { job in
+            job.status == .open && (job.snoozedUntil.map { now >= $0 } ?? true) && (job.dueWall.map { $0 <= now } ?? true)
+        }
+        if model.jobWaiting != (held && waiting) {
+            model.jobWaiting = held && waiting
+            controller.refreshClosed()
+        }
+
+        guard !held, !roamer.isOut, !jobCard.isOpen, !controller.isOpen else { return }
+        // Seconds since the last key press or mouse movement. Only how long, never what: no screen is read.
+        let anyInput = CGEventType(rawValue: ~0) ?? .mouseMoved
+        let idle = Int(CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: anyInput))
+        guard let nudge = Jobs.nextNudge(jobDay, now: now, settings: config.jobs.settings, quiet: false, idleSeconds: idle) else { return }
+
+        outNudge = nudge
+        jobDay.appeared(nudge, now: now)
+        saveJobs()
+        // Out he flies. No sound, no voice: rule 4.
+        roamer.flyOut(level: nudge.level, size: CGFloat(config.character.size), frames: model.character,
+                      roamSeconds: config.jobs.roamMinutes * 60)
+    }
+
+    /// Someone clicked him: he stops, and his card opens beside him.
+    private func roamerClicked() {
+        guard let nudge = outNudge else {
+            roamer.goHome()
+            return
+        }
+        roamer.hold()
+        let shown: (String) -> String = { [weak self] category in
+            guard let self = self else { return "" }
+            return Lines.pick(bank: self.lineBank, state: &self.lineState, category: category, target: nil,
+                              frequency: 0, rng: { Double.random(in: 0..<1) })?.text ?? ""
+        }
+        switch nudge.kind {
+        case .sleep:
+            jobCard.show(line: shown("bedtime"), title: "bed", detail: "the books close when you go",
+                         buttons: ["going", "10 more"], theme: model.theme, beside: roamer.frame)
+        case .job, .check:
+            guard let id = nudge.jobID, let job = jobDay.job(id) else {
+                outNudge = nil
+                roamer.goHome()
+                return
+            }
+            let category = nudge.kind == .check ? "job_check" : (job.owedDays > 0 ? "job_owed" : "job_card")
+            let buttons = nudge.kind == .check ? ["done", "not yet", "skip it"] : ["start it", "later", "skip today"]
+            jobCard.show(line: shown(category), title: job.title, detail: describe(job), buttons: buttons,
+                         theme: model.theme, beside: roamer.frame)
+        }
+        LineStateStore.save(lineState)
+    }
+
+    private func cardButton(_ index: Int) {
+        guard let nudge = outNudge else { return }
+        outNudge = nil
+        // The action first, then he flies home.
+        switch nudge.kind {
+        case .sleep:
+            if index == 0 {
+                goToSleep()
+            } else {
+                jobDay.sleepLater(now: nowWall, minutes: 10)
+                saveJobs()
+                showLine(category: "job_later", target: nil, text: "ten more minutes. i'm counting.", hold: 2.4)
+            }
+        case .job, .check:
+            guard let id = nudge.jobID else { break }
+            switch (nudge.kind, index) {
+            case (.job, 0): startJob(id)
+            case (.check, 0): finishJob(id)
+            case (_, 1): laterJob(id)
+            default: skipJob(id)
+            }
+        }
+        roamer.goHome()
+    }
+
+    /// A click somewhere else while his card was open: not now. He was noticed, so this is not "ignored".
+    private func cardDismissed() {
+        outNudge = nil
+        roamer.goHome()
+    }
+
+    /// Nobody clicked him. Next time he comes out bolder.
+    private func roamerGaveUp() {
+        guard let nudge = outNudge else { return }
+        outNudge = nil
+        jobDay.ignored(nudge)
+        saveJobs()
+    }
+
+    private func roamerMenu() -> NSMenu {
+        let menu = NSMenu()
+        if let nudge = outNudge, nudge.kind != .sleep, let id = nudge.jobID {
+            menu.addItem(MenuAction("Done") { [weak self] in
+                self?.outNudge = nil
+                self?.finishJob(id)
+                self?.roamer.goHome()
+            })
+            menu.addItem(MenuAction("Not today") { [weak self] in
+                self?.outNudge = nil
+                self?.skipJob(id)
+                self?.roamer.goHome()
+            })
+        }
+        menu.addItem(MenuAction("Leave me alone today") { [weak self] in self?.quietForToday() })
+        return menu
+    }
+
+    /// "going": the day's record goes into the diary, the books close, and he stops asking.
+    private func goToSleep() {
+        jobDay.closeBooks()
+        if let id = CaptureWriter.appendToDiary(noteID: jobDay.diaryNoteID, title: diaryTitle, lines: Jobs.ledger(jobDay)) {
+            jobDay.diaryNoteID = id
+        }
+        saveJobs()
+        showLine(category: "sleep_going", target: nil, alwaysSpeak: true, hold: 2.6)
+    }
+
+    // MARK: - The diary
+
+    /// "Brochacho diary · 11 Oct 2026": one note per job day.
+    private var diaryTitle: String {
+        let parse = DateFormatter()
+        parse.dateFormat = "yyyy-MM-dd"
+        parse.locale = Locale(identifier: "en_US_POSIX")
+        let show = DateFormatter()
+        show.dateFormat = "d MMM yyyy"
+        let date = parse.date(from: jobDay.day).map { show.string(from: $0) } ?? jobDay.day
+        return "Brochacho diary · \(date)"
+    }
+
+    /// "diary long day, good one" adds a line to today's diary note. "diary" on its own opens it.
+    private func diary(_ argument: String?) {
+        rollJobs()
+        let text = (argument ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.isEmpty {
+            close()
+            CaptureWriter.showNote(id: jobDay.diaryNoteID)
+            return
+        }
+        guard let id = CaptureWriter.appendToDiary(noteID: jobDay.diaryNoteID, title: diaryTitle,
+                                                   lines: "\(Jobs.clockText(nowWall))  \(text)") else {
+            sounds.play(.unknown)
+            showLine(category: "unknown", target: nil, text: "Notes would not take it. Check Privacy, Automation.", hold: 3)
+            return
+        }
+        jobDay.diaryNoteID = id
+        saveJobs()
+        sounds.play(.captured)
+        showLine(category: "diary_saved", target: nil, hold: 2.2)
+    }
+
+    // MARK: - Music
+
+    /// "play beabadoobee". Spotify's search takes a moment over the internet; the line waits for it.
+    private func playMusic(_ argument: String?) {
+        let words = argument ?? ""
+        let player = config.music.player
+        Task { @MainActor [weak self] in
+            let outcome = await MusicPlayer.play(words, player: player)
+            guard let self = self else { return }
+            switch outcome {
+            case .playing(let name):
+                self.showLine(category: "music_play", target: nil, text: name.isEmpty ? nil : "playing \(name)", hold: 2.4)
+            case .searching(let query):
+                self.showLine(category: "music_play", target: nil, text: "searching spotify for \(query)", hold: 2.4)
+            case .failed(let problem):
+                self.sounds.play(.unknown)
+                self.showLine(category: "unknown", target: nil, text: problem, hold: 3)
+            }
+        }
+    }
+
+    /// Pause, next, louder, quieter, volume 30. No line: the music answering is the feedback.
+    private func musicControl(_ tool: String, _ argument: String?) {
+        let player = config.music.player
+        var ok = true
+        switch tool {
+        case "playpause": ok = MusicPlayer.playPause(player: player)
+        case "next": ok = MusicPlayer.next(player: player)
+        case "louder": ok = MusicPlayer.nudgeVolume(by: 10)
+        case "quieter": ok = MusicPlayer.nudgeVolume(by: -10)
+        default: ok = MusicPlayer.setVolume(argument ?? "") != nil
+        }
+        if ok {
+            close()
+        } else {
+            sounds.play(.unknown)
+            let problem = tool == "volume" ? "Volume from 0 to 100: volume 30." : "Nothing is playing."
+            showLine(category: "unknown", target: nil, text: problem, hold: 2.4)
+        }
     }
 
     // MARK: - The right-click menu, and a test line for the settings window

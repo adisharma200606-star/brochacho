@@ -1,0 +1,843 @@
+{
+  "now": 1791712800000,
+  "catalog": [
+    {
+      "name": "youtube",
+      "display": "YouTube",
+      "aliases": [
+        "yt"
+      ],
+      "kind": "site",
+      "target": "https://www.youtube.com",
+      "profile": "personal",
+      "searchTemplate": "https://www.youtube.com/results?search_query={q}"
+    },
+    {
+      "name": "youtube music",
+      "display": "YouTube Music",
+      "aliases": [
+        "ytm"
+      ],
+      "kind": "site",
+      "target": "https://music.youtube.com",
+      "profile": "personal"
+    },
+    {
+      "name": "gmail",
+      "display": "Gmail",
+      "aliases": [
+        "mail"
+      ],
+      "kind": "site",
+      "target": "https://mail.google.com",
+      "profile": "personal"
+    },
+    {
+      "name": "google",
+      "display": "Google",
+      "aliases": [
+        "g"
+      ],
+      "kind": "site",
+      "target": "https://www.google.com",
+      "profile": "personal",
+      "searchTemplate": "https://www.google.com/search?q={q}"
+    },
+    {
+      "name": "github",
+      "display": "GitHub",
+      "aliases": [
+        "gh"
+      ],
+      "kind": "site",
+      "target": "https://github.com",
+      "profile": "personal",
+      "searchTemplate": "https://github.com/search?q={q}"
+    },
+    {
+      "name": "linkedin",
+      "display": "LinkedIn",
+      "aliases": [
+        "li"
+      ],
+      "kind": "site",
+      "target": "https://www.linkedin.com/feed/",
+      "profile": "personal"
+    },
+    {
+      "name": "claude",
+      "display": "Claude",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://claude.ai",
+      "profile": "personal"
+    },
+    {
+      "name": "whatsapp",
+      "display": "WhatsApp",
+      "aliases": [
+        "wa"
+      ],
+      "kind": "app",
+      "target": "net.whatsapp.WhatsApp"
+    },
+    {
+      "name": "spotify",
+      "display": "Spotify",
+      "aliases": [],
+      "kind": "app",
+      "target": "com.spotify.client"
+    },
+    {
+      "name": "steam",
+      "display": "Steam",
+      "aliases": [],
+      "kind": "app",
+      "target": "com.valvesoftware.steam"
+    },
+    {
+      "name": "vs code",
+      "display": "VS Code",
+      "aliases": [
+        "code",
+        "visual studio code"
+      ],
+      "kind": "app",
+      "target": "com.microsoft.VSCode"
+    },
+    {
+      "name": "downloads",
+      "display": "Downloads",
+      "aliases": [
+        "dl"
+      ],
+      "kind": "path",
+      "target": "~/Downloads"
+    },
+    {
+      "name": "desktop",
+      "display": "Desktop",
+      "aliases": [],
+      "kind": "path",
+      "target": "~/Desktop"
+    },
+    {
+      "name": "tuner",
+      "display": "Tuner",
+      "aliases": [
+        "tune",
+        "guitar tuner",
+        "ukulele tuner",
+        "uke"
+      ],
+      "kind": "tool",
+      "target": "tuner"
+    },
+    {
+      "name": "timer",
+      "display": "Timer",
+      "aliases": [
+        "countdown"
+      ],
+      "kind": "tool",
+      "target": "timer",
+      "takesWords": true
+    },
+    {
+      "name": "note",
+      "display": "New note",
+      "aliases": [
+        "notes",
+        "new note"
+      ],
+      "kind": "tool",
+      "target": "note",
+      "takesWords": true
+    },
+    {
+      "name": "reminder",
+      "display": "Reminder",
+      "aliases": [
+        "remind",
+        "remind me",
+        "reminders",
+        "todo",
+        "task"
+      ],
+      "kind": "tool",
+      "target": "reminder",
+      "takesWords": true
+    },
+    {
+      "name": "settings",
+      "display": "Settings",
+      "aliases": [
+        "preferences",
+        "brochacho"
+      ],
+      "kind": "tool",
+      "target": "settings"
+    },
+    {
+      "name": "bored",
+      "display": "Something I saved",
+      "aliases": [
+        "im bored",
+        "i am bored",
+        "surprise me"
+      ],
+      "kind": "tool",
+      "target": "pull"
+    },
+    {
+      "name": "flip",
+      "display": "Flip the screen",
+      "aliases": [
+        "one eighty",
+        "180",
+        "rotate",
+        "flip screen",
+        "upside down"
+      ],
+      "kind": "tool",
+      "target": "flip"
+    },
+    {
+      "name": "help",
+      "display": "How it works",
+      "aliases": [
+        "tutorial",
+        "guide"
+      ],
+      "kind": "tool",
+      "target": "help"
+    },
+    {
+      "name": "books",
+      "display": "Books",
+      "aliases": [
+        "read",
+        "reading",
+        "apple books"
+      ],
+      "kind": "app",
+      "target": "com.apple.iBooksX"
+    },
+    {
+      "name": "duolingo",
+      "display": "Duolingo",
+      "aliases": [
+        "duo"
+      ],
+      "kind": "site",
+      "target": "https://www.duolingo.com/learn",
+      "profile": "personal"
+    },
+    {
+      "name": "jobs",
+      "display": "Today's jobs",
+      "aliases": [
+        "job",
+        "today",
+        "todo list",
+        "my jobs"
+      ],
+      "kind": "tool",
+      "target": "jobs",
+      "takesWords": true
+    },
+    {
+      "name": "done",
+      "display": "Job done",
+      "aliases": [
+        "finished"
+      ],
+      "kind": "tool",
+      "target": "done",
+      "takesWords": true
+    },
+    {
+      "name": "diary",
+      "display": "Diary",
+      "aliases": [
+        "dear diary",
+        "journal"
+      ],
+      "kind": "tool",
+      "target": "diary",
+      "takesWords": true
+    },
+    {
+      "name": "quiet",
+      "display": "Quiet for today",
+      "aliases": [
+        "hush",
+        "be quiet",
+        "leave me alone"
+      ],
+      "kind": "tool",
+      "target": "quiet"
+    },
+    {
+      "name": "music",
+      "display": "Play music",
+      "aliases": [],
+      "kind": "tool",
+      "target": "music",
+      "takesWords": true
+    },
+    {
+      "name": "pause",
+      "display": "Pause or resume",
+      "aliases": [
+        "resume",
+        "pause music"
+      ],
+      "kind": "tool",
+      "target": "playpause"
+    },
+    {
+      "name": "next song",
+      "display": "Next song",
+      "aliases": [
+        "next",
+        "skip",
+        "skip song"
+      ],
+      "kind": "tool",
+      "target": "next"
+    },
+    {
+      "name": "louder",
+      "display": "Louder",
+      "aliases": [
+        "volume up",
+        "turn it up"
+      ],
+      "kind": "tool",
+      "target": "louder"
+    },
+    {
+      "name": "quieter",
+      "display": "Quieter",
+      "aliases": [
+        "volume down",
+        "turn it down",
+        "softer"
+      ],
+      "kind": "tool",
+      "target": "quieter"
+    },
+    {
+      "name": "volume",
+      "display": "Volume",
+      "aliases": [],
+      "kind": "tool",
+      "target": "volume",
+      "takesWords": true
+    },
+    {
+      "name": "swift course",
+      "aliases": [],
+      "kind": "site",
+      "target": "https://learn.example.org/swift/lesson/4",
+      "profile": "personal",
+      "living": true
+    }
+  ],
+  "parses": [
+    {
+      "text": "read 30 min, swift course, duolingo by 10pm",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "read",
+          "minutes": 30,
+          "dueWall": null,
+          "starter": "books"
+        },
+        {
+          "title": "swift course",
+          "minutes": null,
+          "dueWall": null,
+          "starter": "swift course"
+        },
+        {
+          "title": "duolingo",
+          "minutes": null,
+          "dueWall": 1791756000000,
+          "starter": "duolingo"
+        }
+      ]
+    },
+    {
+      "text": "i need to call dad at 6",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "call dad",
+          "minutes": null,
+          "dueWall": 1791741600000,
+          "starter": null
+        }
+      ]
+    },
+    {
+      "text": "finish the swift course for an hour",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "finish the swift course",
+          "minutes": 60,
+          "dueWall": null,
+          "starter": "swift course"
+        }
+      ]
+    },
+    {
+      "text": "read in 20 minutes",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "read",
+          "minutes": null,
+          "dueWall": 1791714000000,
+          "starter": "books"
+        }
+      ]
+    },
+    {
+      "text": "read 1.5h",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "read",
+          "minutes": 90,
+          "dueWall": null,
+          "starter": "books"
+        }
+      ]
+    },
+    {
+      "text": "practice guitar half an hour",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "practice guitar",
+          "minutes": 30,
+          "dueWall": null,
+          "starter": null
+        }
+      ]
+    },
+    {
+      "text": "call mom and dad",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "call mom and dad",
+          "minutes": null,
+          "dueWall": null,
+          "starter": null
+        }
+      ]
+    },
+    {
+      "text": "gym 45m",
+      "bindings": {
+        "gym": "youtube"
+      },
+      "drafts": [
+        {
+          "title": "gym",
+          "minutes": 45,
+          "dueWall": null,
+          "starter": "youtube"
+        }
+      ]
+    },
+    {
+      "text": "timer stuff",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "timer stuff",
+          "minutes": null,
+          "dueWall": null,
+          "starter": null
+        }
+      ]
+    },
+    {
+      "text": "gotta read a chapter\nduolingo",
+      "bindings": {},
+      "drafts": [
+        {
+          "title": "read a chapter",
+          "minutes": null,
+          "dueWall": null,
+          "starter": "books"
+        },
+        {
+          "title": "duolingo",
+          "minutes": null,
+          "dueWall": null,
+          "starter": "duolingo"
+        }
+      ]
+    },
+    {
+      "text": " , ;  ",
+      "bindings": {},
+      "drafts": []
+    }
+  ],
+  "dayKeys": [
+    {
+      "wall": 1791712800000,
+      "key": "2026-10-11"
+    },
+    {
+      "wall": 1791768600000,
+      "key": "2026-10-11"
+    },
+    {
+      "wall": 1791777600000,
+      "key": "2026-10-12"
+    },
+    {
+      "wall": 1790827140000,
+      "key": "2026-09-30"
+    }
+  ],
+  "steps": [
+    {
+      "op": "add",
+      "text": "read 30 min, swift course, duolingo by 10pm",
+      "at": 1791712800000,
+      "result": [
+        "j1",
+        "j2",
+        "j3"
+      ]
+    },
+    {
+      "op": "nudge",
+      "at": 1791707400000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791712800000,
+      "result": {
+        "kind": "job",
+        "jobID": "j1",
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791712800000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791714000000,
+      "result": null
+    },
+    {
+      "op": "ignored",
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791715500000,
+      "result": {
+        "kind": "job",
+        "jobID": "j2",
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791715500000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791718200000,
+      "result": {
+        "kind": "job",
+        "jobID": "j1",
+        "level": 1
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791718200000,
+      "result": null
+    },
+    {
+      "op": "start",
+      "id": "j1",
+      "at": 1791718260000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791721200000,
+      "result": {
+        "kind": "check",
+        "jobID": "j1",
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791721200000,
+      "result": null
+    },
+    {
+      "op": "finish",
+      "id": "j1",
+      "at": 1791721260000,
+      "result": null
+    },
+    {
+      "op": "later",
+      "id": "j2",
+      "at": 1791721320000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791724200000,
+      "result": {
+        "kind": "job",
+        "jobID": "j2",
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791724200000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791727200000,
+      "quiet": true,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791727200000,
+      "idle": 600,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791756000000,
+      "result": {
+        "kind": "job",
+        "jobID": "j3",
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791756000000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791756300000,
+      "result": null
+    },
+    {
+      "op": "ignored",
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791756660000,
+      "result": {
+        "kind": "job",
+        "jobID": "j3",
+        "level": 1
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791756660000,
+      "result": null
+    },
+    {
+      "op": "skip",
+      "id": "j3",
+      "at": 1791756720000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791765600000,
+      "result": {
+        "kind": "sleep",
+        "jobID": null,
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791765600000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791765900000,
+      "result": null
+    },
+    {
+      "op": "ignored",
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791766260000,
+      "result": {
+        "kind": "sleep",
+        "jobID": null,
+        "level": 1
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791766260000,
+      "result": null
+    },
+    {
+      "op": "sleepLater",
+      "at": 1791766320000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791766800000,
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791766980000,
+      "result": {
+        "kind": "sleep",
+        "jobID": null,
+        "level": 0
+      }
+    },
+    {
+      "op": "appeared",
+      "at": 1791766980000,
+      "result": null
+    },
+    {
+      "op": "closeBooks",
+      "result": null
+    },
+    {
+      "op": "nudge",
+      "at": 1791768600000,
+      "result": null
+    }
+  ],
+  "finalDay": {
+    "day": "2026-10-11",
+    "jobs": [
+      {
+        "id": "j1",
+        "title": "read",
+        "starter": "books",
+        "minutes": 30,
+        "dueWall": null,
+        "status": "done",
+        "addedAt": 1791712800000,
+        "startedAt": 1791718260000,
+        "doneAt": 1791721260000,
+        "snoozedUntil": null,
+        "lastShownAt": 1791721200000,
+        "ignored": 0,
+        "owedDays": 0
+      },
+      {
+        "id": "j2",
+        "title": "swift course",
+        "starter": "swift course",
+        "minutes": null,
+        "dueWall": null,
+        "status": "open",
+        "addedAt": 1791712800000,
+        "startedAt": null,
+        "doneAt": null,
+        "snoozedUntil": 1791723120000,
+        "lastShownAt": 1791724200000,
+        "ignored": 0,
+        "owedDays": 0
+      },
+      {
+        "id": "j3",
+        "title": "duolingo",
+        "starter": "duolingo",
+        "minutes": null,
+        "dueWall": 1791756000000,
+        "status": "skipped",
+        "addedAt": 1791712800000,
+        "startedAt": null,
+        "doneAt": null,
+        "snoozedUntil": null,
+        "lastShownAt": 1791756660000,
+        "ignored": 0,
+        "owedDays": 0
+      }
+    ],
+    "nextID": 4,
+    "lastAppearance": 1791766980000,
+    "sleepSnoozedUntil": 1791766920000,
+    "sleepIgnored": 0,
+    "closed": true,
+    "quietUntil": null,
+    "diaryNoteID": null
+  },
+  "ledger": "Jobs, 2026-10-11\nDone: read (30 min)\nSkipped: duolingo\nStill owed: swift course",
+  "described": [
+    "done · 30 min",
+    "",
+    "skipped · by 22:00"
+  ],
+  "rolled": {
+    "day": "2026-10-12",
+    "jobs": [
+      {
+        "id": "j1",
+        "title": "swift course",
+        "starter": "swift course",
+        "minutes": null,
+        "dueWall": null,
+        "status": "open",
+        "addedAt": 1791712800000,
+        "startedAt": null,
+        "doneAt": null,
+        "snoozedUntil": null,
+        "lastShownAt": null,
+        "ignored": 0,
+        "owedDays": 1
+      }
+    ],
+    "nextID": 2,
+    "lastAppearance": null,
+    "sleepSnoozedUntil": null,
+    "sleepIgnored": 0,
+    "closed": false,
+    "quietUntil": null,
+    "diaryNoteID": null
+  },
+  "rolledLedger": "Jobs, 2026-10-13\nStill owed: swift course (3 days now)"
+}

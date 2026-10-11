@@ -282,6 +282,20 @@
       }
     }
 
+    // "play beabadoobee": "play" is a filler word, so "play me some youtube" still opens YouTube. Only when what
+    // follows is not strongly one of his things does it go to the music tool, before it could be read as a question.
+    if (rawTokens.length >= 2 && normalize(rawTokens[0]) === 'play' && tokens.length < rawTokens.length) {
+      var music = catalog.filter(function (e) { return e.kind === 'tool' && e.target === 'music' && e.takesWords === true; })[0];
+      if (music && !(ranked.length && ranked[0].band >= STRONG_FROM)) {
+        return {
+          mode: 'search',
+          query: tokens.join(' '),
+          results: [{ entry: music, band: BAND.exact, quality: 1, usage: usage[music.name] || 0 }],
+          confident: true
+        };
+      }
+    }
+
     // It starts like a question and is more than one word: ask.
     if (tokens.length >= 2 && QUESTION_WORDS.indexOf(normalize(tokens[0])) >= 0) {
       return askDecision(tokens.join(' '), true);

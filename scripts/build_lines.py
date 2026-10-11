@@ -137,6 +137,65 @@ BANK = {
     "Done. Crossed off.", "One less thing.", "Finito. Next.", "Checked. Beautiful.",
   ]),
   "target:help": ("hp", ["Allora. Let me show you.", "The grand tour.", "Sit down. I explain."]),
+
+  # Jobs. The tone is the family business: jobs, favours, what's owed. Lines in job_card, job_check, job_owed
+  # and bedtime are shown on the card when he flies out; they are never spoken unless the card is clicked.
+  "job_added": ("ja", [
+    "The jobs are on the books.", "Noted. The family thanks you.", "It's in the ledger now.", "Consider it a contract.",
+    "Jobs assigned. I'll be around.", "Written down. In pen.", "I got the list, boss.", "Capisce. The jobs are set.",
+    "On the books. No backing out.", "A day's work. I like it.",
+  ]),
+  "job_started": ("js", [
+    "Now we're talking business.", "Good. Go do the job.", "That's my guy.", "The work, she begins.",
+    "Atta boy. I'll leave you to it.", "Professional. Very professional.", "Get in there, boss.", "This is how it's done.",
+    "Respect. Go get it.", "The family is proud already.",
+  ]),
+  "job_done": ("jd", [
+    "Job's done. Clean work.", "Paid in full.", "Beautiful. Not a trace.", "That's a made man.",
+    "Crossed off the books.", "The family thanks you.", "Like a professional. Bellissimo.", "Done. We never discuss it.",
+    "Another one, handled.", "Respect. Real respect.", "Finito. You earned your cannoli.", "Debt settled.",
+  ]),
+  "job_skipped": ("jk", [
+    "Fine. We forget about it.", "Off the books. This time.", "I didn't see nothing.", "Skipped. It happens to everybody.",
+    "We let it slide. Today.", "Forget about it.",
+  ]),
+  "job_later": ("jl", [
+    "Later. I'll come back around.", "Half an hour. I'm counting.", "I'll be back. Don't make me.",
+    "Okay. I know where you live.", "Later then. I'm patient. Mostly.", "Fine. I'll wait outside.",
+  ]),
+  "job_card": ("jc", [
+    "Got a job for you.", "Boss. The job.", "We need to talk business.", "The job won't do itself.",
+    "A little job. Nothing heavy.", "Excuse me. Business.", "I'm here about the job.", "Time to earn, boss.",
+    "Allora. The work is waiting.", "A favour, for the family.", "Psst. The job.", "You know why I'm here.",
+  ]),
+  "job_check": ("jh", [
+    "So. Is it done.", "Checking on the job.", "How's the work going, boss.", "I'm just asking. Is it finished.",
+    "Report back to me.", "The job. Tell me it's handled.",
+  ]),
+  "job_owed": ("jo", [
+    "You still owe me this.", "Another day. Still owed.", "This one's getting old, boss.", "The interest is piling up.",
+    "I'm a patient man. Usually.", "This debt, it follows you.", "The books don't lie, boss.", "Three days. I'm counting.",
+  ]),
+  "bedtime": ("bt", [
+    "Why you up. Bed.", "Hey. The bed misses you.", "It's late. Go to sleep.", "Even the family sleeps, boss.",
+    "Lights out. I mean it.", "Nobody good is awake now.", "The night shift is mine. Sleep.", "Bed. Before I get upset.",
+    "Close the books. Sleep.", "Mamma says go to bed.",
+  ]),
+  "sleep_going": ("sg", [
+    "Buonanotte, boss.", "Sleep good. I keep watch.", "Sogni d'oro.", "Good man. Good night.",
+    "The books are closed. Rest.", "Goodnight. Tomorrow, more business.",
+  ]),
+  "diary_saved": ("dy", [
+    "Into the diary. Very private.", "Written down. I didn't read it.", "Your secrets are safe.",
+    "Dear diary, he says.", "In the book. Locked.", "The memoirs grow.",
+  ]),
+  "quiet_on": ("qt", [
+    "Okay. I stay in the notch.", "Quiet as a mouse.", "Not a peep. Until tomorrow.", "I'll be in the back.",
+  ]),
+  "music_play": ("mp", [
+    "Music for the boss.", "The band is playing.", "Put the needle down.", "A little music. Bellissimo.",
+    "Turn it up, I say.", "The jukebox, she obeys.", "Music. For the soul.", "Ecco. Your song.",
+  ]),
   "target:timer": ("tm", [
     "The clock, she's running.", "I watch the time. You work.", "Timer set. I'm counting.",
     "Go. I'll tell you when.", "Tick tock, I'm on it.",

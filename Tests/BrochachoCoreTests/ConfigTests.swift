@@ -37,6 +37,24 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config.catalog[0].aliases, [])
     }
 
+    func testJobsCharacterAndMusicSettings() throws {
+        let json = """
+        { "jobs": { "bedtime": "23:45", "dayStart": "nine", "maxLevel": 9, "bindings": { "gym": "youtube" } },
+          "character": { "size": 96 } }
+        """
+        let config = try JSONDecoder().decode(Config.self, from: Data(json.utf8))
+        XCTAssertEqual(config.jobs.bedtime, "23:45")
+        XCTAssertEqual(config.jobs.cooldownMinutes, JobsConfig().cooldownMinutes)
+        XCTAssertEqual(config.jobs.bindings, ["gym": "youtube"])
+        XCTAssertEqual(config.jobs.settings.bedtimeMin, 23 * 60 + 45)
+        XCTAssertEqual(config.jobs.settings.dayStartMin, JobSettings().dayStartMin, "a time it cannot read falls back")
+        XCTAssertEqual(config.jobs.settings.maxLevel, 3, "boldness is capped")
+        XCTAssertEqual(config.character.size, 96)
+        XCTAssertTrue(config.character.roam)
+        XCTAssertEqual(config.music, MusicConfig())
+        XCTAssertEqual(JobsConfig().settings, JobSettings(), "the config's defaults and the brain's agree")
+    }
+
     func testABrokenConfigIsLeftAloneAndDefaultsAreUsed() throws {
         let url = try temporaryDirectory().appendingPathComponent("config.json")
         let broken = Data("{ \"hotkeys\": oops".utf8)

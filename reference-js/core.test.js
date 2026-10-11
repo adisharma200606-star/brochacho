@@ -58,14 +58,14 @@ const MATCH_CASES = [
   ['d', 'open', 'downloads', null, {}, true],
 
   // typed: a later word, skipped letters
-  ['music', 'open', 'youtube music', null, {}, true],
+  ['lofi music', 'search', 'music', 'lofi', {}, true],
   ['studio', 'open', 'vs code', null, {}, true],
   ['stm', 'open', 'steam', null, {}, false],
   ['ytb', 'open', 'youtube', null, {}, false],
   ['linkdin', 'open', 'linkedin', null, {}, false],
 
   // the thing you open most wins inside the same match quality
-  ['s', 'open', 'steam', null, {}, true],
+  ['s', 'open', 'steam', null, { steam: 1 }, true],
   ['s', 'open', 'spotify', null, { spotify: 3 }, true],
   ['c', 'open', 'vs code', null, {}, true],
   ['c', 'open', 'claude', null, { claude: 5 }, true],
@@ -105,6 +105,28 @@ const MATCH_CASES = [
   ['remind me to call mom tomorrow at 5', 'search', 'reminder', 'to call mom tomorrow at 5', {}, true],
   ['todo finish the report', 'search', 'reminder', 'finish the report', {}, true],
   ['reminder', 'open', 'reminder', null, {}, true],
+
+  // jobs, the diary, and being left alone
+  ['jobs', 'open', 'jobs', null, {}, true],
+  ['jobs read 30 min, duolingo by 10pm', 'search', 'jobs', 'read 30 min, duolingo by 10pm', {}, true],
+  ['today call dad', 'search', 'jobs', 'call dad', {}, true],
+  ['done read', 'search', 'done', 'read', {}, true],
+  ['diary long day, good one', 'search', 'diary', 'long day, good one', {}, true],
+  ['hush', 'open', 'quiet', null, {}, true],
+  ['read', 'open', 'books', null, {}, true],
+
+  // music: "play" is still a filler word in front of his own things, and only goes to music otherwise
+  ['play beabadoobee', 'search', 'music', 'beabadoobee', {}, true],
+  ['play some arctic monkeys', 'search', 'music', 'arctic monkeys', {}, true],
+  ['play what is love', 'search', 'music', 'what is love', {}, true],
+  ['play spotify', 'open', 'spotify', null, {}, true],
+  ['music beabadoobee', 'search', 'music', 'beabadoobee', {}, true],
+  ['music', 'open', 'music', null, {}, true],
+  ['pause', 'open', 'pause', null, {}, true],
+  ['next', 'open', 'next song', null, {}, true],
+  ['skip', 'open', 'next song', null, {}, true],
+  ['volume up', 'open', 'louder', null, {}, true],
+  ['volume 30', 'search', 'volume', '30', {}, true],
 
   // asking: a question mark, a question word, or several words that match nothing
   ['how do i undo a git commit?', 'ask', null, 'how do i undo a git commit?', {}, true],

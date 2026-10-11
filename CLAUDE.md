@@ -1,6 +1,6 @@
 # Read this first
 
-You are picking up **Brochacho**, a Mac app that lives in the MacBook notch: type or say the name of a thing and it opens, drag something onto the notch and it is saved, click the notch and one saved thing comes back, and an Italian-accented voice says a short line after each action. It was designed and written for one person, Adi, who is a self-taught builder with no computer-science background. Explain things to him in plain language, teach as you go, and be honest rather than flattering. He asked for that explicitly.
+You are picking up **Brochacho**, a Mac app that lives in the MacBook notch: type or say the name of a thing and it opens, drag something onto the notch and it is saved, click the notch and one saved thing comes back, and an Italian-accented voice says a short line after each action. Since version 2 he also keeps the day's **jobs** (a to-do list where every job knows what to open), lives in the notch as a small **character** who flies out silently when a job is due, keeps a **diary** in Apple Notes, and plays music by name. It was designed and written for one person, Adi, who is a self-taught builder with no computer-science background. Explain things to him in plain language, teach as you go, and be honest rather than flattering. He asked for that explicitly.
 
 ## Updating the app on Adi's Mac
 
@@ -8,9 +8,9 @@ After pushing a change, wait for the CI run to finish (it commits the regenerate
 
 ## The single most important fact
 
-**The app compiles and its brain passes its tests, but the app has never been run.** It was written on a phone, in a sandbox with no Mac. On 24 September 2026 GitHub's cloud Mac (Xcode 16.4, Swift 6.1.2) compiled everything: `swift test` passed all 41 tests, and the app built with no warnings in its own code. What no one has done yet is launch it: nothing about the notch, the hotkeys, the voice, the microphone or the permissions has been seen working. `BLIND_SPOTS.md` lists every runtime guess.
+**Version 1 runs on Adi's MacBook and he uses it every day** (first launch 25 September 2026). **Version 2 (11 October 2026: jobs, the character, the diary, music) compiles and its brain passes its tests, but has not been run yet.** `BLIND_SPOTS.md` section E lists every runtime guess in it; section B still holds version 1 guesses that were never confirmed one by one.
 
-Also tested: the JavaScript reference implementation of the brain (`reference-js/`, 36 passing tests) and the phone prototype built on it.
+Also tested: the JavaScript reference implementation of the brain (`reference-js/`, 49 passing tests) and the phone prototype built on it.
 
 ## What to do, in order
 
@@ -25,9 +25,9 @@ Also tested: the JavaScript reference implementation of the brain (`reference-js
 1. **The action happens first.** The line, the sound and the voice come after and never delay it.
 2. **Fast.** Under 1.5 seconds from Enter to the thing being open. Measure it; treat a regression as a bug.
 3. **Nothing to memorise.** The box matches *names*. There is no command language. Anything that is not "open a thing" is a gesture, a hotkey, or a tool that is itself just a name (`timer 10`, `note buy strings`).
-4. **He never speaks first.** Voice and sound only answer something the person just did, or something they asked to be told (a timer ending).
-5. **No face, no character, no streaks, no dashboards, no watching the screen, no companion behaviour.** This was rejected many times. If an idea starts with "he notices that…", it is out.
-6. **Version 1 is frozen.** Do not add features until it runs and Adi asks. Ideas go in the parked list at the end of `docs/GUIDE.md`.
+4. **He never *speaks* first.** Voice and sound only answer something the person just did, or something they asked to be told (a timer ending). When a job Adi set is due, the character may fly out of the notch and roam **silently**; he gets bolder by *moving* when ignored, never by talking. He stays in the notch during any Focus mode with Brochacho's filter on, and after `quiet`.
+5. **One character, nothing more.** Adi reversed the old "no character" rule on 11 October 2026: a small sprite lives in the notch (his own art goes in `~/.brochacho/character/`, never in the repo). Still no streaks, no dashboards, no watching the screen. He knows only the clock, the jobs Adi typed, and whether the Mac is being used (idle seconds, never content). Jobs carried over are "owed", not a streak.
+6. **Version 2 is the current scope** (jobs, character, diary, music: `docs/GUIDE.md` sections 20 to 23). New ideas go in the parked list at the end of `docs/GUIDE.md` until Adi asks for them. The tone for jobs is Sopranos: jobs, favours, what's owed.
 
 ## Map of the repo
 
@@ -38,14 +38,15 @@ Also tested: the JavaScript reference implementation of the brain (`reference-js
 | `DAY_ONE.md` | Fresh Mac to running app, step by step. |
 | `BLIND_SPOTS.md` | Every assumption that could not be checked without a Mac, and what to try if it is wrong. |
 | `REFERENCES.md` | Third-party code and licences. |
-| `reference-js/` | **The source of truth for behaviour.** Matcher, stash, lines, tuner, timer, bookmarks, reminders, asking. Plain JavaScript with tests. |
+| `reference-js/` | **The source of truth for behaviour.** Matcher, stash, lines, tuner, timer, bookmarks, reminders, asking, jobs. Plain JavaScript with tests. |
 | `fixtures/` | Golden test data written by the JS tests. The Swift tests load these and must reproduce them. |
 | `Sources/BrochachoCore/`, `Tests/` | The brain ported to Swift. Foundation only, no UI. Must behave exactly like `reference-js/`. |
 | `App/` | The Mac app. `project.yml` generates the Xcode project. `Brochacho/` is the source. `Vendor/DynamicNotchKit` is a lightly patched copy of the notch-window library. |
-| `defaults/` | Shared data: the catalog of things to open, the tunings, the 243 lines. |
-| `scripts/` | Generators: Swift defaults from the shared JSON, the lines, the sounds. |
+| `defaults/` | Shared data: the catalog of things to open, the tunings, the 367 lines. |
+| `scripts/` | Generators: Swift defaults from the shared JSON, the lines, the sounds, the dragon. |
 | `prototype/` | The phone prototype (a single web page). Useful as a picture of how every screen should look and feel. |
 | `docs/IPHONE.md` | Two iPhone Shortcuts that save to and pull from the same stash. Untested; not the priority. |
+| `App/Brochacho/Character/` | The character: his frames, the window he roams in, and the job card beside him. |
 
 ## How the tests work. Read before "fixing" a failing test.
 
@@ -60,10 +61,12 @@ Sources/BrochachoCore/*.swift  --(swift test)-->  must reproduce fixtures/*.json
 - If the *behaviour* should change, change `reference-js/`, update its hand-written expectations, run `node --test reference-js/*.test.js` (this rewrites the fixtures), then bring the Swift into line.
 - `Sources/BrochachoCore/DefaultCatalog.swift` and `DefaultTunings.swift` are generated. Edit `defaults/*.json` and run `python3 scripts/gen_default_catalog.py` / `gen_default_tunings.py`.
 - After editing `defaults/lines.json` (or `scripts/build_lines.py`), run `python3 scripts/sync_app_resources.py` so the app bundles the new lines.
+- The bundled dragon is drawn by `scripts/make_sprites.py`. Rerun it after changing him.
+- Node versions differ in the last digit of some floats, so running the JS tests locally can rewrite `fixtures/tuner.json` with no real change. If that is the only fixture diff, `git checkout fixtures/tuner.json` rather than committing it.
 
 ## Conventions
 
 - Comments explain *why*, in plain words, because the owner of this code is learning. Keep that up.
 - The app target is deliberately thin. Logic belongs in `BrochachoCore`, where it can be tested without a Mac's UI.
 - `Brain.swift` is the only class that knows about all the others. Views never do work; they read `NotchModel` and call the closures on it.
-- Secrets: the Claude API key lives in the Keychain (`AskClient.Keychain`). Never write it to a file or a log.
+- Secrets: the Claude API key and the Spotify keys live in the Keychain (`AskClient.Keychain`). Never write them to a file or a log.

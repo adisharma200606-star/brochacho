@@ -25,7 +25,7 @@ struct InputScreen: View {
                 if model.isListening {
                     ListeningDots(color: model.theme.accent)
                 } else {
-                    Text("hold to talk")
+                    Text(model.inputHint ?? "hold to talk")
                         .font(model.theme.mono(10))
                         .kerning(1.2)
                         .foregroundStyle(NotchTheme.faint)

@@ -89,9 +89,11 @@ enum AskClient {
 
     enum Keychain {
         private static let service = "com.adi.brochacho"
-        private static let account = "anthropic-api-key"
+        /// The Claude key. Internal rather than private only because it is a default argument below.
+        static let claudeAccount = "anthropic-api-key"
 
-        static func read() -> String? {
+        /// `account` names which secret: the Claude key by default, or the Spotify keys (see MusicPlayer).
+        static func read(account: String = claudeAccount) -> String? {
             let query: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrService as String: service,
@@ -106,7 +108,7 @@ enum AskClient {
 
         /// Saves the key, replacing any earlier one. An empty string removes it.
         @discardableResult
-        static func write(_ key: String) -> Bool {
+        static func write(_ key: String, account: String = claudeAccount) -> Bool {
             let base: [String: Any] = [
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrService as String: service,

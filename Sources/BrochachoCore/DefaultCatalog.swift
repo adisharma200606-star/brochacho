@@ -23,6 +23,18 @@ public enum DefaultCatalog {
         CatalogEntry(name: "settings", display: "Settings", aliases: ["preferences", "brochacho"], kind: .tool, target: "settings", profile: nil, searchTemplate: nil, takesWords: false, living: false),
         CatalogEntry(name: "bored", display: "Something I saved", aliases: ["im bored", "i am bored", "surprise me"], kind: .tool, target: "pull", profile: nil, searchTemplate: nil, takesWords: false, living: false),
         CatalogEntry(name: "flip", display: "Flip the screen", aliases: ["one eighty", "180", "rotate", "flip screen", "upside down"], kind: .tool, target: "flip", profile: nil, searchTemplate: nil, takesWords: false, living: false),
-        CatalogEntry(name: "help", display: "How it works", aliases: ["tutorial", "guide"], kind: .tool, target: "help", profile: nil, searchTemplate: nil, takesWords: false, living: false)
+        CatalogEntry(name: "help", display: "How it works", aliases: ["tutorial", "guide"], kind: .tool, target: "help", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "books", display: "Books", aliases: ["read", "reading", "apple books"], kind: .app, target: "com.apple.iBooksX", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "duolingo", display: "Duolingo", aliases: ["duo"], kind: .site, target: "https://www.duolingo.com/learn", profile: "personal", searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "jobs", display: "Today's jobs", aliases: ["job", "today", "todo list", "my jobs"], kind: .tool, target: "jobs", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "done", display: "Job done", aliases: ["finished"], kind: .tool, target: "done", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "diary", display: "Diary", aliases: ["dear diary", "journal"], kind: .tool, target: "diary", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "quiet", display: "Quiet for today", aliases: ["hush", "be quiet", "leave me alone"], kind: .tool, target: "quiet", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "music", display: "Play music", aliases: [], kind: .tool, target: "music", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "pause", display: "Pause or resume", aliases: ["resume", "pause music"], kind: .tool, target: "playpause", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "next song", display: "Next song", aliases: ["next", "skip", "skip song"], kind: .tool, target: "next", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "louder", display: "Louder", aliases: ["volume up", "turn it up"], kind: .tool, target: "louder", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "quieter", display: "Quieter", aliases: ["volume down", "turn it down", "softer"], kind: .tool, target: "quieter", profile: nil, searchTemplate: nil, takesWords: false, living: false),
+        CatalogEntry(name: "volume", display: "Volume", aliases: [], kind: .tool, target: "volume", profile: nil, searchTemplate: nil, takesWords: true, living: false)
     ]
 }

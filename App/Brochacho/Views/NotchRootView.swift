@@ -35,14 +35,23 @@ struct CompactLeadingView: View {
     @ObservedObject var model: NotchModel
 
     var body: some View {
-        Rectangle()
-            .fill(model.theme.accent)
-            .frame(width: 2, height: 10)
-            .shadow(color: model.theme.accent, radius: 4)
-            .opacity(model.timerText == nil ? 0 : 1)
-            .padding(8)
-            .contentShape(Rectangle())
-            .onTapGesture { model.onTimerTap() }
+        HStack(spacing: 6) {
+            // A job is waiting but he has been asked to stay in: only his head peeks out.
+            if model.jobWaiting {
+                CharacterView(frames: model.character)
+                    .frame(width: 18, height: 18)
+                    .contentShape(Rectangle())
+                    .onTapGesture { model.onJobWaitingTap() }
+            }
+            Rectangle()
+                .fill(model.theme.accent)
+                .frame(width: 2, height: 10)
+                .shadow(color: model.theme.accent, radius: 4)
+                .opacity(model.timerText == nil ? 0 : 1)
+                .contentShape(Rectangle())
+                .onTapGesture { model.onTimerTap() }
+        }
+        .padding(8)
     }
 }
 

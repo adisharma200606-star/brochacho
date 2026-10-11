@@ -277,6 +277,17 @@ public enum Matcher {
             }
         }
 
+        // "play beabadoobee": "play" is a filler word, so "play me some youtube" still opens YouTube. Only when what
+        // follows is not strongly one of his things does it go to the music tool, before it could be read as a question.
+        if rawTokens.count >= 2, TextTools.normalize(rawTokens[0]) == "play", tokens.count < rawTokens.count,
+           let music = catalog.first(where: { $0.kind == .tool && $0.target == "music" && $0.takesWords }) {
+            let strong = ranked.first.map { $0.band >= Band.strongFrom } ?? false
+            if !strong {
+                let hit = Hit(entry: music, band: .exact, quality: 1, usage: usage[music.name] ?? 0)
+                return Decision(mode: .search, results: [hit], query: tokens.joined(separator: " "), confident: true)
+            }
+        }
+
         // It starts like a question and is more than one word: ask.
         if tokens.count >= 2 && questionWords.contains(TextTools.normalize(tokens[0])) {
             return askDecision(tokens.joined(separator: " "), confident: true)

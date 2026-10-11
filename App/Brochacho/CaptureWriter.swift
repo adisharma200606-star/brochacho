@@ -41,6 +41,38 @@ enum CaptureWriter {
         if !run(source) { _ = Opener.openApp("com.apple.Notes", name: "Notes") }
     }
 
+    /// Adds a few lines to the day's diary note, making the note first if `noteID` is nil or the note has gone
+    /// (deleted, say). The note is titled `title`, so Notes lists one diary note per day. Returns the note's id,
+    /// to pass back in next time, or nil if Notes refused.
+    static func appendToDiary(noteID: String?, title: String, lines: String) -> String? {
+        let body = htmlEscaped(lines).replacingOccurrences(of: "\n", with: "<br>")
+        let find = noteID.map { id in
+            """
+                try
+                    set theNote to note id "\(appleScriptEscaped(id))"
+                end try
+            """
+        } ?? ""
+        let source = """
+        tell application "Notes"
+            set theNote to missing value
+        \(find)
+            if theNote is missing value then
+                set theNote to make new note with properties {body:"<h1>\(appleScriptEscaped(htmlEscaped(title)))</h1>"}
+            end if
+            set body of theNote to (body of theNote) & "<div>\(appleScriptEscaped(body))</div><div><br></div>"
+            return id of theNote
+        end tell
+        """
+        var error: NSDictionary?
+        let result = NSAppleScript(source: source)?.executeAndReturnError(&error)
+        if let error = error {
+            NSLog("Brochacho: Notes would not take the diary: \(error)")
+            return nil
+        }
+        return result?.stringValue ?? ""
+    }
+
     /// Opens Notes on a fresh, empty note, ready to type.
     static func openFreshNote() -> Bool {
         let source = """

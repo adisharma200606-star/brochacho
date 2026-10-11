@@ -102,6 +102,20 @@ Tick these off. When one fails, look it up in `BLIND_SPOTS.md` before anything e
 - [ ] `what is a closure` gets a short answer; `how do i undo a git commit?` gives a command with Copy
 - [ ] make an entry with "Remember where I left off", go to another page on that site, press ⌃⌥M, and the entry now opens the new page
 
+### Version 2 (after `install.sh`)
+
+- [ ] `jobs read 30 min, duolingo by 10pm`: he says back "on the books: read · duolingo by 22:00"
+- [ ] `jobs`: the list shows both; `read` says "opens books"
+- [ ] `jobs stretch in 1 minute`: a minute later he flies out of the notch without a sound (give it up to 30 seconds more)
+- [ ] click him: the card opens beside him; **start it**: the starter opens first, then he speaks
+- [ ] ignore him for three minutes: he flies home, and the next visit is bolder
+- [ ] add the Brochacho Focus filter to a Focus mode with "Stay in the notch" on, turn that Focus on: he stays home and only his head shows beside the notch
+- [ ] `play beabadoobee` (with the Spotify keys in settings) plays; `pause` and `next` work
+- [ ] `diary testing` makes today's diary note in Notes
+- [ ] `yt` still opens YouTube in under 1.5 seconds
+
+If something here misbehaves, `BLIND_SPOTS.md` section E is where the guesses are.
+
 ## 11. Make it start by itself
 
 In Xcode: Product → Show Build Folder in Finder → `Products/Debug/Brochacho.app`. Drag it to Applications. Then System Settings → General → Login Items → **+** → Brochacho.
@@ -110,7 +124,7 @@ In Xcode: Product → Show Build Folder in Finder → `Products/Debug/Brochacho.
 
 - Update the **Status** lines in `docs/GUIDE.md` for everything that now works. Rewrite anything that turned out different.
 - Every `git push` to `main` builds and tests on a cloud Mac (`.github/workflows/ci.yml`); the logs land on the `ci-logs` branch.
-- Parked ideas are at the end of `docs/GUIDE.md`. Version 1 is frozen until the list above is all ticked.
+- Parked ideas are at the end of `docs/GUIDE.md`.
 
 ## Updating, from now on
 

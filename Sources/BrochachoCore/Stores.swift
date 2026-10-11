@@ -27,6 +27,10 @@ public enum BrochachoPaths {
         return configDirectory.appendingPathComponent("catalog-migrations.json")
     }
 
+    public static var jobsFile: URL {
+        return configDirectory.appendingPathComponent("jobs.json")
+    }
+
     public static var lineStateFile: URL {
         return configDirectory.appendingPathComponent("line-state.json")
     }
@@ -177,6 +181,17 @@ public enum CaptureLogStore {
 
     public static func save(_ log: CaptureLog, to url: URL = BrochachoPaths.captureLogFile) {
         try? JSONFile.write(log, to: url)
+    }
+}
+
+/// Today's jobs. A missing or unreadable file means an empty day; it is never deleted.
+public enum JobsStore {
+    public static func load(from url: URL = BrochachoPaths.jobsFile) -> JobDay? {
+        return try? JSONFile.read(JobDay.self, from: url)
+    }
+
+    public static func save(_ day: JobDay, to url: URL = BrochachoPaths.jobsFile) {
+        try? JSONFile.write(day, to: url)
     }
 }
 

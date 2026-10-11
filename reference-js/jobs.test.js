@@ -1,0 +1,169 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const path = require('node:path');
+const jobs = require('./jobs.js');
+const defaults = require('../defaults/catalog.json');
+
+// Saturday 11 October 2026, 10:00 on the wall clock.
+const at = (h, m, day) => Date.UTC(2026, 9, day || 11, h, m || 0);
+const NOW = at(10, 0);
+const CATALOG = defaults.concat([
+  { name: 'swift course', aliases: [], kind: 'site', target: 'https://learn.example.org/swift/lesson/4', profile: 'personal', living: true }
+]);
+
+// [text, bindings, expected drafts as [title, minutes, dueWall, starter]]
+const PARSE_CASES = [
+  ['read 30 min, swift course, duolingo by 10pm', {}, [
+    ['read', 30, null, 'books'], ['swift course', null, null, 'swift course'], ['duolingo', null, at(22, 0), 'duolingo']]],
+  ['i need to call dad at 6', {}, [['call dad', null, at(18, 0), null]]],
+  ['finish the swift course for an hour', {}, [['finish the swift course', 60, null, 'swift course']]],
+  ['read in 20 minutes', {}, [['read', null, at(10, 20), 'books']]],
+  ['read 1.5h', {}, [['read', 90, null, 'books']]],
+  ['practice guitar half an hour', {}, [['practice guitar', 30, null, null]]],
+  ['call mom and dad', {}, [['call mom and dad', null, null, null]]],
+  ['gym 45m', { gym: 'youtube' }, [['gym', 45, null, 'youtube']]],
+  ['timer stuff', {}, [['timer stuff', null, null, null]]],          // a tool never starts a job
+  ['gotta read a chapter\nduolingo', {}, [['read a chapter', null, null, 'books'], ['duolingo', null, null, 'duolingo']]],
+  [' , ;  ', {}, []]
+];
+
+test('jobs: reading what he typed', () => {
+  for (const [text, bindings, expected] of PARSE_CASES) {
+    const got = jobs.parseJobs(text, NOW, CATALOG, bindings).map(d => [d.title, d.minutes, d.dueWall, d.starter]);
+    assert.deepStrictEqual(got, expected, JSON.stringify(text));
+  }
+});
+
+test('jobs: clock settings and job days', () => {
+  assert.strictEqual(jobs.clockMinutes('09:00'), 540);
+  assert.strictEqual(jobs.clockMinutes('0:30'), 30);
+  assert.strictEqual(jobs.clockMinutes('24:00'), null);
+  assert.strictEqual(jobs.clockMinutes('nine'), null);
+  assert.strictEqual(jobs.dayKey(at(10, 0)), '2026-10-11');
+  assert.strictEqual(jobs.dayKey(at(1, 30, 12)), '2026-10-11', 'half past one at night is still the day before');
+  assert.strictEqual(jobs.dayKey(at(4, 0, 12)), '2026-10-12');
+});
+
+test('jobs: the same job twice is one job, and done read finds it', () => {
+  const day = jobs.newDay('2026-10-11');
+  jobs.addJobs(day, jobs.parseJobs('read 30 min, call dad', NOW, CATALOG), NOW);
+  jobs.addJobs(day, jobs.parseJobs('Read 45 min', NOW, CATALOG), NOW);
+  assert.strictEqual(day.jobs.length, 2);
+  assert.strictEqual(day.jobs[0].minutes, 45);
+  assert.strictEqual(jobs.findJob(day, 'read').id, 'j1');
+  assert.strictEqual(jobs.findJob(day, 'dad').id, 'j2');
+  assert.strictEqual(jobs.findJob(day, 'gym'), null);
+  assert.strictEqual(jobs.findJob(day, ''), null);
+});
+
+/** Plays a list of steps against one day and records what each step returned. */
+function play(steps) {
+  const day = jobs.newDay('2026-10-11');
+  let last = null, shown = null;   // the last answer, and the last time he actually came out
+  const results = [];
+  for (const s of steps) {
+    let r = null;
+    switch (s.op) {
+      case 'add': r = jobs.addJobs(day, jobs.parseJobs(s.text, s.at, CATALOG), s.at).map(j => j.id); break;
+      case 'nudge': last = jobs.nextNudge(day, s.at, jobs.DEFAULT_SETTINGS, { quiet: !!s.quiet, idleSec: s.idle || 0 }); r = last; break;
+      case 'appeared': shown = last; jobs.appeared(day, shown, s.at); break;
+      case 'ignored': jobs.ignored(day, shown); break;
+      case 'start': jobs.start(day, s.id, s.at); break;
+      case 'finish': jobs.finish(day, s.id, s.at); break;
+      case 'skip': jobs.skip(day, s.id); break;
+      case 'later': jobs.later(day, s.id, s.at, jobs.DEFAULT_SETTINGS); break;
+      case 'sleepLater': jobs.sleepLater(day, s.at, 10); break;
+      case 'closeBooks': jobs.closeBooks(day); break;
+      default: throw new Error('unknown step ' + s.op);
+    }
+    results.push(r);
+  }
+  return { day, results };
+}
+
+const STEPS = [
+  { op: 'add', text: 'read 30 min, swift course, duolingo by 10pm', at: at(10, 0) },
+  { op: 'nudge', at: at(8, 30) },
+  { op: 'nudge', at: at(10, 0) }, { op: 'appeared', at: at(10, 0) },
+  { op: 'nudge', at: at(10, 20) },
+  { op: 'ignored' },
+  { op: 'nudge', at: at(10, 45) }, { op: 'appeared', at: at(10, 45) },
+  { op: 'nudge', at: at(11, 30) }, { op: 'appeared', at: at(11, 30) },
+  { op: 'start', id: 'j1', at: at(11, 31) },
+  { op: 'nudge', at: at(12, 20) }, { op: 'appeared', at: at(12, 20) },
+  { op: 'finish', id: 'j1', at: at(12, 21) },
+  { op: 'later', id: 'j2', at: at(12, 22) },
+  { op: 'nudge', at: at(13, 10) }, { op: 'appeared', at: at(13, 10) },
+  { op: 'nudge', at: at(14, 0), quiet: true },
+  { op: 'nudge', at: at(14, 0), idle: 600 },
+  { op: 'nudge', at: at(22, 0) }, { op: 'appeared', at: at(22, 0) },
+  { op: 'nudge', at: at(22, 5) },
+  { op: 'ignored' },
+  { op: 'nudge', at: at(22, 11) }, { op: 'appeared', at: at(22, 11) },
+  { op: 'skip', id: 'j3', at: at(22, 12) },
+  { op: 'nudge', at: at(0, 40, 12) }, { op: 'appeared', at: at(0, 40, 12) },
+  { op: 'nudge', at: at(0, 45, 12) },
+  { op: 'ignored' },
+  { op: 'nudge', at: at(0, 51, 12) }, { op: 'appeared', at: at(0, 51, 12) },
+  { op: 'sleepLater', at: at(0, 52, 12) },
+  { op: 'nudge', at: at(1, 0, 12) },
+  { op: 'nudge', at: at(1, 3, 12) }, { op: 'appeared', at: at(1, 3, 12) },
+  { op: 'closeBooks' },
+  { op: 'nudge', at: at(1, 30, 12) }
+];
+
+test('jobs: when he comes out, and how bold he is', () => {
+  const { day, results } = play(STEPS);
+  const nudges = STEPS.map((s, i) => [s, results[i]]).filter(([s]) => s.op === 'nudge').map(([, r]) => r);
+  assert.deepStrictEqual(nudges, [
+    null,                                            // 08:30, before the day starts
+    { kind: 'job', jobID: 'j1', level: 0 },          // 10:00, the first job
+    null,                                            // 10:20, too soon after
+    { kind: 'job', jobID: 'j2', level: 0 },          // 10:45, the one not yet shown
+    { kind: 'job', jobID: 'j1', level: 1 },          // 11:30, back to read, bolder: he was ignored
+    { kind: 'check', jobID: 'j1', level: 0 },        // 12:20, started 49 minutes ago: done yet?
+    { kind: 'job', jobID: 'j2', level: 0 },          // 13:10, "later" is over
+    null,                                            // a Focus mode with his filter on
+    null,                                            // nobody at the Mac
+    { kind: 'job', jobID: 'j3', level: 0 },          // 22:00, duolingo is due
+    null,                                            // 22:05, too soon even for something due
+    { kind: 'job', jobID: 'j3', level: 1 },          // 22:11, ignored once
+    { kind: 'sleep', jobID: null, level: 0 },        // 00:40, past bedtime
+    null,                                            // 00:45, too soon
+    { kind: 'sleep', jobID: null, level: 1 },        // 00:51, ignored once
+    null,                                            // 01:00, "10 more" is not over
+    { kind: 'sleep', jobID: null, level: 0 },        // 01:03, it is
+    null                                             // the books are closed
+  ]);
+  assert.strictEqual(jobs.ledger(day), 'Jobs, 2026-10-11\nDone: read (30 min)\nSkipped: duolingo\nStill owed: swift course');
+  assert.deepStrictEqual(day.jobs.map(jobs.describeJob), ['done · 30 min', '', 'skipped · by 22:00']);
+
+  const next = jobs.rollover(day, '2026-10-12');
+  assert.deepStrictEqual(next.jobs.map(j => [j.id, j.title, j.owedDays, j.status, j.dueWall]), [['j1', 'swift course', 1, 'open', null]]);
+  assert.strictEqual(jobs.describeJob(next.jobs[0]), 'owed since yesterday');
+  assert.strictEqual(jobs.rollover(next, '2026-10-12'), next, 'the same day is left alone');
+  const third = jobs.rollover(next, '2026-10-13');
+  assert.strictEqual(third.jobs[0].owedDays, 2);
+  assert.strictEqual(jobs.ledger(third), 'Jobs, 2026-10-13\nStill owed: swift course (3 days now)');
+  assert.strictEqual(jobs.ledger(jobs.newDay('2026-10-14')), 'Jobs, 2026-10-14\nNo jobs today.');
+});
+
+test('write jobs fixtures', () => {
+  const dir = path.join(__dirname, '..', 'fixtures');
+  const { day, results } = play(STEPS);
+  const next = jobs.rollover(JSON.parse(JSON.stringify(day)), '2026-10-12');
+  fs.writeFileSync(path.join(dir, 'jobs.json'), JSON.stringify({
+    now: NOW,
+    catalog: CATALOG,
+    parses: PARSE_CASES.map(([text, bindings]) => ({ text, bindings, drafts: jobs.parseJobs(text, NOW, CATALOG, bindings) })),
+    dayKeys: [at(10, 0), at(1, 30, 12), at(4, 0, 12), at(3, 59, 1)].map(wall => ({ wall, key: jobs.dayKey(wall) })),
+    steps: STEPS.map((s, i) => Object.assign({}, s, { result: results[i] })),
+    finalDay: day,
+    ledger: jobs.ledger(day),
+    described: day.jobs.map(jobs.describeJob),
+    rolled: next,
+    rolledLedger: jobs.ledger(jobs.rollover(JSON.parse(JSON.stringify(next)), '2026-10-13'))
+  }, null, 2));
+});

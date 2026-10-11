@@ -10,6 +10,8 @@ Built for one person (Adi). Not for sale. Target machine: M1 Pro MacBook Pro (ha
 
 These override everything else in this file.
 
+> **Version 2 (11 October 2026) changed rules 4, 5 and 7.** He may come out of the notch *silently* when a job is due, there is one small character, and unfinished jobs are "owed" (not a streak). The current rules are in `CLAUDE.md`; this spec is kept as the history of version 1.
+
 1. **Action first, voice after.** The thing opens, then the line plays. Voice never delays an action.
 2. **Under 1.5 seconds** from Enter (or key release) to the thing being open.
 3. **No vocabulary.** The box is a search over the names of his things. No command words to memorise. Everything that isn't "open a thing" is a gesture or a hotkey, not a typed command.

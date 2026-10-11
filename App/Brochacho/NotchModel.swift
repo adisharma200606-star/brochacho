@@ -71,6 +71,13 @@ final class NotchModel: ObservableObject {
     @Published var timerText: String? = nil
     @Published var timerFraction: Double = 0
 
+    // the character: shown beside his lines, and flying around the screen when a job is due
+    @Published var character = CharacterFrames.bundled
+    /// A job is due but he may not fly out (a Focus mode, or roaming switched off): his head sits beside the notch.
+    @Published var jobWaiting = false
+    /// Replaces "hold to talk" in the box, for example "what opens it?" while a job is being given a starter.
+    @Published var inputHint: String? = nil
+
     // glance
     @Published var glanceTitle = ""
     @Published var glanceItems: [GlanceItem] = []
@@ -90,6 +97,7 @@ final class NotchModel: ObservableObject {
     var onGlanceOpen: (Int) -> Void = { _ in }
     var onGlanceTick: (Int) -> Void = { _ in }
     var onGlanceButton: (Int) -> Void = { _ in }
+    var onJobWaitingTap: () -> Void = {}
 
     init(theme: NotchTheme) {
         self.theme = theme
