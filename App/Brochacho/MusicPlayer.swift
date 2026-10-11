@@ -10,6 +10,11 @@ import Foundation
 /// settings). Without the key, "play beabadoobee" opens Spotify's search for it instead, one click short.
 ///
 /// Apple Music needs no key: it searches your library by AppleScript and plays the first match.
+///
+/// Everything here runs on the main thread. AppleScript (and macOS's "may Brochacho control Spotify?" prompt)
+/// must; run from a background thread after the search, it failed silently. Each attempt is written to
+/// ~/.brochacho/music.log, readable with `cat`, so a failure says exactly which step went wrong.
+@MainActor
 enum MusicPlayer {
 
     enum Outcome {
@@ -25,32 +30,44 @@ enum MusicPlayer {
 
     static func play(_ words: String, player: String) async -> Outcome {
         let query = words.trimmingCharacters(in: .whitespacesAndNewlines)
+        var log = MusicLog(query: query, player: player)
+        defer { log.write() }
+
         if query.isEmpty {
             return playPause(player: player) ? .playing("") : .failed("Nothing to play.")
         }
         if player == "music" { return playFromLibrary(query) }
 
-        if let id = AskClient.Keychain.read(account: clientIDAccount), let secret = AskClient.Keychain.read(account: clientSecretAccount),
-           !id.isEmpty, !secret.isEmpty {
+        let id = AskClient.Keychain.read(account: clientIDAccount) ?? ""
+        let secret = AskClient.Keychain.read(account: clientSecretAccount) ?? ""
+        log.add("keys: client id \(id.isEmpty ? "missing" : "present"), secret \(secret.isEmpty ? "missing" : "present")")
+
+        if !id.isEmpty, !secret.isEmpty {
             do {
-                if let found = try await SpotifySearch.best(for: query, clientID: id, secret: secret) {
-                    // Spotify only reliably *plays* a song. Given an artist or album address on its own, newer
-                    // versions just open that page. So it is always a song, played inside its artist or album,
-                    // which also keeps the next songs coming from the same place.
-                    var script = "tell application \"Spotify\" to play track \"\(escaped(found.uri))\""
-                    if let context = found.context { script += " in context \"\(escaped(context))\"" }
-                    if runScript(script) {
-                        return .playing(found.name)
-                    }
-                    return .failed("Spotify would not play. Check Privacy, Automation.")
+                let found = try await SpotifySearch.best(for: query, clientID: id, secret: secret, log: &log)
+                guard let found = found else {
+                    log.add("search found nothing")
+                    return .failed("Spotify found nothing called \(query).")
                 }
-                return .failed("Spotify found nothing called \(query).")
+                // Spotify only reliably *plays* a song. Given an artist or album address on its own, newer
+                // versions just open that page. So it is always a song, played inside its artist or album,
+                // which also keeps the next songs coming from the same place.
+                var script = "tell application \"Spotify\" to play track \"\(escaped(found.uri))\""
+                if let context = found.context { script += " in context \"\(escaped(context))\"" }
+                log.add("script: \(script)")
+                if let problem = run(script) {
+                    log.add("script failed: \(problem.text)")
+                    return .failed(problem.forNotch)
+                }
+                log.add("played")
+                return .playing(found.name)
             } catch {
-                NSLog("Brochacho: Spotify search failed: \(error)")
+                log.add("search failed: \(error)")
                 // Fall through to the search page, which still gets him there.
             }
         }
         let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? query
+        log.add("opening spotify:search:\(encoded)")
         if let url = URL(string: "spotify:search:\(encoded)"), NSWorkspace.shared.open(url) {
             return .searching(query)
         }
@@ -105,15 +122,35 @@ enum MusicPlayer {
         return text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"")
     }
 
-    @discardableResult
-    private static func runScript(_ source: String) -> Bool {
+    /// What went wrong with a script: AppleScript's number and message, and a sentence for the notch.
+    struct ScriptProblem {
+        let number: Int
+        let message: String
+
+        var text: String { "\(number) \(message)" }
+
+        var forNotch: String {
+            switch number {
+            case -1743: return "macOS won't let me control Spotify. Privacy & Security, Automation, Brochacho."
+            case -600: return "Spotify isn't open."
+            default: return "Spotify said no (\(number))."
+            }
+        }
+    }
+
+    /// Runs a script. Nil means it worked.
+    private static func run(_ source: String) -> ScriptProblem? {
         var error: NSDictionary?
         NSAppleScript(source: source)?.executeAndReturnError(&error)
-        if let error = error {
-            NSLog("Brochacho: music script failed: \(error)")
-            return false
-        }
-        return true
+        guard let error = error else { return nil }
+        NSLog("Brochacho: music script failed: \(error)")
+        return ScriptProblem(number: (error[NSAppleScript.errorNumber] as? Int) ?? 0,
+                             message: (error[NSAppleScript.errorMessage] as? String) ?? "")
+    }
+
+    @discardableResult
+    private static func runScript(_ source: String) -> Bool {
+        return run(source) == nil
     }
 
     private static func runScriptForString(_ source: String) -> String? {
@@ -124,6 +161,24 @@ enum MusicPlayer {
             return nil
         }
         return result?.stringValue ?? ""
+    }
+}
+
+/// The story of the last "play", written to ~/.brochacho/music.log. Never the keys themselves.
+struct MusicLog {
+    private var lines: [String]
+
+    init(query: String, player: String) {
+        lines = ["\(Date()) play \"\(query)\" in \(player)"]
+    }
+
+    mutating func add(_ line: String) {
+        lines.append(line)
+    }
+
+    func write() {
+        let url = BrochachoPaths.configDirectory.appendingPathComponent("music.log")
+        try? Data((lines.joined(separator: "\n") + "\n").utf8).write(to: url, options: .atomic)
     }
 }
 
@@ -161,9 +216,11 @@ private enum SpotifySearch {
 
     /// When the words are an artist's name ("beabadoobee"): their best-known song, played inside the artist.
     /// Otherwise the best matching song, played inside its album. A playlist only if there is no song at all.
-    static func best(for query: String, clientID: String, secret: String) async throws -> Found? {
+    static func best(for query: String, clientID: String, secret: String, log: inout MusicLog) async throws -> Found? {
         let token = try await fetchToken(clientID: clientID, secret: secret)
+        log.add("token: ok")
         let results = try await search(query, types: "artist,track,playlist", token: token)
+        log.add("search: artist \(results.artists?.items.compactMap { $0 }.first?.name ?? "-"), song \(results.tracks?.items.compactMap { $0 }.first?.name ?? "-")")
 
         let wanted = TextTools.normalize(query)
         if let artist = results.artists?.items.compactMap({ $0 }).first, TextTools.normalize(artist.name) == wanted {
@@ -194,7 +251,8 @@ private enum SpotifySearch {
         request.timeoutInterval = 8
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else { throw SpotifyProblem(step: "search", status: status, body: String(decoding: data.prefix(300), as: UTF8.self)) }
         return try JSONDecoder().decode(Results.self, from: data)
     }
 
@@ -208,7 +266,18 @@ private enum SpotifySearch {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data("grant_type=client_credentials".utf8)
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.userAuthenticationRequired) }
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 200 else { throw SpotifyProblem(step: "token", status: status, body: String(decoding: data.prefix(300), as: UTF8.self)) }
         return try JSONDecoder().decode(Token.self, from: data).access_token
     }
 }
+
+/// Spotify answered with something other than "OK". Its own words go into music.log.
+private struct SpotifyProblem: Error, CustomStringConvertible {
+    let step: String
+    let status: Int
+    let body: String
+
+    var description: String { "\(step) HTTP \(status): \(body)" }
+}
+
