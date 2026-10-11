@@ -31,7 +31,9 @@
     sleepGapMin: 10,          // least time between two bedtime appearances
     laterMin: 30,             // what "later" puts a job off by
     maxLevel: 3,              // how bold he gets when ignored: 0 bobs under the notch, 3 loops the middle of the screen
-    idleLimitSec: 300         // nobody at the Mac for this long: stay home
+    idleLimitSec: 300,        // nobody at the Mac for this long: stay home
+    openAtMin: 10 * 60,       // the list opens by itself once a day, the first time he is at the Mac after this
+    activeWithinSec: 120      // ...and only if he touched the Mac this recently, so it is seen
   };
 
   function bare(token) { return String(token).toLowerCase().replace(/^[^a-z0-9.:]+|[^a-z0-9.:]+$/g, ''); }
@@ -142,7 +144,7 @@
 
   function newDay(key) {
     return { day: key, jobs: [], nextID: 1, lastAppearance: null, sleepSnoozedUntil: null, sleepIgnored: 0,
-      closed: false, quietUntil: null, diaryNoteID: null };
+      closed: false, quietUntil: null, diaryNoteID: null, listOpened: false };
   }
 
   function newJob(id, draft, now) {
@@ -221,6 +223,34 @@
   }
   function sleepLater(day, now, minutes) { day.sleepSnoozedUntil = now + (minutes || 10) * MIN; day.sleepIgnored = 0; }
   function closeBooks(day) { day.closed = true; }
+  /** Ticked by mistake: back on the list. */
+  function reopen(day, id) {
+    var j = job(day, id); if (!j) return null;
+    j.status = 'open'; j.doneAt = null; j.startedAt = null; touch(j);
+    return j;
+  }
+  /** Gone from the list, not done and not skipped: it never goes into the ledger. */
+  function remove(day, id) {
+    var before = day.jobs.length;
+    day.jobs = day.jobs.filter(function (j) { return j.id !== id; });
+    return day.jobs.length < before;
+  }
+
+  /**
+   * Should the list open by itself now, so he can plan the day? Once a day, the first time he is at the Mac
+   * after openAtMin, never during quiet, never after bedtime. This is the one thing besides a due job that
+   * shows without being asked, and it is silent: the list opens, nothing is said.
+   */
+  function shouldOpenList(day, now, settings, ctx) {
+    settings = settings || DEFAULT_SETTINGS;
+    ctx = ctx || {};
+    if (day.listOpened || ctx.quiet) return false;
+    if (day.quietUntil !== null && day.quietUntil !== undefined && now < day.quietUntil) return false;
+    if ((ctx.idleSec || 0) > settings.activeWithinSec) return false;
+    var nowS = shiftedMinutes(wallMinutes(now));
+    return nowS >= shiftedMinutes(settings.openAtMin) && nowS < shiftedMinutes(settings.bedtimeMin);
+  }
+  function listOpened(day) { day.listOpened = true; }
 
   // ------------------------------------------------------------ when he comes out ----
 
@@ -332,6 +362,7 @@
     clockMinutes: clockMinutes, dayKey: dayKey, takeDuration: takeDuration, bindStarter: bindStarter, parseJobs: parseJobs,
     newDay: newDay, addJobs: addJobs, rollover: rollover, findJob: findJob,
     start: start, finish: finish, skip: skip, later: later, sleepLater: sleepLater, closeBooks: closeBooks,
+    reopen: reopen, remove: remove, shouldOpenList: shouldOpenList, listOpened: listOpened,
     nextNudge: nextNudge, appeared: appeared, ignored: ignored, describeJob: describeJob, ledger: ledger
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

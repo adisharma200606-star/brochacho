@@ -43,6 +43,14 @@ final class JobsTests: XCTestCase {
         }
     }
 
+    private struct OpenFixture: Decodable {
+        let wall: Int
+        let quiet: Bool
+        let idle: Int
+        let opened: Bool
+        let open: Bool
+    }
+
     private struct FileFixture: Decodable {
         let now: Int
         let catalog: [CatalogEntry]
@@ -54,6 +62,7 @@ final class JobsTests: XCTestCase {
         let described: [String]
         let rolled: JobDay
         let rolledLedger: String
+        let opens: [OpenFixture]
     }
 
     private func load() throws -> FileFixture {
@@ -115,6 +124,32 @@ final class JobsTests: XCTestCase {
         XCTAssertEqual(rolled, file.rolled)
         XCTAssertEqual(Jobs.rollover(rolled, to: "2026-10-12"), rolled, "the same day is left alone")
         XCTAssertEqual(Jobs.ledger(Jobs.rollover(rolled, to: "2026-10-13")), file.rolledLedger)
+    }
+
+    func testTheListOpensByItselfOnceADay() throws {
+        let file = try load()
+        XCTAssertGreaterThanOrEqual(file.opens.count, 8)
+        for o in file.opens {
+            var day = JobDay(day: "2026-10-11")
+            if o.opened { day.markListOpened() }
+            XCTAssertEqual(Jobs.shouldOpenList(day, now: o.wall, quiet: o.quiet, idleSeconds: o.idle), o.open, "\(o.wall) quiet=\(o.quiet) idle=\(o.idle)")
+        }
+    }
+
+    func testUntickingAndDeleting() throws {
+        let file = try load()
+        var day = JobDay(day: "2026-10-11")
+        day.add(Jobs.parse("read 30 min, call dad, gym", nowWall: file.now, catalog: file.catalog), now: file.now)
+        day.finish("j1", now: file.now)
+        day.reopen("j1")
+        XCTAssertEqual(day.jobs[0].status, .open)
+        XCTAssertNil(day.jobs[0].doneAt)
+        XCTAssertTrue(day.remove("j2"))
+        XCTAssertFalse(day.remove("j2"))
+        XCTAssertEqual(day.jobs.map { $0.id }, ["j1", "j3"])
+        day.add(Jobs.parse("stretch", nowWall: file.now, catalog: file.catalog), now: file.now)
+        XCTAssertEqual(day.jobs[2].id, "j4", "ids are never reused")
+        XCTAssertEqual(Jobs.ledger(day), "Jobs, 2026-10-11\nStill owed: read (30 min), gym, stretch")
     }
 
     func testFindingAJobByName() throws {

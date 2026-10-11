@@ -357,6 +357,7 @@ private struct JobsTab: View {
             TextField("Minutes between visits", value: $state.config.jobs.cooldownMinutes, format: .number)
             TextField("Minutes \"later\" waits", value: $state.config.jobs.laterMinutes, format: .number)
             Stepper("How bold he gets when ignored: \(state.config.jobs.maxLevel)", value: $state.config.jobs.maxLevel, in: 0...3)
+            TextField("The list opens by itself from (HH:MM; empty: never)", text: $state.config.jobs.openListAt)
             Toggle("He may fly out of the notch", isOn: $state.config.character.roam)
             Text("To keep him in during some Focus modes: System Settings → Focus → a Focus → Focus filters → Brochacho.")
                 .font(.caption).foregroundStyle(.secondary)
@@ -364,7 +365,8 @@ private struct JobsTab: View {
             Divider()
             TextField("Character folder", text: $state.config.character.folder)
             TextField("Size in points", value: $state.config.character.size, format: .number)
-            Text("PNG frames named idle_0.png, idle_1.png… and fly_0.png, fly_1.png…, facing right. Empty means the little dragon.")
+            Toggle("The pictures face left", isOn: $state.config.character.facesLeft)
+            Text("An animated idle.gif, or PNG frames named idle_0.png, idle_1.png… and fly_0.png…. An empty folder means the little dragon.")
                 .font(.caption).foregroundStyle(.secondary)
 
             Divider()

@@ -52,7 +52,6 @@ final class Brain {
     private var glanceKind = ""
     private var glanceNotes: [CaptureEntry] = []
     private var glanceReminders: [CaptureWriter.Upcoming] = []
-    private var glanceJobIDs: [String] = []
     /// What he is out of the notch about, while he is.
     private var outNudge: Nudge?
     private var jobTicker: Timer?
@@ -115,7 +114,10 @@ final class Brain {
             self?.sounds.play(.close)
             self?.close()
         }
-        controller.onEnter = { [weak self] in self?.submit(choosing: nil) }
+        controller.onEnter = { [weak self] in
+            guard let self = self else { return }
+            if self.model.screen == .jobs { self.addDraftJobs() } else { self.submit(choosing: nil) }
+        }
         startJobs()
         refreshInstalledApps()
         if !TutorialWindow.hasBeenSeen {
@@ -173,7 +175,7 @@ final class Brain {
         sounds.apply(config.feedback)
         ears.setLocale(config.speechLocale)
         tunerSession.options.toleranceCents = config.tuner.toleranceCents
-        model.character = CharacterFrames.load(folder: config.character.folder)
+        model.character = CharacterFrames.load(folder: config.character.folder, facesLeft: config.character.facesLeft)
 
         hotkeys.removeAll()
         let ok = [
@@ -199,6 +201,10 @@ final class Brain {
         model.onGlanceTick = { [weak self] index in self?.tickGlanceItem(index) }
         model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
         model.onJobWaitingTap = { [weak self] in self?.showJobs() }
+        model.onJobToggle = { [weak self] id in self?.toggleJob(id) }
+        model.onJobStart = { [weak self] id in self?.startJob(id) }
+        model.onJobDelete = { [weak self] id in self?.deleteJob(id) }
+        model.onJobDraftChange = { [weak self] in self?.cancelAutoClose() }
     }
 
     // MARK: - The box
@@ -813,10 +819,6 @@ final class Brain {
     }
 
     private func openGlanceItem(_ index: Int) {
-        if glanceKind == "jobs" {
-            if glanceJobIDs.indices.contains(index) { startJob(glanceJobIDs[index]) }
-            return
-        }
         if glanceKind == "note", glanceNotes.indices.contains(index) {
             close()
             CaptureWriter.showNote(id: glanceNotes[index].externalID)
@@ -827,11 +829,6 @@ final class Brain {
     }
 
     private func tickGlanceItem(_ index: Int) {
-        if glanceKind == "jobs" {
-            guard glanceJobIDs.indices.contains(index), let job = jobDay.job(glanceJobIDs[index]), job.status != .done else { return }
-            finishJob(job.id)
-            return
-        }
         guard glanceKind == "reminder", glanceReminders.indices.contains(index),
               model.glanceItems.indices.contains(index) else { return }
         let done = !(model.glanceItems[index].done ?? false)
@@ -849,10 +846,6 @@ final class Brain {
     }
 
     private func glanceButton(_ index: Int) {
-        if glanceKind == "jobs" {
-            if let next = jobDay.jobs.first(where: { $0.status == .open }) { startJob(next.id) } else { close() }
-            return
-        }
         close()
         if glanceKind == "note" {
             if index == 0 { _ = CaptureWriter.openFreshNote() } else { CaptureWriter.showNote(id: nil) }
@@ -986,16 +979,80 @@ final class Brain {
         showLine(category: "job_added", target: nil, text: "on the books: " + said.joined(separator: " · "), hold: 3.4)
     }
 
-    /// The list: tick to finish, click to start.
-    private func showJobs() {
+    /// The checklist. It stays open while you work in it. `byItself` is the once-a-day opening: then it does not
+    /// take the keyboard (you may be typing somewhere else) and closes after a minute if you never touch it.
+    private func showJobs(byItself: Bool = false) {
         rollJobs()
-        glanceKind = "jobs"
-        let live = jobDay.jobs.contains { $0.status == .open }
-        openGlance(title: "Today's jobs", empty: "No jobs yet. Type jobs, then what needs doing.", buttons: live ? ["Start the next one"] : [])
-        glanceJobIDs = jobDay.jobs.map { $0.id }
-        model.glanceItems = jobDay.jobs.enumerated().map { index, job in
-            NotchModel.GlanceItem(id: index, title: job.title, detail: describe(job), done: job.status == .done)
+        cancelAutoClose()
+        model.jobDraft = ""
+        refreshJobRows()
+        model.screen = .jobs
+        controller.open(takeKeyboard: !byItself)
+        if byItself { closeAfter(60) }
+    }
+
+    private static let jobsDateFormat: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE d MMMM"
+        return formatter
+    }()
+
+    private func refreshJobRows() {
+        model.jobsDate = Brain.jobsDateFormat.string(from: Date())
+        let done = jobDay.jobs.filter { $0.status == .done }.count
+        model.jobsCount = jobDay.jobs.isEmpty ? "" : "\(done) of \(jobDay.jobs.count) done"
+        model.jobRows = jobDay.jobs.map { job in
+            let canStart = job.starter.map { name in searchable.contains { $0.name == name } } ?? false
+            return NotchModel.JobRow(id: job.id, title: job.title, detail: describe(job), done: job.status == .done,
+                                     canStart: canStart)
         }
+    }
+
+    /// Enter on the checklist: whatever is in the field goes on the books, and the field is ready for more.
+    private func addDraftJobs() {
+        rollJobs()
+        cancelAutoClose()
+        let text = model.jobDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        let drafts = Jobs.parse(text, nowWall: nowWall, catalog: searchable, bindings: config.jobs.bindings)
+        guard !drafts.isEmpty else {
+            sounds.play(.unknown)
+            return
+        }
+        jobDay.add(drafts, now: nowWall)
+        saveJobs()
+        sounds.play(.captured)
+        model.jobDraft = ""
+        refreshJobRows()
+    }
+
+    /// A box on the checklist: done (with the explosion), or, if it was done, back on the list.
+    private func toggleJob(_ id: String) {
+        guard let job = jobDay.job(id) else { return }
+        cancelAutoClose()
+        if job.status == .done {
+            jobDay.reopen(id)
+        } else {
+            jobDay.finish(id, now: nowWall)
+            if countdownJobID == id { cancelTimer() }
+            model.boom = NotchModel.Boom(rowID: id, serial: (model.boom?.serial ?? 0) + 1)
+            sounds.play(.allInTune)
+            // He answers the tick, but the list stays where it is: no line screen in the way.
+            let pick = Lines.pick(bank: lineBank, state: &lineState, category: "job_done", target: nil,
+                                  frequency: config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
+            LineStateStore.save(lineState)
+            if let pick = pick, config.speak { mouth.say(pick) }
+        }
+        saveJobs()
+        refreshJobRows()
+    }
+
+    private func deleteJob(_ id: String) {
+        cancelAutoClose()
+        if countdownJobID == id { cancelTimer() }
+        jobDay.remove(id)
+        saveJobs()
+        refreshJobRows()
     }
 
     /// "by 22:00 · 30 min · opens books".
@@ -1143,10 +1200,21 @@ final class Brain {
             controller.refreshClosed()
         }
 
-        guard !held, !roamer.isOut, !jobCard.isOpen, !controller.isOpen else { return }
+        guard !roamer.isOut, !jobCard.isOpen, !controller.isOpen else { return }
         // Seconds since the last key press or mouse movement. Only how long, never what: no screen is read.
         let anyInput = CGEventType(rawValue: ~0) ?? .mouseMoved
         let idle = Int(CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: anyInput))
+
+        // Once a day, from jobs.openListAt (10:00), the list opens by itself so the day can be planned. Silent.
+        if !config.jobs.openListAt.isEmpty,
+           Jobs.shouldOpenList(jobDay, now: now, settings: config.jobs.settings, quiet: FocusQuiet.isOn, idleSeconds: idle) {
+            jobDay.markListOpened()
+            saveJobs()
+            showJobs(byItself: true)
+            return
+        }
+
+        guard !held else { return }
         guard let nudge = Jobs.nextNudge(jobDay, now: now, settings: config.jobs.settings, quiet: false, idleSeconds: idle) else { return }
 
         outNudge = nudge

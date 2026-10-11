@@ -14,6 +14,23 @@ final class NotchModel: ObservableObject {
         case chooser    // "which one did you mean?"
         case timer      // the running timer, with Stop and more time
         case glance     // recent notes, or upcoming reminders
+        case jobs       // today's jobs: a checklist you add to, tick and start right here
+    }
+
+    /// One job on the checklist.
+    struct JobRow: Identifiable, Equatable {
+        let id: String
+        let title: String
+        let detail: String
+        let done: Bool
+        /// It has a starter, so "start" opens something.
+        let canStart: Bool
+    }
+
+    /// A tick that just happened, so that row's pixel explosion plays once.
+    struct Boom: Equatable {
+        let rowID: String
+        let serial: Int
     }
 
     /// One line in the glance.
@@ -78,6 +95,13 @@ final class NotchModel: ObservableObject {
     /// Replaces "hold to talk" in the box, for example "what opens it?" while a job is being given a starter.
     @Published var inputHint: String? = nil
 
+    // jobs
+    @Published var jobRows: [JobRow] = []
+    @Published var jobDraft = ""
+    @Published var jobsDate = ""
+    @Published var jobsCount = ""
+    @Published var boom: Boom? = nil
+
     // glance
     @Published var glanceTitle = ""
     @Published var glanceItems: [GlanceItem] = []
@@ -98,6 +122,10 @@ final class NotchModel: ObservableObject {
     var onGlanceTick: (Int) -> Void = { _ in }
     var onGlanceButton: (Int) -> Void = { _ in }
     var onJobWaitingTap: () -> Void = {}
+    var onJobToggle: (String) -> Void = { _ in }
+    var onJobStart: (String) -> Void = { _ in }
+    var onJobDelete: (String) -> Void = { _ in }
+    var onJobDraftChange: () -> Void = {}
 
     init(theme: NotchTheme) {
         self.theme = theme

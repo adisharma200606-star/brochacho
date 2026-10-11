@@ -112,8 +112,8 @@ final class NotchController {
             case 53:    // Escape
                 self.onDismiss()
                 return nil
-            case 36, 76:  // Return, and the numeric-keypad Enter
-                if self.model.screen == .input {
+            case 36, 76:  // Return, and the numeric-keypad Enter. On the jobs list it adds what was typed.
+                if self.model.screen == .input || self.model.screen == .jobs {
                     self.onEnter()
                     return nil
                 }

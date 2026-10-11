@@ -315,21 +315,24 @@ public struct JobsConfig: Codable, Equatable {
     public var maxLevel: Int
     /// Minutes he roams before giving up and flying home.
     public var roamMinutes: Double
+    /// The list opens by itself once a day, the first time you are at the Mac after this. Empty: never.
+    public var openListAt: String
     /// Words he has learned start a particular thing: "read" to "books". Filled in when you pick one.
     public var bindings: [String: String]
 
     public init(dayStart: String = "09:00", bedtime: String = "00:30", cooldownMinutes: Int = 45, laterMinutes: Int = 30,
-                maxLevel: Int = 3, roamMinutes: Double = 3, bindings: [String: String] = [:]) {
+                maxLevel: Int = 3, roamMinutes: Double = 3, openListAt: String = "10:00", bindings: [String: String] = [:]) {
         self.dayStart = dayStart
         self.bedtime = bedtime
         self.cooldownMinutes = cooldownMinutes
         self.laterMinutes = laterMinutes
         self.maxLevel = maxLevel
         self.roamMinutes = roamMinutes
+        self.openListAt = openListAt
         self.bindings = bindings
     }
 
-    private enum CodingKeys: String, CodingKey { case dayStart, bedtime, cooldownMinutes, laterMinutes, maxLevel, roamMinutes, bindings }
+    private enum CodingKeys: String, CodingKey { case dayStart, bedtime, cooldownMinutes, laterMinutes, maxLevel, roamMinutes, openListAt, bindings }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -340,6 +343,7 @@ public struct JobsConfig: Codable, Equatable {
         laterMinutes = try c.decodeIfPresent(Int.self, forKey: .laterMinutes) ?? d.laterMinutes
         maxLevel = try c.decodeIfPresent(Int.self, forKey: .maxLevel) ?? d.maxLevel
         roamMinutes = try c.decodeIfPresent(Double.self, forKey: .roamMinutes) ?? d.roamMinutes
+        openListAt = try c.decodeIfPresent(String.self, forKey: .openListAt) ?? d.openListAt
         bindings = try c.decodeIfPresent([String: String].self, forKey: .bindings) ?? d.bindings
     }
 
@@ -349,7 +353,8 @@ public struct JobsConfig: Codable, Equatable {
         return JobSettings(dayStartMin: Jobs.clockMinutes(dayStart) ?? d.dayStartMin,
                            bedtimeMin: Jobs.clockMinutes(bedtime) ?? d.bedtimeMin,
                            cooldownMin: max(1, cooldownMinutes), laterMin: max(1, laterMinutes),
-                           maxLevel: min(3, max(0, maxLevel)))
+                           maxLevel: min(3, max(0, maxLevel)),
+                           openAtMin: Jobs.clockMinutes(openListAt) ?? d.openAtMin)
     }
 }
 
@@ -362,14 +367,17 @@ public struct CharacterConfig: Codable, Equatable {
     public var size: Double
     /// Off: he never leaves the notch; a due job only shows as his head beside it.
     public var roam: Bool
+    /// True when the pictures in the folder face left (most game sprites face you, slightly left).
+    public var facesLeft: Bool
 
-    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = true) {
+    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = true, facesLeft: Bool = false) {
         self.folder = folder
         self.size = size
         self.roam = roam
+        self.facesLeft = facesLeft
     }
 
-    private enum CodingKeys: String, CodingKey { case folder, size, roam }
+    private enum CodingKeys: String, CodingKey { case folder, size, roam, facesLeft }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -377,6 +385,7 @@ public struct CharacterConfig: Codable, Equatable {
         folder = try c.decodeIfPresent(String.self, forKey: .folder) ?? d.folder
         size = try c.decodeIfPresent(Double.self, forKey: .size) ?? d.size
         roam = try c.decodeIfPresent(Bool.self, forKey: .roam) ?? d.roam
+        facesLeft = try c.decodeIfPresent(Bool.self, forKey: .facesLeft) ?? d.facesLeft
     }
 }
 

@@ -804,7 +804,8 @@
     "sleepIgnored": 0,
     "closed": true,
     "quietUntil": null,
-    "diaryNoteID": null
+    "diaryNoteID": null,
+    "listOpened": false
   },
   "ledger": "Jobs, 2026-10-11\nDone: read (30 min)\nSkipped: duolingo\nStill owed: swift course",
   "described": [
@@ -837,7 +838,66 @@
     "sleepIgnored": 0,
     "closed": false,
     "quietUntil": null,
-    "diaryNoteID": null
+    "diaryNoteID": null,
+    "listOpened": false
   },
-  "rolledLedger": "Jobs, 2026-10-13\nStill owed: swift course (3 days now)"
+  "rolledLedger": "Jobs, 2026-10-13\nStill owed: swift course (3 days now)",
+  "opens": [
+    {
+      "wall": 1791712740000,
+      "quiet": false,
+      "idle": 0,
+      "opened": false,
+      "open": false
+    },
+    {
+      "wall": 1791712800000,
+      "quiet": false,
+      "idle": 0,
+      "opened": false,
+      "open": true
+    },
+    {
+      "wall": 1791732600000,
+      "quiet": false,
+      "idle": 30,
+      "opened": false,
+      "open": true
+    },
+    {
+      "wall": 1791732600000,
+      "quiet": false,
+      "idle": 600,
+      "opened": false,
+      "open": false
+    },
+    {
+      "wall": 1791732600000,
+      "quiet": true,
+      "idle": 0,
+      "opened": false,
+      "open": false
+    },
+    {
+      "wall": 1791732600000,
+      "quiet": false,
+      "idle": 0,
+      "opened": true,
+      "open": false
+    },
+    {
+      "wall": 1791765900000,
+      "quiet": false,
+      "idle": 0,
+      "opened": false,
+      "open": false
+    },
+    {
+      "wall": 1791774000000,
+      "quiet": false,
+      "idle": 0,
+      "opened": false,
+      "open": false
+    }
+  ]
 }

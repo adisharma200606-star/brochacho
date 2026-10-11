@@ -111,9 +111,14 @@ public struct JobSettings: Equatable, Sendable {
     public var maxLevel: Int
     /// Nobody at the Mac for this long: stay home.
     public var idleLimitSec: Int
+    /// The list opens by itself once a day, the first time he is at the Mac after this (minutes after midnight).
+    public var openAtMin: Int
+    /// ...and only if he touched the Mac this recently, so it is seen.
+    public var activeWithinSec: Int
 
     public init(dayStartMin: Int = 540, bedtimeMin: Int = 30, cooldownMin: Int = 45, dueGapMin: Int = 10,
-                sleepGapMin: Int = 10, laterMin: Int = 30, maxLevel: Int = 3, idleLimitSec: Int = 300) {
+                sleepGapMin: Int = 10, laterMin: Int = 30, maxLevel: Int = 3, idleLimitSec: Int = 300,
+                openAtMin: Int = 600, activeWithinSec: Int = 120) {
         self.dayStartMin = dayStartMin
         self.bedtimeMin = bedtimeMin
         self.cooldownMin = cooldownMin
@@ -122,6 +127,8 @@ public struct JobSettings: Equatable, Sendable {
         self.laterMin = laterMin
         self.maxLevel = maxLevel
         self.idleLimitSec = idleLimitSec
+        self.openAtMin = openAtMin
+        self.activeWithinSec = activeWithinSec
     }
 }
 
@@ -162,6 +169,8 @@ public struct JobDay: Codable, Equatable, Sendable {
     public var quietUntil: Int?
     /// The day's diary note in Apple Notes.
     public var diaryNoteID: String?
+    /// The list has already opened by itself today.
+    public var listOpened: Bool
 
     public init(day: String) {
         self.day = day
@@ -173,10 +182,11 @@ public struct JobDay: Codable, Equatable, Sendable {
         closed = false
         quietUntil = nil
         diaryNoteID = nil
+        listOpened = false
     }
 
     private enum CodingKeys: String, CodingKey {
-        case day, jobs, nextID, lastAppearance, sleepSnoozedUntil, sleepIgnored, closed, quietUntil, diaryNoteID
+        case day, jobs, nextID, lastAppearance, sleepSnoozedUntil, sleepIgnored, closed, quietUntil, diaryNoteID, listOpened
     }
 
     public init(from decoder: Decoder) throws {
@@ -190,6 +200,7 @@ public struct JobDay: Codable, Equatable, Sendable {
         closed = try c.decodeIfPresent(Bool.self, forKey: .closed) ?? false
         quietUntil = try c.decodeIfPresent(Int.self, forKey: .quietUntil)
         diaryNoteID = try c.decodeIfPresent(String.self, forKey: .diaryNoteID)
+        listOpened = try c.decodeIfPresent(Bool.self, forKey: .listOpened) ?? false
     }
 
     public func job(_ id: String) -> Job? {
@@ -269,6 +280,23 @@ public struct JobDay: Codable, Equatable, Sendable {
 
     public mutating func closeBooks() {
         closed = true
+    }
+
+    /// Ticked by mistake: back on the list.
+    public mutating func reopen(_ id: String) {
+        change(id) { $0.status = .open; $0.doneAt = nil; $0.startedAt = nil }
+    }
+
+    /// Gone from the list, not done and not skipped: it never goes into the ledger. True if it was there.
+    @discardableResult
+    public mutating func remove(_ id: String) -> Bool {
+        let before = jobs.count
+        jobs.removeAll { $0.id == id }
+        return jobs.count < before
+    }
+
+    public mutating func markListOpened() {
+        listOpened = true
     }
 
     // MARK: coming out of the notch
@@ -523,6 +551,16 @@ public enum Jobs {
             return Nudge(kind: .job, jobID: first.id, level: level(first))
         }
         return nil
+    }
+
+    /// Should the list open by itself now, so he can plan the day? Once a day, the first time he is at the Mac
+    /// after `openAtMin`, never during quiet, never after bedtime. Silent: the list opens, nothing is said.
+    public static func shouldOpenList(_ day: JobDay, now: Int, settings: JobSettings = JobSettings(), quiet: Bool, idleSeconds: Int) -> Bool {
+        if day.listOpened || quiet { return false }
+        if let until = day.quietUntil, now < until { return false }
+        if idleSeconds > settings.activeWithinSec { return false }
+        let nowShifted = shifted(wallMinutes(now))
+        return nowShifted >= shifted(settings.openAtMin) && nowShifted < shifted(settings.bedtimeMin)
     }
 
     // MARK: saying it back

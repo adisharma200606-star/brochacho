@@ -534,8 +534,8 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
   "ask":   { "model": "claude-haiku-4-5", "maxTokens": 300, "monthlyBudgetUSD": 2 },
   "feedback": { "sounds": true, "volume": 0.5, "haptics": true },
   "includeInstalledApps": true,
-  "jobs": { "dayStart": "09:00", "bedtime": "00:30", "cooldownMinutes": 45, "laterMinutes": 30, "maxLevel": 3, "roamMinutes": 3, "bindings": {} },
-  "character": { "folder": "~/.brochacho/character", "size": 64, "roam": true },
+  "jobs": { "dayStart": "09:00", "bedtime": "00:30", "cooldownMinutes": 45, "laterMinutes": 30, "maxLevel": 3, "roamMinutes": 3, "openListAt": "10:00", "bindings": {} },
+  "character": { "folder": "~/.brochacho/character", "size": 64, "roam": true, "facesLeft": false },
   "music": { "player": "spotify" },
   "catalog": [ ]
 }
@@ -634,13 +634,23 @@ Ideas that are parked, not planned: a calculator in the box (so sums never go to
 
 **Status:** brain tested (reading jobs, what opens each one, when he comes out, carrying jobs over) · Mac app builds, never run
 
-The day's to-do list, the family-business way: they are **jobs**. The thing that makes this one different from a diary is that every job knows **what to open**. You never have to go and find the book or the course: **start it** opens it.
+The day's to-do list, the family-business way: they are **jobs**. The thing that makes this one different from a diary is that every job knows **what to open**. You never have to go and find the book or the course: **start** opens it.
+
+**Type `jobs`** and the checklist opens in the notch:
+
+- **Add** by typing in the line at the bottom and pressing Enter. Commas add several at once (`read 30 min, gym, duolingo by 10pm`). The line stays ready for more.
+- **Tick** a box and the job is done, with a small pixel explosion and a sound. Tick it again if you did it by mistake.
+- **start** (on jobs that know what to open) opens it and starts the timer for the job's length.
+- **Right-click** a job to delete it.
+- **Escape**, or a click anywhere else, closes the list.
+
+**Every day from 10:00** the list opens by itself, the first time you are at the Mac after that (not while a Focus mode with his filter is on, and not after `quiet`), so the day starts with a look at what is on the books. It opens without taking the keyboard, so nothing you are typing lands in it; click the line at the bottom to add. Untouched, it closes after a minute. Change the time with `jobs.openListAt` (empty: never).
+
+Shortcuts from the box, if you prefer them:
 
 | You type | What happens |
 |---|---|
-| `jobs read 30 min, swift course, duolingo by 10pm` | three jobs on the books. He says back what he understood. |
-| `today call dad at 6` | `today` works the same as `jobs` |
-| `jobs` | the list. Tick a circle to finish one; click a job to start it. |
+| `jobs read 30 min, swift course` | adds them without opening the list. He says back what he understood. |
 | `done read` | that job is done. `done` on its own finishes the one you started. |
 | `quiet` (or `hush`, `leave me alone`) | he stays in the notch until tomorrow |
 
@@ -668,8 +678,9 @@ He lives in the notch: he sits beside his lines when the notch opens. When a job
 - **Bedtime.** After `jobs.bedtime` (00:30) he comes out about one job only: bed. **going** closes the books (section 22) and he stops; **10 more** gives you ten minutes.
 - **Mouse clicks go through.** He is in a window exactly his size, so a click anywhere else lands on whatever is underneath.
 
-**Your own character.** Put PNG pictures, facing right, in `~/.brochacho/character/`:
-`idle_0.png`, `idle_1.png`… (sitting) and `fly_0.png`, `fly_1.png`… (flying). A single `idle.png` works too, and so does a folder with any PNGs in it (they become the sitting frames). Pixel art stays sharp. Press **Save** in settings (or restart) to load them. Without a folder he is the little orange dragon that ships with the app. Art that belongs to someone else (a Dragonite) stays in that folder and never goes into the repo.
+**Your own character.** Put pictures in `~/.brochacho/character/`: an **animated GIF** called `idle.gif` (plus `fly.gif` if flying should look different), or numbered PNGs `idle_0.png`, `idle_1.png`… and `fly_0.png`…. Any one GIF, or any PNGs, in the folder also work. A GIF plays at its own speed. Most game sprites face left: tick **The pictures face left** in settings (`character.facesLeft`) so he turns the right way when he flies. Pixel art stays sharp. Press **Save** in settings (or restart) to load them.
+
+On Adi's Mac the folder holds Dragonite's animated sprite from Pokémon Black and White (from Pokémon Showdown's sprite collection, `play.pokemonshowdown.com/sprites/gen5ani/dragonite.gif`). A smoother 3D one is at `…/sprites/ani/dragonite.gif`. Without a folder he is the little orange dragon that ships with the app. Art that belongs to someone else (a Dragonite) stays in that folder and never goes into the repo.
 
 Settings: **settings → Jobs and music**, or `character.size`, `character.roam` (off: he never leaves the notch; a waiting job only shows his head), `jobs.maxLevel` (0 to 3: how bold he may get), `jobs.roamMinutes`.
 

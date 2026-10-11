@@ -150,6 +150,43 @@ test('jobs: when he comes out, and how bold he is', () => {
   assert.strictEqual(jobs.ledger(jobs.newDay('2026-10-14')), 'Jobs, 2026-10-14\nNo jobs today.');
 });
 
+// [hh, mm, day of October, quiet, idle seconds, already opened today, expected]
+const OPEN_CASES = [
+  [9, 59, 11, false, 0, false, false],     // before 10:00
+  [10, 0, 11, false, 0, false, true],
+  [15, 30, 11, false, 30, false, true],    // later in the day still counts: the first time he is around
+  [15, 30, 11, false, 600, false, false],  // nobody at the Mac
+  [15, 30, 11, true, 0, false, false],     // a Focus mode keeps it shut
+  [15, 30, 11, false, 0, true, false],     // once a day
+  [0, 45, 12, false, 0, false, false],     // after bedtime
+  [3, 0, 12, false, 0, false, false]       // the small hours belong to the night before
+];
+
+test('jobs: the list opens by itself once a day', () => {
+  for (const [h, m, d, quiet, idle, opened, expected] of OPEN_CASES) {
+    const day = jobs.newDay('2026-10-11');
+    if (opened) jobs.listOpened(day);
+    assert.strictEqual(jobs.shouldOpenList(day, at(h, m, d), jobs.DEFAULT_SETTINGS, { quiet, idleSec: idle }), expected, `${h}:${m} quiet=${quiet} idle=${idle} opened=${opened}`);
+  }
+  const day = jobs.newDay('2026-10-11');
+  day.quietUntil = at(4, 0, 12);
+  assert.strictEqual(jobs.shouldOpenList(day, at(11, 0), jobs.DEFAULT_SETTINGS, {}), false, '"quiet" keeps it shut too');
+});
+
+test('jobs: unticking and deleting', () => {
+  const day = jobs.newDay('2026-10-11');
+  jobs.addJobs(day, jobs.parseJobs('read 30 min, call dad, gym', NOW, CATALOG), NOW);
+  jobs.finish(day, 'j1', NOW);
+  assert.strictEqual(jobs.reopen(day, 'j1').status, 'open');
+  assert.strictEqual(day.jobs[0].doneAt, null);
+  assert.strictEqual(jobs.remove(day, 'j2'), true);
+  assert.strictEqual(jobs.remove(day, 'j2'), false);
+  assert.deepStrictEqual(day.jobs.map(j => j.id), ['j1', 'j3']);
+  jobs.addJobs(day, jobs.parseJobs('stretch', NOW, CATALOG), NOW);
+  assert.strictEqual(day.jobs[2].id, 'j4', 'ids are never reused');
+  assert.strictEqual(jobs.ledger(day), 'Jobs, 2026-10-11\nStill owed: read (30 min), gym, stretch');
+});
+
 test('write jobs fixtures', () => {
   const dir = path.join(__dirname, '..', 'fixtures');
   const { day, results } = play(STEPS);
@@ -164,6 +201,11 @@ test('write jobs fixtures', () => {
     ledger: jobs.ledger(day),
     described: day.jobs.map(jobs.describeJob),
     rolled: next,
-    rolledLedger: jobs.ledger(jobs.rollover(JSON.parse(JSON.stringify(next)), '2026-10-13'))
+    rolledLedger: jobs.ledger(jobs.rollover(JSON.parse(JSON.stringify(next)), '2026-10-13')),
+    opens: OPEN_CASES.map(([h, m, d, quiet, idle, opened]) => {
+      const day = jobs.newDay('2026-10-11');
+      if (opened) jobs.listOpened(day);
+      return { wall: at(h, m, d), quiet, idle, opened, open: jobs.shouldOpenList(day, at(h, m, d), jobs.DEFAULT_SETTINGS, { quiet, idleSec: idle }) };
+    })
   }, null, 2));
 });

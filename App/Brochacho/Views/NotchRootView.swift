@@ -19,6 +19,7 @@ struct NotchRootView: View {
             case .chooser: ChooserScreen(model: model)
             case .timer: TimerScreen(model: model)
             case .glance: GlanceScreen(model: model)
+            case .jobs: JobsScreen(model: model)
             }
         }
         .frame(width: NotchRootView.width, alignment: .leading)
@@ -27,6 +28,7 @@ struct NotchRootView: View {
         .foregroundStyle(NotchTheme.text)
         .animation(model.theme.spring, value: model.screen)
         .animation(model.theme.spring, value: model.rows)
+        .animation(model.theme.spring, value: model.jobRows)
     }
 }
 

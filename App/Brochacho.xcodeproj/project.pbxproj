@@ -36,6 +36,7 @@
 		685900E74183CDE7E15D9F38 /* pull.wav in Resources */ = {isa = PBXBuildFile; fileRef = A32B96D581F3437937156CB4 /* pull.wav */; };
 		6903B6EA3EFE03FD132F1EE6 /* close.wav in Resources */ = {isa = PBXBuildFile; fileRef = C32CFC1B695956AFADB9D64A /* close.wav */; };
 		6CA0C75B211307D715345AB7 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C61F301664502709E564CDF /* HotkeyCenter.swift */; };
+		6F7F90A3CFF2FBA313015B01 /* JobsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E45E516EB2DA6D0B236574 /* JobsScreen.swift */; };
 		744C4DA0616715CA8F13E0E3 /* CaptureWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73F216E3CE38E102D5005B5 /* CaptureWriter.swift */; };
 		8170C74E7F6D7B920001BF68 /* RotationBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 60FB5A278ECE687FE4125D81 /* RotationBridge */; };
 		8FBD122CEC91104A8707AFC5 /* Roamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D546ECDD0E5573B2A03A844E /* Roamer.swift */; };
@@ -75,6 +76,7 @@
 		3241D1C4BC2F559AE0597EDF /* ScreenRotator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenRotator.swift; sourceTree = "<group>"; };
 		32D421C1069E6051F3AFEC3A /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
 		4077E338B48FE2F35C039F0B /* grain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grain.png; sourceTree = "<group>"; };
+		42E45E516EB2DA6D0B236574 /* JobsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsScreen.swift; sourceTree = "<group>"; };
 		43781935D69DBFF1EC76BDA6 /* dragon_idle_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dragon_idle_0.png; sourceTree = "<group>"; };
 		5099179F12E38183C31F02FD /* Mouth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mouth.swift; sourceTree = "<group>"; };
 		52C4D7A25F9A4B4AFDC14175 /* NotchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchController.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				9AC70350CCE7BC9E79DDCF05 /* AnswerScreen.swift */,
 				1B4DE10B972177024AB22077 /* GlanceScreen.swift */,
 				A71B92D034763DE468A9B192 /* InputScreen.swift */,
+				42E45E516EB2DA6D0B236574 /* JobsScreen.swift */,
 				ACDE555FC266143CCAEDA448 /* LineScreen.swift */,
 				65E2E330FBBE845910C5D42B /* NotchRootView.swift */,
 				DD965EE3C2AC1CE7E68FF2EF /* TimerScreen.swift */,
@@ -381,6 +384,7 @@
 				6CA0C75B211307D715345AB7 /* HotkeyCenter.swift in Sources */,
 				55822C9BFDFA083F46538E18 /* InputScreen.swift in Sources */,
 				50AE5DFA3EE1ABBF3A22F0E1 /* JobCard.swift in Sources */,
+				6F7F90A3CFF2FBA313015B01 /* JobsScreen.swift in Sources */,
 				A60CB64F883644D985BB07D8 /* LineScreen.swift in Sources */,
 				BBE958D532707112CDE07C02 /* MicTuner.swift in Sources */,
 				B201DDCF2C6D78E79BF879A3 /* Mouth.swift in Sources */,
