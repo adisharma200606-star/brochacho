@@ -31,5 +31,6 @@
   {"name": "next song", "display": "Next song", "aliases": ["next", "skip", "skip song"], "kind": "tool", "target": "next"},
   {"name": "louder", "display": "Louder", "aliases": ["volume up", "turn it up"], "kind": "tool", "target": "louder"},
   {"name": "quieter", "display": "Quieter", "aliases": ["volume down", "turn it down", "softer"], "kind": "tool", "target": "quieter"},
-  {"name": "volume", "display": "Volume", "aliases": [], "kind": "tool", "target": "volume", "takesWords": true}
+  {"name": "volume", "display": "Volume", "aliases": [], "kind": "tool", "target": "volume", "takesWords": true},
+  {"name": "pet", "display": "Your dragon", "aliases": ["dragonite", "come here", "here boy", "buddy"], "kind": "tool", "target": "pet"}
 ]

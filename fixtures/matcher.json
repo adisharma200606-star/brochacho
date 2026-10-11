@@ -334,6 +334,18 @@
       "kind": "tool",
       "target": "volume",
       "takesWords": true
+    },
+    {
+      "name": "pet",
+      "display": "Your dragon",
+      "aliases": [
+        "dragonite",
+        "come here",
+        "here boy",
+        "buddy"
+      ],
+      "kind": "tool",
+      "target": "pet"
     }
   ],
   "cases": [
@@ -666,6 +678,10 @@
         {
           "name": "vs code",
           "band": "exact"
+        },
+        {
+          "name": "pet",
+          "band": "prefixEdit"
         }
       ],
       "plan": {
@@ -1217,6 +1233,10 @@
           "band": "prefix"
         },
         {
+          "name": "pet",
+          "band": "prefix"
+        },
+        {
           "name": "timer",
           "band": "prefix"
         }
@@ -1242,6 +1262,10 @@
         },
         {
           "name": "vs code",
+          "band": "prefix"
+        },
+        {
+          "name": "pet",
           "band": "prefix"
         },
         {
@@ -2171,6 +2195,60 @@
         "tool": "volume",
         "argument": "30",
         "entry": "volume"
+      }
+    },
+    {
+      "input": "pet",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "pet",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "pet",
+        "entry": "pet"
+      }
+    },
+    {
+      "input": "dragonite",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "pet",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "pet",
+        "entry": "pet"
+      }
+    },
+    {
+      "input": "come here",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "pet",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "pet",
+        "entry": "pet"
       }
     },
     {

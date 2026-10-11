@@ -192,6 +192,30 @@ BANK = {
   "quiet_on": ("qt", [
     "Okay. I stay in the notch.", "Quiet as a mouse.", "Not a peep. Until tomorrow.", "I'll be in the back.",
   ]),
+  # The dragon, when you call him out with "pet". Only ever said right after something you did to him.
+  "pet_hello": ("ph", [
+    "You called, boss.", "Eccomi. Here I am.", "Somebody wants a dragon.", "I was napping. For you, okay.",
+    "Out of the notch. Finally.", "Ciao, bello.", "The family pet reports for duty.", "Fresh air. Bellissimo.",
+  ]),
+  "petted": ("pt", [
+    "Ahh. Right there.", "Okay okay, I'm a softie.", "Don't tell the family.", "Mamma mia, that's nice.",
+    "A little to the left.", "This is the good life.", "You got good hands, boss.", "I'm purring. Dragons purr.",
+    "Bellissimo. Don't stop.", "Respect. And scratches.",
+  ]),
+  "thrown": ("tw", [
+    "Ey. I'm flying here.", "Was that necessary.", "My wings. My beautiful wings.", "I'll remember this.",
+    "Whoa. Whoa. Okay.", "You throw like my cousin.", "The room, she's spinning.", "Again. No. Maybe.",
+  ]),
+  "fetched": ("ft", [
+    "Got it. What now.", "Here. Like a good dragon.", "Delivered. No questions asked.", "Fetched. Where's my treat.",
+    "Done. I'm very fast.", "Special delivery, boss.",
+  ]),
+  "follow_on": ("fo", [
+    "Lead the way.", "Right behind you, boss.", "Like a shadow. A big one.", "Where you go, I go.",
+  ]),
+  "pet_bye": ("pb", [
+    "Back to the notch.", "Ciao. Call me.", "I'll be upstairs.", "Nap time. Arrivederci.",
+  ]),
   "music_play": ("mp", [
     "Music for the boss.", "The band is playing.", "Put the needle down.", "A little music. Bellissimo.",
     "Turn it up, I say.", "The jukebox, she obeys.", "Music. For the soul.", "Ecco. Your song.",

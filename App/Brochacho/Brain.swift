@@ -205,6 +205,7 @@ final class Brain {
         model.onJobStart = { [weak self] id in self?.startJob(id) }
         model.onJobDelete = { [weak self] id in self?.deleteJob(id) }
         model.onJobDraftChange = { [weak self] in self?.cancelAutoClose() }
+        model.onCharacterTap = { [weak self] in self?.pet() }
     }
 
     // MARK: - The box
@@ -267,6 +268,7 @@ final class Brain {
             case "music": return searching ? "music" : "play"
             case "playpause", "next": return "music"
             case "louder", "quieter", "volume": return "volume"
+            case "pet": return "your dragon"
             default: return "in the notch"
             }
         }
@@ -325,6 +327,7 @@ final class Brain {
             case "quiet": quietForToday()
             case "music": playMusic(argument)
             case "playpause", "next", "louder", "quieter", "volume": musicControl(tool, argument)
+            case "pet": pet()
             default:
                 sounds.play(.unknown)
                 showLine(category: "unknown", target: nil)
@@ -950,6 +953,9 @@ final class Brain {
         roamer.onClick = { [weak self] in self?.roamerClicked() }
         roamer.onGaveUp = { [weak self] in self?.roamerGaveUp() }
         roamer.menuProvider = { [weak self] in self?.roamerMenu() }
+        roamer.onPetted = { [weak self] in self?.dragonSays("petted", always: false) }
+        roamer.onThrown = { [weak self] in self?.dragonSays("thrown", always: true) }
+        roamer.onFetched = { [weak self] in self?.dragonSays("fetched", always: true) }
         jobCard.onButton = { [weak self] index in self?.cardButton(index) }
         jobCard.onDismiss = { [weak self] in self?.cardDismissed() }
         jobTicker = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
@@ -1296,6 +1302,19 @@ final class Brain {
 
     private func roamerMenu() -> NSMenu {
         let menu = NSMenu()
+        if roamer.isPlaying {
+            menu.addItem(MenuAction("Follow me") { [weak self] in
+                self?.roamer.startFollowing()
+                self?.dragonSays("follow_on", always: true)
+            })
+            menu.addItem(MenuAction("Fetch") { [weak self] in self?.roamer.startFetch() })
+            menu.addItem(.separator())
+            menu.addItem(MenuAction("Go home") { [weak self] in
+                self?.dragonSays("pet_bye", always: true)
+                self?.roamer.goHome()
+            })
+            return menu
+        }
         if let nudge = outNudge, nudge.kind != .sleep, let id = nudge.jobID {
             menu.addItem(MenuAction("Done") { [weak self] in
                 self?.outNudge = nil
@@ -1320,6 +1339,29 @@ final class Brain {
         }
         saveJobs()
         showLine(category: "sleep_going", target: nil, alwaysSpeak: true, hold: 2.6)
+    }
+
+    // MARK: - The dragon, out to play
+
+    /// "pet": he flies out of the notch to be played with. Already out playing: he comes to the cursor.
+    /// Out about a job: he is already here; click him for the job.
+    private func pet() {
+        close()
+        if roamer.isOut && !roamer.isPlaying { return }
+        let wasOut = roamer.isOut
+        roamer.comeOutToPlay(size: CGFloat(config.character.size), frames: model.character)
+        if !wasOut { dragonSays("pet_hello", always: true) }
+    }
+
+    /// A line from him while he is out: always in his speech bubble, spoken like any other line.
+    /// `always` for answers to something you just did to him; petting uses the usual frequency dial.
+    private func dragonSays(_ category: String, always: Bool) {
+        let pick = Lines.pick(bank: lineBank, state: &lineState, category: category, target: nil,
+                              frequency: always ? 1 : config.theme.voice.frequency, rng: { Double.random(in: 0..<1) })
+        LineStateStore.save(lineState)
+        guard let pick = pick else { return }
+        roamer.say(pick.text)
+        if config.speak { mouth.say(pick) }
     }
 
     // MARK: - The diary

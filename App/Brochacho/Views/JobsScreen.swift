@@ -10,8 +10,11 @@ struct JobsScreen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 10) {
+                // Click him to let him out to play.
                 CharacterView(frames: model.character)
                     .frame(width: 30, height: 30)
+                    .contentShape(Rectangle())
+                    .onTapGesture { model.onCharacterTap() }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("today's jobs")
                         .font(model.theme.mono(10))

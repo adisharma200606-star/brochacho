@@ -126,6 +126,7 @@ final class NotchModel: ObservableObject {
     var onJobStart: (String) -> Void = { _ in }
     var onJobDelete: (String) -> Void = { _ in }
     var onJobDraftChange: () -> Void = {}
+    var onCharacterTap: () -> Void = {}
 
     init(theme: NotchTheme) {
         self.theme = theme

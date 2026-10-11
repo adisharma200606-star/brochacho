@@ -35,6 +35,7 @@ public enum DefaultCatalog {
         CatalogEntry(name: "next song", display: "Next song", aliases: ["next", "skip", "skip song"], kind: .tool, target: "next", profile: nil, searchTemplate: nil, takesWords: false, living: false),
         CatalogEntry(name: "louder", display: "Louder", aliases: ["volume up", "turn it up"], kind: .tool, target: "louder", profile: nil, searchTemplate: nil, takesWords: false, living: false),
         CatalogEntry(name: "quieter", display: "Quieter", aliases: ["volume down", "turn it down", "softer"], kind: .tool, target: "quieter", profile: nil, searchTemplate: nil, takesWords: false, living: false),
-        CatalogEntry(name: "volume", display: "Volume", aliases: [], kind: .tool, target: "volume", profile: nil, searchTemplate: nil, takesWords: true, living: false)
+        CatalogEntry(name: "volume", display: "Volume", aliases: [], kind: .tool, target: "volume", profile: nil, searchTemplate: nil, takesWords: true, living: false),
+        CatalogEntry(name: "pet", display: "Your dragon", aliases: ["dragonite", "come here", "here boy", "buddy"], kind: .tool, target: "pet", profile: nil, searchTemplate: nil, takesWords: false, living: false)
     ]
 }

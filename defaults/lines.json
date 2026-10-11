@@ -1511,6 +1511,178 @@
       "text": "I'll be in the back."
     }
   ],
+  "pet_hello": [
+    {
+      "id": "ph01",
+      "text": "You called, boss."
+    },
+    {
+      "id": "ph02",
+      "text": "Eccomi. Here I am."
+    },
+    {
+      "id": "ph03",
+      "text": "Somebody wants a dragon."
+    },
+    {
+      "id": "ph04",
+      "text": "I was napping. For you, okay."
+    },
+    {
+      "id": "ph05",
+      "text": "Out of the notch. Finally."
+    },
+    {
+      "id": "ph06",
+      "text": "Ciao, bello."
+    },
+    {
+      "id": "ph07",
+      "text": "The family pet reports for duty."
+    },
+    {
+      "id": "ph08",
+      "text": "Fresh air. Bellissimo."
+    }
+  ],
+  "petted": [
+    {
+      "id": "pt01",
+      "text": "Ahh. Right there."
+    },
+    {
+      "id": "pt02",
+      "text": "Okay okay, I'm a softie."
+    },
+    {
+      "id": "pt03",
+      "text": "Don't tell the family."
+    },
+    {
+      "id": "pt04",
+      "text": "Mamma mia, that's nice."
+    },
+    {
+      "id": "pt05",
+      "text": "A little to the left."
+    },
+    {
+      "id": "pt06",
+      "text": "This is the good life."
+    },
+    {
+      "id": "pt07",
+      "text": "You got good hands, boss."
+    },
+    {
+      "id": "pt08",
+      "text": "I'm purring. Dragons purr."
+    },
+    {
+      "id": "pt09",
+      "text": "Bellissimo. Don't stop."
+    },
+    {
+      "id": "pt10",
+      "text": "Respect. And scratches."
+    }
+  ],
+  "thrown": [
+    {
+      "id": "tw01",
+      "text": "Ey. I'm flying here."
+    },
+    {
+      "id": "tw02",
+      "text": "Was that necessary."
+    },
+    {
+      "id": "tw03",
+      "text": "My wings. My beautiful wings."
+    },
+    {
+      "id": "tw04",
+      "text": "I'll remember this."
+    },
+    {
+      "id": "tw05",
+      "text": "Whoa. Whoa. Okay."
+    },
+    {
+      "id": "tw06",
+      "text": "You throw like my cousin."
+    },
+    {
+      "id": "tw07",
+      "text": "The room, she's spinning."
+    },
+    {
+      "id": "tw08",
+      "text": "Again. No. Maybe."
+    }
+  ],
+  "fetched": [
+    {
+      "id": "ft01",
+      "text": "Got it. What now."
+    },
+    {
+      "id": "ft02",
+      "text": "Here. Like a good dragon."
+    },
+    {
+      "id": "ft03",
+      "text": "Delivered. No questions asked."
+    },
+    {
+      "id": "ft04",
+      "text": "Fetched. Where's my treat."
+    },
+    {
+      "id": "ft05",
+      "text": "Done. I'm very fast."
+    },
+    {
+      "id": "ft06",
+      "text": "Special delivery, boss."
+    }
+  ],
+  "follow_on": [
+    {
+      "id": "fo01",
+      "text": "Lead the way."
+    },
+    {
+      "id": "fo02",
+      "text": "Right behind you, boss."
+    },
+    {
+      "id": "fo03",
+      "text": "Like a shadow. A big one."
+    },
+    {
+      "id": "fo04",
+      "text": "Where you go, I go."
+    }
+  ],
+  "pet_bye": [
+    {
+      "id": "pb01",
+      "text": "Back to the notch."
+    },
+    {
+      "id": "pb02",
+      "text": "Ciao. Call me."
+    },
+    {
+      "id": "pb03",
+      "text": "I'll be upstairs."
+    },
+    {
+      "id": "pb04",
+      "text": "Nap time. Arrivederci."
+    }
+  ],
   "music_play": [
     {
       "id": "mp01",

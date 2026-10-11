@@ -337,6 +337,18 @@
       "takesWords": true
     },
     {
+      "name": "pet",
+      "display": "Your dragon",
+      "aliases": [
+        "dragonite",
+        "come here",
+        "here boy",
+        "buddy"
+      ],
+      "kind": "tool",
+      "target": "pet"
+    },
+    {
       "name": "swift course",
       "aliases": [],
       "kind": "site",

@@ -678,6 +678,19 @@ He lives in the notch: he sits beside his lines when the notch opens. When a job
 - **Bedtime.** After `jobs.bedtime` (00:30) he comes out about one job only: bed. **going** closes the books (section 22) and he stops; **10 more** gives you ten minutes.
 - **Mouse clicks go through.** He is in a window exactly his size, so a click anywhere else lands on whatever is underneath.
 
+**Playing with him.** Type `pet` (or `dragonite`, `come here`, or click him at the top of the jobs list) and he flies out of the notch to wander around the screen. Then:
+
+| You | He |
+|---|---|
+| rub the mouse over him | pixel hearts float up, he wiggles, and now and then says something (in a speech bubble, and out loud) |
+| click him | hops, one heart |
+| drag him and let go fast | gets thrown: tumbles, bounces off the edges of the screen, sees stars, rights himself, grumbles |
+| right-click → **Follow me** | chases your cursor for twenty seconds |
+| right-click → **Fetch**, then click anywhere | flies to where you clicked (the click also lands on whatever is there) |
+| right-click → **Go home** | says goodbye and flies back into the notch |
+
+Left alone for a few minutes, he flies home by himself, without a word. Typing `pet` while he is out brings him over to the cursor. He talks only right after something you did to him. You can drag and pet him when he is out about a job too; a click then opens the job card as usual.
+
 **Your own character.** Put pictures in `~/.brochacho/character/`: an **animated GIF** called `idle.gif` (plus `fly.gif` if flying should look different), or numbered PNGs `idle_0.png`, `idle_1.png`… and `fly_0.png`…. Any one GIF, or any PNGs, in the folder also work. A GIF plays at its own speed. Most game sprites face left: tick **The pictures face left** in settings (`character.facesLeft`) so he turns the right way when he flies. Pixel art stays sharp. Press **Save** in settings (or restart) to load them.
 
 On Adi's Mac the folder holds Dragonite's animated sprite from Pokémon Black and White (from Pokémon Showdown's sprite collection, `play.pokemonshowdown.com/sprites/gen5ani/dragonite.gif`). A smoother 3D one is at `…/sprites/ani/dragonite.gif`. Without a folder he is the little orange dragon that ships with the app. Art that belongs to someone else (a Dragonite) stays in that folder and never goes into the repo.
