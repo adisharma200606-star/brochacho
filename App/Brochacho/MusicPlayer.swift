@@ -34,7 +34,12 @@ enum MusicPlayer {
            !id.isEmpty, !secret.isEmpty {
             do {
                 if let found = try await SpotifySearch.best(for: query, clientID: id, secret: secret) {
-                    if runScript("tell application \"Spotify\" to play track \"\(escaped(found.uri))\"") {
+                    // Spotify only reliably *plays* a song. Given an artist or album address on its own, newer
+                    // versions just open that page. So it is always a song, played inside its artist or album,
+                    // which also keeps the next songs coming from the same place.
+                    var script = "tell application \"Spotify\" to play track \"\(escaped(found.uri))\""
+                    if let context = found.context { script += " in context \"\(escaped(context))\"" }
+                    if runScript(script) {
                         return .playing(found.name)
                     }
                     return .failed("Spotify would not play. Check Privacy, Automation.")
@@ -125,8 +130,11 @@ enum MusicPlayer {
 /// Spotify's search, with the "client credentials" kind of key: no logging in, it only looks things up.
 private enum SpotifySearch {
     struct Found {
+        /// Always a song ("spotify:track:…"), except for a playlist, which is the last resort.
         let uri: String
         let name: String
+        /// The artist or album the song plays inside, so the music carries on after it.
+        let context: String?
     }
 
     private struct Token: Decodable {
@@ -134,9 +142,14 @@ private enum SpotifySearch {
     }
 
     private struct Results: Decodable {
+        struct Album: Decodable {
+            let uri: String
+        }
         struct Item: Decodable {
             let uri: String
             let name: String
+            /// Only songs have one.
+            let album: Album?
         }
         struct Page: Decodable {
             let items: [Item?]
@@ -146,30 +159,43 @@ private enum SpotifySearch {
         let playlists: Page?
     }
 
-    /// An artist when the words are the artist's name ("beabadoobee"), otherwise the best song, then a playlist.
+    /// When the words are an artist's name ("beabadoobee"): their best-known song, played inside the artist.
+    /// Otherwise the best matching song, played inside its album. A playlist only if there is no song at all.
     static func best(for query: String, clientID: String, secret: String) async throws -> Found? {
         let token = try await fetchToken(clientID: clientID, secret: secret)
-        var parts = URLComponents(string: "https://api.spotify.com/v1/search")
-        parts?.queryItems = [
-            URLQueryItem(name: "q", value: query),
-            URLQueryItem(name: "type", value: "artist,track,playlist"),
-            URLQueryItem(name: "limit", value: "1")
-        ]
-        guard let url = parts?.url else { return nil }
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 8
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let results = try JSONDecoder().decode(Results.self, from: data)
+        let results = try await search(query, types: "artist,track,playlist", token: token)
 
         let wanted = TextTools.normalize(query)
         if let artist = results.artists?.items.compactMap({ $0 }).first, TextTools.normalize(artist.name) == wanted {
-            return Found(uri: artist.uri, name: artist.name)
+            // Search ranks an artist's songs by popularity, so the first one is a fair "play this artist".
+            let theirs = try await search("artist:\"\(artist.name)\"", types: "track", token: token)
+            if let song = theirs.tracks?.items.compactMap({ $0 }).first {
+                return Found(uri: song.uri, name: artist.name, context: artist.uri)
+            }
         }
-        if let track = results.tracks?.items.compactMap({ $0 }).first { return Found(uri: track.uri, name: track.name) }
-        if let artist = results.artists?.items.compactMap({ $0 }).first { return Found(uri: artist.uri, name: artist.name) }
-        if let list = results.playlists?.items.compactMap({ $0 }).first { return Found(uri: list.uri, name: list.name) }
+        if let song = results.tracks?.items.compactMap({ $0 }).first {
+            return Found(uri: song.uri, name: song.name, context: song.album?.uri)
+        }
+        if let list = results.playlists?.items.compactMap({ $0 }).first {
+            return Found(uri: list.uri, name: list.name, context: nil)
+        }
         return nil
+    }
+
+    private static func search(_ query: String, types: String, token: String) async throws -> Results {
+        var parts = URLComponents(string: "https://api.spotify.com/v1/search")
+        parts?.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "type", value: types),
+            URLQueryItem(name: "limit", value: "1")
+        ]
+        guard let url = parts?.url else { throw URLError(.badURL) }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 8
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        return try JSONDecoder().decode(Results.self, from: data)
     }
 
     private static func fetchToken(clientID: String, secret: String) async throws -> String {
