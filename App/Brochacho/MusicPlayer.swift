@@ -61,6 +61,11 @@ enum MusicPlayer {
                 }
                 log.add("played")
                 return .playing(found.name)
+            } catch let problem as SpotifyProblem where problem.step == "token" && (problem.status == 400 || problem.status == 401) {
+                // A wrong key will not fix itself. Say so, rather than quietly opening the search page.
+                log.add("search failed: \(problem)")
+                return .failed(problem.body.contains("secret") ? "Spotify says the client secret is wrong. Settings, Jobs and music."
+                                                               : "Spotify does not know that client ID. Settings, Jobs and music.")
             } catch {
                 log.add("search failed: \(error)")
                 // Fall through to the search page, which still gets him there.
@@ -273,7 +278,7 @@ private enum SpotifySearch {
 }
 
 /// Spotify answered with something other than "OK". Its own words go into music.log.
-private struct SpotifyProblem: Error, CustomStringConvertible {
+struct SpotifyProblem: Error, CustomStringConvertible {
     let step: String
     let status: Int
     let body: String

@@ -118,8 +118,9 @@ final class SettingsState: ObservableObject {
 
     func save() {
         AskClient.Keychain.write(apiKey)
-        AskClient.Keychain.write(spotifyID, account: MusicPlayer.clientIDAccount)
-        AskClient.Keychain.write(spotifySecret, account: MusicPlayer.clientSecretAccount)
+        // Pasted keys often bring a space or a line break along; Spotify then rejects them.
+        AskClient.Keychain.write(spotifyID.filter { !$0.isWhitespace }, account: MusicPlayer.clientIDAccount)
+        AskClient.Keychain.write(spotifySecret.filter { !$0.isWhitespace }, account: MusicPlayer.clientSecretAccount)
         brain.update(config)
         note = "Saved."
     }
