@@ -683,7 +683,7 @@ Settings: **settings → Jobs and music**, or `character.size`, `character.roam`
 
 ## 23. Music
 
-**Status:** Mac app builds, never run · needs Spotify (or Apple Music) and, for Spotify, a free key to play rather than search
+**Status:** works on Adi's Mac with Spotify (11 Oct 2026) · Apple Music not yet tried · Spotify needs a free key to play rather than search
 
 | You say or type | What happens |
 |---|---|
@@ -700,6 +700,8 @@ Settings: **settings → Jobs and music**, or `character.size`, `character.roam`
 **Apple Music**: set **Music plays in** to Apple Music. It searches your library and plays the first match. No key needed.
 
 The first time, macOS asks whether Brochacho may control Spotify (or Music). Say yes once.
+
+**If it does not play**, the notch says why, and `cat ~/.brochacho/music.log` shows every step of the last try (never the keys). "Invalid client secret" there means the secret in settings is wrong: copy it again from the dashboard (**View client secret**) and paste it into an empty box.
 
 ---
 
