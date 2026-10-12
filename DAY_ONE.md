@@ -109,7 +109,7 @@ Tick these off. When one fails, look it up in `BLIND_SPOTS.md` before anything e
 - [ ] `jobs stretch in 1 minute`: a minute later he flies out of the notch without a sound (give it up to 30 seconds more)
 - [ ] click him: the card opens beside him; **start it**: the starter opens first, then he speaks
 - [ ] ignore him for three minutes: he flies home, and the next visit is bolder
-- [ ] add the Brochacho Focus filter to a Focus mode with "Stay in the notch" on, turn that Focus on: nothing changes, since he no longer comes out for jobs anyway
+- [ ] add the Brochacho Focus filter to a Focus mode with "Stay in the notch" on, turn that Focus on: he stays home and only his head shows beside the notch
 - [ ] `play beabadoobee` (with the Spotify keys in settings) plays; `pause` and `next` work
 - [ ] `diary testing` makes today's diary note in Notes
 - [ ] `yt` still opens YouTube in under 1.5 seconds

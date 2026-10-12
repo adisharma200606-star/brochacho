@@ -200,6 +200,7 @@ final class Brain {
         model.onGlanceOpen = { [weak self] index in self?.openGlanceItem(index) }
         model.onGlanceTick = { [weak self] index in self?.tickGlanceItem(index) }
         model.onGlanceButton = { [weak self] index in self?.glanceButton(index) }
+        model.onJobWaitingTap = { [weak self] in self?.showJobs() }
         model.onJobToggle = { [weak self] id in self?.toggleJob(id) }
         model.onJobStart = { [weak self] id in self?.startJob(id) }
         model.onJobDelete = { [weak self] id in self?.deleteJob(id) }
@@ -1197,6 +1198,15 @@ final class Brain {
         rollJobs()
         let now = nowWall
         let held = FocusQuiet.isOn || !config.character.roam || (jobDay.quietUntil.map { now < $0 } ?? false)
+
+        // While he is kept in, his head beside the notch says a job is waiting.
+        let waiting = jobDay.jobs.contains { job in
+            job.status == .open && (job.snoozedUntil.map { now >= $0 } ?? true) && (job.dueWall.map { $0 <= now } ?? true)
+        }
+        if model.jobWaiting != (held && waiting) {
+            model.jobWaiting = held && waiting
+            controller.refreshClosed()
+        }
 
         guard !roamer.isOut, !jobCard.isOpen, !controller.isOpen else { return }
         // Seconds since the last key press or mouse movement. Only how long, never what: no screen is read.

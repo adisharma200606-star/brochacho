@@ -88,8 +88,8 @@ final class NotchController {
         isOpen = false
         let screen = NotchController.preferredScreen
         // The small timer beside the notch only exists on a screen with a notch (for example, not while the
-        // screen is flipped upside down).
-        let showCompact = model.timerText != nil && screen.brochachoNotchFrame != nil
+        // screen is flipped upside down). The same place shows his head when a job is waiting.
+        let showCompact = (model.timerText != nil || model.jobWaiting) && screen.brochachoNotchFrame != nil
         Task {
             if showCompact {
                 await notch.compact(on: screen)
