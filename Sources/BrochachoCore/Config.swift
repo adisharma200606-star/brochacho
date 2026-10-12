@@ -370,7 +370,7 @@ public struct CharacterConfig: Codable, Equatable {
     /// True when the pictures in the folder face left (most game sprites face you, slightly left).
     public var facesLeft: Bool
 
-    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = true, facesLeft: Bool = false) {
+    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = false, facesLeft: Bool = false) {
         self.folder = folder
         self.size = size
         self.roam = roam

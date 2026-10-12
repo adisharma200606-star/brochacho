@@ -50,7 +50,7 @@ It follows five rules. They explain most of the choices below.
 1. **The action comes first, the voice after.** He never makes you wait for a joke.
 2. **Fast.** Under a second and a half from Enter to the thing being open.
 3. **Nothing to memorise.** You type the *name* of what you want. There are no commands.
-4. **He never speaks first.** He only talks in reply to something you just did, or something you asked him to tell you (like a timer ending). When one of your jobs is due he may fly out of the notch, but silently (section 21).
+4. **He never speaks first.** He only talks in reply to something you just did, or something you asked him to tell you (like a timer ending). He never leaves the notch on his own: only `pet` brings him out, and not for long (section 21).
 5. **One little character, and nothing that watches you.** No streaks, no dashboards, no watching your screen. (The character arrived in version 2; before that the rule was "no face" too.)
 
 ---
@@ -535,7 +535,7 @@ Inside the open notch: **Enter** runs the highlighted row, **↑ ↓** move the 
   "feedback": { "sounds": true, "volume": 0.5, "haptics": true },
   "includeInstalledApps": true,
   "jobs": { "dayStart": "09:00", "bedtime": "00:30", "cooldownMinutes": 45, "laterMinutes": 30, "maxLevel": 3, "roamMinutes": 3, "openListAt": "10:00", "bindings": {} },
-  "character": { "folder": "~/.brochacho/character", "size": 64, "roam": true, "facesLeft": false },
+  "character": { "folder": "~/.brochacho/character", "size": 64, "roam": false, "facesLeft": false },
   "music": { "player": "spotify" },
   "catalog": [ ]
 }
@@ -669,7 +669,7 @@ Shortcuts from the box, if you prefer them:
 
 **Status:** Mac app builds, never run · the timing of when he comes out is brain tested
 
-He lives in the notch: he sits beside his lines when the notch opens. When a job is due he **flies out of the notch and wanders around the screen, without a word**. Click him and a small card opens beside him with the job and **start it · later · skip today**. Right-click him for **Done**, **Not today**, **Leave me alone today**.
+He lives in the notch: he sits beside his lines when the notch opens. **He does not come out about jobs** (Adi turned that off on 13 October 2026: it was annoying). A waiting job only shows his head beside the closed notch. If `character.roam` is switched back on, he flies out silently when a job is due, and a click opens a card with **start it · later · skip today**.
 
 - **He gets bolder when ignored.** If nobody clicks him for three minutes he flies home, and next time he comes out bolder: first he bobs under the notch, then drifts along the top, then wanders the upper third bigger, then loops round the middle of the screen twice the size. Any click resets him.
 - **He never speaks first.** The voice only comes once you click.
@@ -689,7 +689,7 @@ He lives in the notch: he sits beside his lines when the notch opens. When a job
 | right-click → **Fetch**, then click anywhere | flies to where you clicked (the click also lands on whatever is there) |
 | right-click → **Go home**, or type `go home` (`go back`, `go away`, `back off`, `scram`, `bye`) | says goodbye and flies back into the notch |
 
-Left alone for a few minutes, he flies home by himself, without a word. Typing `pet` while he is out brings him over to the cursor. `go home` works when he is out about a job too: it means "not now", like closing his card, and does not count as ignoring him. He talks only right after something you did to him. You can drag and pet him when he is out about a job too; a click then opens the job card as usual.
+He never lingers: left alone for 12 seconds he flies home by himself, and after 45 seconds out he goes home whatever he is doing. Typing `pet` while he is out brings him over to the cursor. `go home` works when he is out about a job too: it means "not now", like closing his card, and does not count as ignoring him. He talks only right after something you did to him. You can drag and pet him when he is out about a job too; a click then opens the job card as usual.
 
 **Your own character.** Put pictures in `~/.brochacho/character/`: an **animated GIF** called `idle.gif` (plus `fly.gif` if flying should look different), or numbered PNGs `idle_0.png`, `idle_1.png`… and `fly_0.png`…. Any one GIF, or any PNGs, in the folder also work. A GIF plays at its own speed. Most game sprites face left: tick **The pictures face left** in settings (`character.facesLeft`) so he turns the right way when he flies. Pixel art stays sharp. Press **Save** in settings (or restart) to load them.
 
@@ -701,7 +701,7 @@ python3 scripts/hat.py gengar.gif ~/.brochacho/character/idle.gif
 
 The script finds the top of his head in each frame, so the hat follows him as he moves; it works on other characters too (tweak `SINK` if it sits too high or low). Dragonite, the one before, is kept in `~/.brochacho/characters-retired/`. Without a folder he is the little orange dragon that ships with the app. Art that belongs to someone else (a Dragonite) stays in that folder and never goes into the repo.
 
-Settings: **settings → Jobs and music**, or `character.size`, `character.roam` (off: he never leaves the notch; a waiting job only shows his head), `jobs.maxLevel` (0 to 3: how bold he may get), `jobs.roamMinutes`.
+Settings: **settings → Jobs and music**, or `character.size`, `character.roam` (off, the default: he never leaves the notch for a job; a waiting job only shows his head), `jobs.maxLevel` (0 to 3: how bold he may get), `jobs.roamMinutes`.
 
 ## 22. The diary
 

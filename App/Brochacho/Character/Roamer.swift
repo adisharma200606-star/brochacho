@@ -64,8 +64,11 @@ final class Roamer {
     private var lastPetLine = Date.distantPast
     private var fetchMonitors: [Any] = []
 
-    /// How long he plays with nobody touching him before going home.
-    private static let playPatience: TimeInterval = 150
+    /// How long he plays with nobody touching him before going home. Short: Adi does not want him lingering.
+    private static let playPatience: TimeInterval = 12
+    /// The longest he is ever out to play, touched or not. Then home, whatever he is doing.
+    private static let playLimit: TimeInterval = 45
+    private var playEndsAt = Date.distantFuture
 
     /// Where he is (his body, not the bigger window), in screen coordinates. The job card goes beside this.
     var frame: NSRect {
@@ -92,6 +95,7 @@ final class Roamer {
         }
         isPlaying = true
         giveUpAt = .distantFuture
+        playEndsAt = Date().addingTimeInterval(Roamer.playLimit)
         launch(size: size, frames: frames)
     }
 
@@ -165,6 +169,11 @@ final class Roamer {
         if let local = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown, handler: { event in handler(event); return event }) {
             fetchMonitors.append(local)
         }
+    }
+
+    private var isReturning: Bool {
+        if case .returning = motion { return true }
+        return false
     }
 
     private func stopFetchMonitors() {
@@ -333,6 +342,11 @@ final class Roamer {
         var next = center
         var nextScale = scale
 
+        // Out to play too long, or left alone: home, from any mode (following, fetching, dizzy...).
+        if isPlaying, !isReturning, now >= playEndsAt || now.timeIntervalSince(lastTouch) > Roamer.playPatience {
+            goHome { [weak self] in self?.onPlayOver() }
+        }
+
         switch motion {
         case .path:
             let (goal, goalScale) = pathTarget(t)
@@ -341,9 +355,6 @@ final class Roamer {
             look.flying = true
             if !isPlaying, now >= giveUpAt {
                 goHome { [weak self] in self?.onGaveUp() }
-            }
-            if isPlaying, now.timeIntervalSince(lastTouch) > Roamer.playPatience {
-                goHome { [weak self] in self?.onPlayOver() }
             }
         case .holding(let spot):
             next = CGPoint(x: spot.x, y: spot.y + sin(t * 2.5) * 2)
