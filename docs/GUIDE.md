@@ -669,7 +669,7 @@ Shortcuts from the box, if you prefer them:
 
 **Status:** Mac app builds, never run · the timing of when he comes out is brain tested
 
-He lives in the notch: he sits beside his lines when the notch opens. **He does not come out about jobs** (Adi turned that off on 13 October 2026: it was annoying). A waiting job only shows his head beside the closed notch. If `character.roam` is switched back on, he flies out silently when a job is due, and a click opens a card with **start it · later · skip today**.
+He lives in the notch: he sits beside his lines when the notch opens. **He does not come out about jobs** (Adi turned that off on 13 October 2026: it was annoying). Nothing of him shows beside the closed notch either: he only appears when the notch is open. If `character.roam` is switched back on, he flies out silently when a job is due, and a click opens a card with **start it · later · skip today**.
 
 - **He gets bolder when ignored.** If nobody clicks him for three minutes he flies home, and next time he comes out bolder: first he bobs under the notch, then drifts along the top, then wanders the upper third bigger, then loops round the middle of the screen twice the size. Any click resets him.
 - **He never speaks first.** The voice only comes once you click.
@@ -701,7 +701,7 @@ python3 scripts/hat.py gengar.gif ~/.brochacho/character/idle.gif
 
 The script finds the top of his head in each frame, so the hat follows him as he moves; it works on other characters too (tweak `SINK` if it sits too high or low). Dragonite, the one before, is kept in `~/.brochacho/characters-retired/`. Without a folder he is the little orange dragon that ships with the app. Art that belongs to someone else (a Dragonite) stays in that folder and never goes into the repo.
 
-Settings: **settings → Jobs and music**, or `character.size`, `character.roam` (off, the default: he never leaves the notch for a job; a waiting job only shows his head), `jobs.maxLevel` (0 to 3: how bold he may get), `jobs.roamMinutes`.
+Settings: **settings → Jobs and music**, or `character.size`, `character.roam` (off, the default: he never leaves the notch for a job), `jobs.maxLevel` (0 to 3: how bold he may get), `jobs.roamMinutes`.
 
 ## 22. The diary
 

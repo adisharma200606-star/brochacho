@@ -38,13 +38,6 @@ struct CompactLeadingView: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            // A job is waiting but he has been asked to stay in: only his head peeks out.
-            if model.jobWaiting {
-                CharacterView(frames: model.character)
-                    .frame(width: 18, height: 18)
-                    .contentShape(Rectangle())
-                    .onTapGesture { model.onJobWaitingTap() }
-            }
             Rectangle()
                 .fill(model.theme.accent)
                 .frame(width: 2, height: 10)
