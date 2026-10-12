@@ -349,6 +349,19 @@
       "target": "pet"
     },
     {
+      "name": "go home",
+      "display": "Send him home",
+      "aliases": [
+        "go back",
+        "go away",
+        "back off",
+        "scram",
+        "bye"
+      ],
+      "kind": "tool",
+      "target": "home"
+    },
+    {
       "name": "swift course",
       "aliases": [],
       "kind": "site",

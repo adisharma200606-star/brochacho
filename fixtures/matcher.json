@@ -346,6 +346,19 @@
       ],
       "kind": "tool",
       "target": "pet"
+    },
+    {
+      "name": "go home",
+      "display": "Send him home",
+      "aliases": [
+        "go back",
+        "go away",
+        "back off",
+        "scram",
+        "bye"
+      ],
+      "kind": "tool",
+      "target": "home"
     }
   ],
   "cases": [
@@ -581,6 +594,10 @@
         {
           "name": "github",
           "band": "exact"
+        },
+        {
+          "name": "go home",
+          "band": "acronym"
         }
       ],
       "plan": {
@@ -840,6 +857,10 @@
         {
           "name": "gmail",
           "band": "prefix"
+        },
+        {
+          "name": "go home",
+          "band": "subsequence"
         }
       ],
       "plan": {
@@ -1171,11 +1192,11 @@
           "band": "prefix"
         },
         {
-          "name": "quieter",
+          "name": "go home",
           "band": "prefix"
         },
         {
-          "name": "spotify",
+          "name": "quieter",
           "band": "prefix"
         }
       ],
@@ -1203,11 +1224,11 @@
           "band": "prefix"
         },
         {
-          "name": "steam",
+          "name": "go home",
           "band": "prefix"
         },
         {
-          "name": "quieter",
+          "name": "steam",
           "band": "prefix"
         }
       ],
@@ -2249,6 +2270,82 @@
         "type": "openTool",
         "tool": "pet",
         "entry": "pet"
+      }
+    },
+    {
+      "input": "go home",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "go home",
+          "band": "wordPrefix"
+        },
+        {
+          "name": "pet",
+          "band": "prefixEdit"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "home",
+        "entry": "go home"
+      }
+    },
+    {
+      "input": "go back",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "go home",
+          "band": "prefix"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "home",
+        "entry": "go home"
+      }
+    },
+    {
+      "input": "scram",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "go home",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "home",
+        "entry": "go home"
+      }
+    },
+    {
+      "input": "bye",
+      "usage": {},
+      "mode": "open",
+      "confident": true,
+      "query": null,
+      "results": [
+        {
+          "name": "go home",
+          "band": "exact"
+        }
+      ],
+      "plan": {
+        "type": "openTool",
+        "tool": "home",
+        "entry": "go home"
       }
     },
     {

@@ -132,6 +132,10 @@ const MATCH_CASES = [
   ['pet', 'open', 'pet', null, {}, true],
   ['dragonite', 'open', 'pet', null, {}, true],
   ['come here', 'open', 'pet', null, {}, true],
+  ['go home', 'open', 'go home', null, {}, true],
+  ['go back', 'open', 'go home', null, {}, true],
+  ['scram', 'open', 'go home', null, {}, true],
+  ['bye', 'open', 'go home', null, {}, true],
 
   // asking: a question mark, a question word, or several words that match nothing
   ['how do i undo a git commit?', 'ask', null, 'how do i undo a git commit?', {}, true],

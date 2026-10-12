@@ -269,6 +269,7 @@ final class Brain {
             case "playpause", "next": return "music"
             case "louder", "quieter", "volume": return "volume"
             case "pet": return "your dragon"
+            case "home": return "back in the notch"
             default: return "in the notch"
             }
         }
@@ -328,6 +329,7 @@ final class Brain {
             case "music": playMusic(argument)
             case "playpause", "next", "louder", "quieter", "volume": musicControl(tool, argument)
             case "pet": pet()
+            case "home": sendHome()
             default:
                 sounds.play(.unknown)
                 showLine(category: "unknown", target: nil)
@@ -1351,6 +1353,23 @@ final class Brain {
         let wasOut = roamer.isOut
         roamer.comeOutToPlay(size: CGFloat(config.character.size), frames: model.character)
         if !wasOut { dragonSays("pet_hello", always: true) }
+    }
+
+    /// "go home", "go back", "scram": wherever he is, back into the notch. Out about a job, it counts as
+    /// "not now" (like closing his card), not as ignoring him.
+    private func sendHome() {
+        close()
+        guard roamer.isOut else {
+            showLine(category: "unknown", target: nil, text: "He's already home.", hold: 1.8)
+            return
+        }
+        if roamer.isPlaying {
+            dragonSays("pet_bye", always: true)
+        } else {
+            jobCard.close()
+            outNudge = nil
+        }
+        roamer.goHome()
     }
 
     /// A line from him while he is out: always in his speech bubble, spoken like any other line.
