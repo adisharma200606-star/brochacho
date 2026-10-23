@@ -57,7 +57,7 @@ It follows five rules. They explain most of the choices below.
 
 ## 2. Opening things
 
-**Status:** brain tested · Swift written · Mac app builds, never run
+**Status:** brain tested · in daily use on Adi's Mac since 25 Sep 2026
 
 Press the **open** hotkey. The notch grows into a box. Type the name of the thing. Press Enter. It opens, the notch closes, he says a line.
 
@@ -235,7 +235,7 @@ Add them under `tuner.customTunings` in the config (section 16). Notes are writt
 
 ## 8. The timer
 
-**Status:** brain tested · Mac app builds and has run
+**Status:** brain tested · in use on Adi's Mac
 
 Type `timer` and how long. The notch closes, and the time left shows beside it. When it ends, he tells you. (You asked him to, so rule 4 holds.)
 
@@ -314,7 +314,7 @@ The first time, macOS will ask whether Brochacho may add to your Reminders and c
 
 ## 9½. Flipping the screen
 
-**Status:** works on Adi's Mac with only the built-in screen · HDMI-connected fix shipped 9 Oct 2026, waiting to be tried · uses a private part of macOS (see below)
+**Status:** works on Adi's Mac, including with an HDMI screen connected (confirmed 9 Oct 2026) · uses a private part of macOS (see below)
 
 Type `one eighty` (or `180`, `flip`, `rotate`, `upside down`). The screen turns upside down. Type it again to turn it back. You can also hold the talk key and say "one eighty".
 
@@ -429,7 +429,7 @@ Settings, under `feedback` in the config: `sounds` (on or off), `volume` (0 to 1
 
 ## 13. Adding your own things
 
-**Status:** brain tested · settings window builds, never run
+**Status:** brain tested · settings window in use on Adi's Mac
 
 Everything he can open is an **entry**. You add entries in the settings window, so you never have to touch a file. Open it by typing `settings` in the notch, or by right-clicking the notch.
 
@@ -632,7 +632,7 @@ Ideas that are parked, not planned: a calculator in the box (so sums never go to
 
 ## 20. Jobs
 
-**Status:** brain tested (reading jobs, what opens each one, when he comes out, carrying jobs over) · Mac app builds, never run
+**Status:** brain tested (reading jobs, what opens each one, when he comes out, carrying jobs over) · in daily use on Adi's Mac since 12 Oct 2026
 
 The day's to-do list, the family-business way: they are **jobs**. The thing that makes this one different from a diary is that every job knows **what to open**. You never have to go and find the book or the course: **start** opens it.
 
@@ -667,7 +667,7 @@ Shortcuts from the box, if you prefer them:
 
 ## 21. The character
 
-**Status:** Mac app builds, never run · the timing of when he comes out is brain tested
+**Status:** in use on Adi's Mac since 12 Oct 2026 (`pet`, the head beside the notch, a custom GIF) · the timing of when he comes out is brain tested
 
 He lives in the notch: he sits beside his lines when the notch opens. **He does not come out about jobs** (Adi turned that off on 13 October 2026: it was annoying). A waiting job only shows his head beside the closed notch. If `character.roam` is switched back on, he flies out silently when a job is due, and a click opens a card with **start it · later · skip today**.
 
