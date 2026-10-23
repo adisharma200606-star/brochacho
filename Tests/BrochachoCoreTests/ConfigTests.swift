@@ -50,7 +50,7 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(config.jobs.settings.dayStartMin, JobSettings().dayStartMin, "a time it cannot read falls back")
         XCTAssertEqual(config.jobs.settings.maxLevel, 3, "boldness is capped")
         XCTAssertEqual(config.character.size, 96)
-        XCTAssertFalse(config.character.roam)
+        XCTAssertTrue(config.character.roam)
         XCTAssertEqual(config.music, MusicConfig())
         XCTAssertEqual(JobsConfig().settings, JobSettings(), "the config's defaults and the brain's agree")
     }
