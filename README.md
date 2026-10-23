@@ -138,7 +138,7 @@ The day's to-do list, Sopranos-style: they are **jobs**, and unfinished ones are
 
 ### The character (version 2)
 
-One small pixel sprite lives in the notch. He leaves it on his own for one reason only: when a job is due, he flies out silently and waits to be clicked (click him for **start it · later · skip today**). Type `pet` and he flies out to be played with:
+One small pixel sprite lives in the notch. He never leaves on his own. Type `pet` and he flies out to be played with:
 
 - rub the cursor over him for pixel hearts,
 - drag and throw him (he tumbles, bounces off the screen edges, gets dizzy, grumbles),

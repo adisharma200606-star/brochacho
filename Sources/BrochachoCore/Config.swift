@@ -365,12 +365,12 @@ public struct CharacterConfig: Codable, Equatable {
     public var folder: String
     /// How big he is on screen, in points, before he gets bolder.
     public var size: Double
-    /// On (the default): he flies out when a job is due. Off: he never leaves the notch; a due job only shows as his head beside it.
+    /// Off: he never leaves the notch; a due job only shows as his head beside it.
     public var roam: Bool
     /// True when the pictures in the folder face left (most game sprites face you, slightly left).
     public var facesLeft: Bool
 
-    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = true, facesLeft: Bool = false) {
+    public init(folder: String = "~/.brochacho/character", size: Double = 64, roam: Bool = false, facesLeft: Bool = false) {
         self.folder = folder
         self.size = size
         self.roam = roam
