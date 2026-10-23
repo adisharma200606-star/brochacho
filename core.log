@@ -1,0 +1,202 @@
+swift-driver version: 1.120.5 Apple Swift version 6.1.2 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
+Target: arm64-apple-macosx15.0
+Building for debugging...
+[0/7] /Users/runner/work/brochacho/brochacho/.build/arm64-apple-macosx/debug/BrochachoCorePackageTests.derived/runner.swift
+[0/7] Write sources
+[4/7] Write swift-version--79AA4F9932D1E87A.txt
+[6/20] Emitting module BrochachoCore
+[7/26] Compiling BrochachoCore ActionPlan.swift
+[8/26] Compiling BrochachoCore Ask.swift
+[9/26] Compiling BrochachoCore Capture.swift
+[10/26] Compiling BrochachoCore CaptureLog.swift
+[11/26] Compiling BrochachoCore Catalog.swift
+[12/26] Compiling BrochachoCore CatalogMigration.swift
+[13/26] Compiling BrochachoCore Config.swift
+[14/26] Compiling BrochachoCore DefaultCatalog.swift
+[15/26] Compiling BrochachoCore DefaultTunings.swift
+[16/26] Compiling BrochachoCore Extras.swift
+[17/26] Compiling BrochachoCore Feedback.swift
+[18/26] Compiling BrochachoCore Jobs.swift
+[19/26] Compiling BrochachoCore Lines.swift
+[20/26] Compiling BrochachoCore Matcher.swift
+[21/26] Compiling BrochachoCore Stash.swift
+[22/26] Compiling BrochachoCore Stores.swift
+[23/26] Compiling BrochachoCore TextTools.swift
+[24/26] Compiling BrochachoCore Tuner.swift
+[25/35] Compiling BrochachoCoreTests ExtrasTests.swift
+[26/35] Compiling BrochachoCoreTests JobsTests.swift
+[27/35] Compiling BrochachoCoreTests LinesTests.swift
+[28/35] Compiling BrochachoCoreTests MatcherTests.swift
+[29/35] Emitting module BrochachoCoreTests
+[30/35] Compiling BrochachoCoreTests CaptureLogTests.swift
+[31/35] Compiling BrochachoCoreTests CaptureTests.swift
+[32/35] Compiling BrochachoCoreTests CatalogMigrationTests.swift
+[33/35] Compiling BrochachoCoreTests ConfigTests.swift
+[34/38] Compiling BrochachoCoreTests StashTests.swift
+[35/38] Compiling BrochachoCoreTests Support.swift
+[36/38] Compiling BrochachoCoreTests TunerTests.swift
+[37/40] Emitting module BrochachoCorePackageTests
+[38/40] Compiling BrochachoCorePackageTests runner.swift
+[38/40] Write Objects.LinkFileList
+[39/40] Linking BrochachoCorePackageTests
+Build complete! (38.08s)
+Test Suite 'All tests' started at 2026-10-23 22:27:13.272.
+Test Suite 'BrochachoCorePackageTests.xctest' started at 2026-10-23 22:27:13.274.
+Test Suite 'CaptureLogTests' started at 2026-10-23 22:27:13.275.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testExternalIDIsFilledInLater]' started.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testExternalIDIsFilledInLater]' passed (0.005 seconds).
+Test Case '-[BrochachoCoreTests.CaptureLogTests testInstalledAppsSkipWhatTheCatalogAlreadyOpens]' started.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testInstalledAppsSkipWhatTheCatalogAlreadyOpens]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.CaptureLogTests testRecentIsNewestFirstAndPerKind]' started.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testRecentIsNewestFirstAndPerKind]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.CaptureLogTests testTheOldestFallOff]' started.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testTheOldestFallOff]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.CaptureLogTests testTimerStopWords]' started.
+Test Case '-[BrochachoCoreTests.CaptureLogTests testTimerStopWords]' passed (0.000 seconds).
+Test Suite 'CaptureLogTests' passed at 2026-10-23 22:27:13.282.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.008 (0.008) seconds
+Test Suite 'CaptureTests' started at 2026-10-23 22:27:13.283.
+Test Case '-[BrochachoCoreTests.CaptureTests testEveryGoldenCase]' started.
+Test Case '-[BrochachoCoreTests.CaptureTests testEveryGoldenCase]' passed (0.004 seconds).
+Test Case '-[BrochachoCoreTests.CaptureTests testWallClockRoundTripsThroughARealTimeZone]' started.
+Test Case '-[BrochachoCoreTests.CaptureTests testWallClockRoundTripsThroughARealTimeZone]' passed (0.000 seconds).
+Test Suite 'CaptureTests' passed at 2026-10-23 22:27:13.287.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'CatalogMigrationTests' started at 2026-10-23 22:27:13.287.
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testCustomEntriesAreUntouched]' started.
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testCustomEntriesAreUntouched]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testDeletingABuiltinOnPurposeIsRespectedForever]' started.
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testDeletingABuiltinOnPurposeIsRespectedForever]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testEveryGoldenCase]' started.
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testEveryGoldenCase]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testStoreRoundTrips]' started.
+Test Case '-[BrochachoCoreTests.CatalogMigrationTests testStoreRoundTrips]' passed (0.002 seconds).
+Test Suite 'CatalogMigrationTests' passed at 2026-10-23 22:27:13.291.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'ConfigTests' started at 2026-10-23 22:27:13.292.
+Test Case '-[BrochachoCoreTests.ConfigTests testABrokenConfigIsLeftAloneAndDefaultsAreUsed]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testABrokenConfigIsLeftAloneAndDefaultsAreUsed]' passed (0.003 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testAMissingFileIsCreatedWithDefaults]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testAMissingFileIsCreatedWithDefaults]' passed (0.003 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testAnOldAuroraConfigMovesToNocturneButANewOneIsKept]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testAnOldAuroraConfigMovesToNocturneButANewOneIsKept]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testAPartialConfigKeepsDefaultsForEverythingElse]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testAPartialConfigKeepsDefaultsForEverythingElse]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testColourParsing]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testColourParsing]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testFeedbackAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testFeedbackAgreesWithTheReference]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testJobsCharacterAndMusicSettings]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testJobsCharacterAndMusicSettings]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.ConfigTests testProfilesAndTilde]' started.
+Test Case '-[BrochachoCoreTests.ConfigTests testProfilesAndTilde]' passed (0.000 seconds).
+Test Suite 'ConfigTests' passed at 2026-10-23 22:27:13.300.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
+Test Suite 'ExtrasTests' started at 2026-10-23 22:27:13.300.
+Test Case '-[BrochachoCoreTests.ExtrasTests testBookmarksAgreeWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testBookmarksAgreeWithTheReference]' passed (0.003 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testCountdown]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testCountdown]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testDurationsAgreeWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testDurationsAgreeWithTheReference]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testLivingFlagIsOnlyWrittenWhenOn]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testLivingFlagIsOnlyWrittenWhenOn]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testMovingAnEntryKeepsEverythingElse]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testMovingAnEntryKeepsEverythingElse]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testPhoneDates]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testPhoneDates]' passed (0.004 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testPhoneFilesAgreeWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testPhoneFilesAgreeWithTheReference]' passed (0.005 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testStoppingAndAddingTimeAgreeWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testStoppingAndAddingTimeAgreeWithTheReference]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.ExtrasTests testURLParts]' started.
+Test Case '-[BrochachoCoreTests.ExtrasTests testURLParts]' passed (0.000 seconds).
+Test Suite 'ExtrasTests' passed at 2026-10-23 22:27:13.316.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.016 (0.016) seconds
+Test Suite 'JobsTests' started at 2026-10-23 22:27:13.316.
+Test Case '-[BrochachoCoreTests.JobsTests testAJobDayRoundTripsThroughItsFile]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testAJobDayRoundTripsThroughItsFile]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testDayKeys]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testDayKeys]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testFindingAJobByName]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testFindingAJobByName]' passed (0.013 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testReadingJobsAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testReadingJobsAgreesWithTheReference]' passed (0.139 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testTheListOpensByItselfOnceADay]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testTheListOpensByItselfOnceADay]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testTheTimelineAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testTheTimelineAgreesWithTheReference]' passed (0.017 seconds).
+Test Case '-[BrochachoCoreTests.JobsTests testUntickingAndDeleting]' started.
+Test Case '-[BrochachoCoreTests.JobsTests testUntickingAndDeleting]' passed (0.014 seconds).
+Test Suite 'JobsTests' passed at 2026-10-23 22:27:13.504.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.187 (0.187) seconds
+Test Suite 'LinesTests' started at 2026-10-23 22:27:13.504.
+Test Case '-[BrochachoCoreTests.LinesTests testAPoolOfOneStillWorksAndUnknownCategoriesGiveNothing]' started.
+Test Case '-[BrochachoCoreTests.LinesTests testAPoolOfOneStillWorksAndUnknownCategoriesGiveNothing]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.LinesTests testFrequencyZeroNeverSpeaks]' started.
+Test Case '-[BrochachoCoreTests.LinesTests testFrequencyZeroNeverSpeaks]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.LinesTests testGoldenPicks]' started.
+Test Case '-[BrochachoCoreTests.LinesTests testGoldenPicks]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.LinesTests testNeverRepeatsWithinTheLastFive]' started.
+Test Case '-[BrochachoCoreTests.LinesTests testNeverRepeatsWithinTheLastFive]' passed (0.000 seconds).
+Test Suite 'LinesTests' passed at 2026-10-23 22:27:13.506.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'MatcherTests' started at 2026-10-23 22:27:13.506.
+Test Case '-[BrochachoCoreTests.MatcherTests testAskAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testAskAgreesWithTheReference]' passed (0.003 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testAskNeverLeaksTheClipboardAndBuildsAValidBody]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testAskNeverLeaksTheClipboardAndBuildsAValidBody]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testDefaultCatalogMatchesTheSharedJSON]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testDefaultCatalogMatchesTheSharedJSON]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testEveryGoldenCase]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testEveryGoldenCase]' passed (0.729 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testSearchURLs]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testSearchURLs]' passed (0.015 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testTappingARowOpensThatRow]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testTappingARowOpensThatRow]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.MatcherTests testTextHelpers]' started.
+Test Case '-[BrochachoCoreTests.MatcherTests testTextHelpers]' passed (0.000 seconds).
+Test Suite 'MatcherTests' passed at 2026-10-23 22:27:14.257.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.751 (0.751) seconds
+Test Suite 'StashTests' started at 2026-10-23 22:27:14.257.
+Test Case '-[BrochachoCoreTests.StashTests testABrokenFileIsMovedAsideNotDeleted]' started.
+Test Case '-[BrochachoCoreTests.StashTests testABrokenFileIsMovedAsideNotDeleted]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.StashTests testAlternatesFreshAndOldAndNeverRepeats]' started.
+Test Case '-[BrochachoCoreTests.StashTests testAlternatesFreshAndOldAndNeverRepeats]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.StashTests testGoldenSession]' started.
+Test Case '-[BrochachoCoreTests.StashTests testGoldenSession]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.StashTests testSavingTheSameThingTwiceRefreshesIt]' started.
+Test Case '-[BrochachoCoreTests.StashTests testSavingTheSameThingTwiceRefreshesIt]' passed (0.000 seconds).
+Test Suite 'StashTests' passed at 2026-10-23 22:27:14.262.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'TunerTests' started at 2026-10-23 22:27:14.262.
+Test Case '-[BrochachoCoreTests.TunerTests testASlackStringNeverReadsAsInTune]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testASlackStringNeverReadsAsInTune]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testChromaticMode]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testChromaticMode]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testCleanPlucksLandWithinOneAndAHalfCents]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testCleanPlucksLandWithinOneAndAHalfCents]' passed (43.327 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testDefaultTuningsMatchTheSharedJSON]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testDefaultTuningsMatchTheSharedJSON]' passed (0.003 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testEveryStringLockingIsAnnouncedExactlyOnce]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testEveryStringLockingIsAnnouncedExactlyOnce]' passed (0.000 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testLaptopMicPlucksAt48kLandWithinThreeCents]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testLaptopMicPlucksAt48kLandWithinThreeCents]' passed (13.453 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testNotes]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testNotes]' passed (0.002 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testSessionAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testSessionAgreesWithTheReference]' passed (0.001 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testSilenceAndShortBuffersGiveNothing]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testSilenceAndShortBuffersGiveNothing]' passed (0.449 seconds).
+Test Case '-[BrochachoCoreTests.TunerTests testStringMatchingAgreesWithTheReference]' started.
+Test Case '-[BrochachoCoreTests.TunerTests testStringMatchingAgreesWithTheReference]' passed (0.001 seconds).
+Test Suite 'TunerTests' passed at 2026-10-23 22:28:11.500.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 57.237 (57.238) seconds
+Test Suite 'BrochachoCorePackageTests.xctest' passed at 2026-10-23 22:28:11.500.
+	 Executed 60 tests, with 0 failures (0 unexpected) in 58.222 (58.226) seconds
+Test Suite 'All tests' passed at 2026-10-23 22:28:11.500.
+	 Executed 60 tests, with 0 failures (0 unexpected) in 58.222 (58.229) seconds
+◇ Test run started.
+↳ Testing Library Version: 124.4
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests passed after 0.001 seconds.
